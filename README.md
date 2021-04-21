@@ -21,11 +21,11 @@ The solution is based on low cost products, easy to find for about $50:
 	- Rx Rssi - ack Rssi level 
 	- Rx Snr - ack Snr level
 	- Retries - number of retry before getting a ack
+- Manual / Automatic mode switch
 
 ## Comming soon feature
 - Screen shot and user guide
 - RFM95 Schematics
-- Manual / Automatic mode switch
 - Display last frame information
 - Your favorite network splash screen
 - Network side RSSI / SNR / #of station

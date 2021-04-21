@@ -44,6 +44,15 @@ uint8_t getIndexInBuffer(int i) {
   return t;
 }
 
+uint8_t getLastIndexWritten() {
+  if ( state.writePtr == 0 ) {
+    if ( state.readPtr == 0 ) {
+      return MAXBUFFER;
+    }
+    return MAXBUFFER-1;
+  }
+  return state.writePtr-1;
+}
 
 void tst_setPower(int8_t pwr) {
   if ( pwr < 2 ) pwr = 2;

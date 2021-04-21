@@ -12,6 +12,7 @@ typedef struct {
   uint8_t   cSf;      // Current SF
   uint8_t   cRetry;   // Current Number of retry
   uint8_t   selected_display;
+  uint8_t   selected_mode;
 } Config;
 
 
@@ -27,6 +28,7 @@ bool readConfig() {
     state.cSf = c.cSf;
     state.cRetry = c.cRetry;
     ui.selected_display = c.selected_display;
+    ui.selected_mode = c.selected_mode;
   } else {
     return false;
   }
@@ -42,5 +44,6 @@ void storeConfig() {
   c.cSf = state.cSf;
   c.cRetry = state.cRetry;
   c.selected_display = ui.selected_display;
+  c.selected_mode = ui.selected_mode;
   my_flash_store.write(c);
 }

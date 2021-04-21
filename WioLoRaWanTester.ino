@@ -26,21 +26,39 @@ void setup() {
 
 
 void loop() {
+  static long cTime = 0;
 
- refresUI();
+  long sTime = millis();
+  bool fireMessage = false;
 
-
-  
-  static long cLoop = 0;
-
-  if ( cLoop > 5*1000 ) {
-    cLoop = 0;
+  refresUI();
+  switch ( ui.selected_mode ) {
+    case MODE_MANUAL:
+      if ( ui.hasClick && canLoRaSend() ) { 
+        fireMessage = true;
+        ui.hasClick = false;
+      }
+      break;
+    case MODE_AUTO_5MIN:
+      if ( cTime >= ( 5 * 60 * 1000 ) ) fireMessage = true;
+      break;
+    case MODE_AUTO_1MIN:
+      if ( cTime >= ( 1 * 60 * 1000 ) ) fireMessage = true;
+      break;
+    case MODE_MAX_RATE:
+      if ( canLoRaSend() ) fireMessage = true;
+      break;
+  }
+  if ( fireMessage ) {
+    cTime = 0;
     do_send(myFrame, sizeof(myFrame),getCurrentDr(), state.cPwr,true, state.cRetry); 
   }
   
-  // put your main code here, to run repeatedly:
   loraLoop();
+
+  // Wait for the next loop and update time with overflow consideration
   delay(10);
-  cLoop += 10;
-  
+  long duration = millis() - sTime;
+  if ( duration < 0 ) duration = 10;
+  cTime += duration;
 }

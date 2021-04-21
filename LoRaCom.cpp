@@ -98,7 +98,7 @@ uint32_t nextPossibleSendMs() {
 
 
 // Make sure we are allowed to transmit in regard of the duty cycle
-boolean canSend() {
+boolean canLoRaSend() {
     if ( nextPossibleSendMs() > 0 ) {
       return false;
     }
@@ -106,9 +106,9 @@ boolean canSend() {
 }
 
  
-
+static uint8_t countRepeat = 0;
 void do_send(uint8_t * data, uint8_t sz, _dr_configured_t dr, uint8_t pwr, bool acked, uint8_t retries ) {
-    if ( ! canSend() ) {
+    if ( ! canLoRaSend() ) {
       // Duty cycle limitation
       LOGLN((F("REFUSED_DUTY_CYCLE")));
       return;
@@ -119,6 +119,7 @@ void do_send(uint8_t * data, uint8_t sz, _dr_configured_t dr, uint8_t pwr, bool 
     } else {
         LMIC_setDrTxpow(dr,pwr); 
         // Prepare upstream data transmission at the next possible time.
+        countRepeat = 0;
         lmic_tx_error_t err = LMIC_setTxData2(1, data, sz, ((acked)?1:0));
         switch ( err ) {
           case LMIC_ERROR_SUCCESS:
@@ -140,8 +141,6 @@ void do_send(uint8_t * data, uint8_t sz, _dr_configured_t dr, uint8_t pwr, bool 
 
 
 void onEvent (ev_t ev) {
-    //Serial.print(os_getTime());
-    //Serial.print(": ");
     switch(ev) {
         case EV_SCAN_TIMEOUT:
             LOGLN((F("EV_SCAN_TIMEOUT")));
@@ -157,6 +156,7 @@ void onEvent (ev_t ev) {
             break;
         case EV_JOINING:
             LOGLN((F("EV_JOINING")));
+            state.cState = JOINING;
             break;
         case EV_JOINED:
             LOGLN((F("EV_JOINED")));
@@ -167,31 +167,23 @@ void onEvent (ev_t ev) {
 
             // Update state
             state.cState = JOINED;
-            
+            countRepeat=0;
             break;
-        /*
-        || This event is defined but not used in the code. No
-        || point in wasting codespace on it.
-        ||
-        || case EV_RFU1:
-        ||     Serial.println(F("EV_RFU1"));
-        ||     break;
-        */
         case EV_JOIN_FAILED:
             LOGLN((F("EV_JOIN_FAILED")));
             isTransmitting = false;
+            state.cState = NOT_JOINED;
             break;
         case EV_REJOIN_FAILED:
             LOGLN((F("EV_REJOIN_FAILED")));
+            state.cState = NOT_JOINED;
             isTransmitting = false;
             break;
         case EV_TXCOMPLETE:
-           
             Serial.println(F("EV_TXCOMPLETE (includes waiting for RX windows)"));
-            Serial.printf("TxCnt : %d\r\n",LMIC.txCnt);
-            if ( (LMIC.txrxFlags & TXRX_ACK != 0) || LMIC.dataLen > 0 ) {
+            if ( (LMIC.txrxFlags & TXRX_ACK != 0) || LMIC.dataLen > 0 || state.cState == JOINING ) {
               // Transmission confirmed
-              addInBuffer(LMIC.rssi, LMIC.snr, LMIC.txCnt, LMIC_getSeqnoUp(), false);
+              addInBuffer(LMIC.rssi, LMIC.snr, countRepeat-1, LMIC_getSeqnoUp(), false);
               if (LMIC.dataLen) {
                 Serial.print(F("Received "));
                 Serial.print(LMIC.dataLen);
@@ -204,11 +196,10 @@ void onEvent (ev_t ev) {
               // not acked
               Serial.print(F("Not acked "));
               addInBuffer(0, 0, state.cRetry, LMIC_getSeqnoUp(), true);              
-            }
-            
-            // Schedule next transmission
-            //os_setTimedCallback(&sendjob, os_getTime()+sec2osticks(TX_INTERVAL), do_send);
+            }            
+            state.cState = JOINED;
             isTransmitting = false;
+            countRepeat=0;
             break;
         case EV_LOST_TSYNC:
             LOGLN((F("EV_LOST_TSYNC")));
@@ -236,7 +227,10 @@ void onEvent (ev_t ev) {
         ||    break;
         */
         case EV_TXSTART:
-            LOGLN((F("EV_TXSTART")));
+            countRepeat++;
+            if ( state.cState != JOINING ) {
+              state.cState = ( countRepeat > 1 )? IN_RPT : IN_TX;
+            }
             break;
         case EV_TXCANCELED:
             isTransmitting = false;
@@ -247,6 +241,7 @@ void onEvent (ev_t ev) {
             break;
         case EV_JOIN_TXCOMPLETE:
             LOGLN((F("EV_JOIN_TXCOMPLETE: no JoinAccept")));
+            state.cState = JOIN_FAILED;
             isTransmitting = false;
             break;
 

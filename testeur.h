@@ -10,7 +10,11 @@
 
 enum e_state {
   NOT_JOINED = 1,
-  JOINED = 2,
+  JOIN_FAILED = 2,
+  JOINING = 3,
+  JOINED = 4,
+  IN_TX = 5,
+  IN_RPT = 6,
 
   UKN = 255
 };
@@ -46,6 +50,7 @@ void tst_setSf(uint8_t sf);
 void tst_setRetry(uint8_t retry);
 void addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lost);
 uint8_t getIndexInBuffer(int i);
+uint8_t getLastIndexWritten();
 _dr_configured_t getCurrentDr();
 
 #endif

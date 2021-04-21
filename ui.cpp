@@ -49,6 +49,7 @@ void initScreen() {
 
   if ( ! readConfig() ) {
     ui.selected_display = DISPLAY_RSSI_HIST;    
+    ui.selected_mode = MODE_MANUAL;
   }
 
   ui.selected_menu = SELECTED_NONE;
@@ -56,12 +57,15 @@ void initScreen() {
   ui.transmit_v = 255;
   ui.previous_display = DISPLAY_UNKNONW;
   ui.lastWrId = MAXBUFFER;
+  ui.hasClick = false;
   
   // draw mask
   refreshPower(); 
   refreshSf();
   refreshRetry();
   refreshState();
+  refreshMode();
+  refreshLastFrame();
 
   pinMode(WIO_KEY_A, INPUT_PULLUP);
   pinMode(WIO_KEY_B, INPUT_PULLUP);
@@ -103,6 +107,13 @@ void refresUI() {
          configHasChanged = true;
          forceRefresh = true;
          break;
+       case SELECTED_NONE:
+         if ( ui.selected_mode < MODE_MAX ) {
+            ui.selected_mode++;
+            configHasChanged = true;
+            refreshMode();
+            hasAction = true;
+         }
       default:
          break;   
     }  
@@ -124,6 +135,13 @@ void refresUI() {
          configHasChanged = true;
          forceRefresh = true;
          break;
+      case SELECTED_NONE:
+         if ( ui.selected_mode > 0 ) {
+            ui.selected_mode--;
+            configHasChanged = true;
+            refreshMode();
+            hasAction = true;
+         }
       default:
          break;   
     }  
@@ -162,7 +180,12 @@ void refresUI() {
          break;   
     }  
     hasAction=true;
-  }   
+  } else if (digitalRead(WIO_5S_PRESS) == LOW) {
+    if ( ui.selected_mode == MODE_MANUAL ) {
+      ui.hasClick = true;
+      hasAction = true;
+    }
+  }
 
   if ( prev_select != ui.selected_menu || forceRefresh ) {
     if ( prev_select == SELECTED_POWER || ui.selected_menu == SELECTED_POWER ) {
@@ -207,45 +230,115 @@ void refresUI() {
 }
 
 
+void refreshMode() {
+  int xOffset = X_OFFSET+3*X_SIZE;
+  int yOffset = Y_OFFSET;
+  tft.fillRoundRect(xOffset,yOffset,X_SIZE-5,Y_SIZE,R_SIZE,TFT_WHITE);   
+  tft.setTextColor(TFT_BLACK);
+  tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+  switch ( ui.selected_mode ) {
+    case MODE_MANUAL:
+      tft.drawString("Manual",xOffset+5,yOffset+3, GFXFF);  
+      break;
+    case MODE_AUTO_5MIN:
+      tft.drawString("Auto 5m",xOffset+5,yOffset+3, GFXFF);  
+      break;
+    case MODE_AUTO_1MIN:
+      tft.drawString("Auto 1m",xOffset+5,yOffset+3, GFXFF);  
+      break;
+    case MODE_MAX_RATE:
+      tft.drawString("Max rate",xOffset+5,yOffset+3, GFXFF);  
+      break;
+  }
+  
+}
+
+
+void refreshLastFrame() {
+  int xOffset = X_OFFSET;
+  int yOffset = Y_OFFSET+Y_SIZE+2;
+  tft.fillRect(xOffset,yOffset,3*X_SIZE,Y_SIZE,TFT_BLACK);
+  tft.drawRoundRect(xOffset,yOffset,3*X_SIZE,Y_SIZE,R_SIZE,TFT_WHITE);
+
+  int idx = getLastIndexWritten();
+  tft.setFreeFont(FS9);
+  tft.setTextColor(TFT_WHITE);
+  char tmp[100];
+  if ( idx != MAXBUFFER ) {
+     if ( state.retry[idx] != LOSTFRAME ) {
+       sprintf(tmp,"%04d  %ddBm %ddBm %d rpt",state.seq[idx],state.rssi[idx],state.snr[idx], state.retry[idx]);
+     } else {
+       sprintf(tmp,"%04d  LOST",state.seq[idx]);
+     }
+     tft.drawString(tmp,xOffset+3,yOffset+3, GFXFF);   
+  }
+  tft.drawRoundRect(xOffset,yOffset,42,Y_SIZE,R_SIZE,TFT_WHITE);
+}
+
+
 void refreshState() {
   int xOffset = X_OFFSET+3*X_SIZE;
+  int yOffset = Y_OFFSET+Y_SIZE+2;
+  if ( (ui.displayed_state == IN_TX || ui.displayed_state == IN_RPT) && state.cState == JOINED ) {
+    // New data to display
+    refreshLastFrame();
+  }
   if ( ui.displayed_state != state.cState ) {
     ui.displayed_state = state.cState;
-    tft.fillRect(xOffset,Y_OFFSET,X_SIZE-BOX_SPACING,Y_SIZE,TFT_BLACK);
-    if ( ui.displayed_state == JOINED ) {
-      tft.setTextColor(TFT_GREEN);
-      tft.setTextSize(1);
-      tft.drawString("Join",xOffset+3,Y_OFFSET+3, GFXFF);      
-    } else if ( ui.displayed_state == NOT_JOINED ) {
-      tft.setTextColor(TFT_RED);
-      tft.setTextSize(1);
-      tft.drawString("Disc",xOffset+3,Y_OFFSET+3, GFXFF);   
-
-      // Duty Cycle status
-      tft.fillRoundRect(xOffset+40,Y_OFFSET,35,Y_SIZE,R_SIZE,TFT_RED);
-      tft.setTextColor(TFT_WHITE);
-      tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
-      tft.drawString("NA",xOffset+43,Y_OFFSET+3, GFXFF);   
-      
+    tft.fillRect(xOffset,yOffset,X_SIZE-BOX_SPACING,Y_SIZE,TFT_BLACK);
+    tft.setTextSize(1);
+    switch ( ui.displayed_state ) {
+      case NOT_JOINED:
+      case JOIN_FAILED:
+        tft.setTextColor(TFT_RED);
+        tft.drawString("Disc",xOffset+3,yOffset+3, GFXFF);   
+        break;
+      case JOINED:
+        tft.setTextColor(TFT_GREEN);
+        tft.drawString("Cnx",xOffset+3,yOffset+3, GFXFF);      
+        break;
+      case JOINING:
+        ui.transmit_v = 255; 
+        tft.setTextColor(TFT_ORANGE);
+        tft.drawString("Join",xOffset+3,yOffset+3, GFXFF); 
+        break;
+      case IN_TX:
+        tft.setTextColor(TFT_GREEN);
+        tft.drawString("Tx",xOffset+3,yOffset+3, GFXFF); 
+        break;
+      case IN_RPT:
+        tft.setTextColor(TFT_ORANGE);
+        tft.drawString("Tx",xOffset+3,yOffset+3, GFXFF); 
+        break;
     }
   }
+   
   // Update duty cycle status
-  if ( ui.displayed_state == JOINED ) {
-    uint8_t next = (nextPossibleSendMs())/1000;
-    if ( next != ui.transmit_v ) {
+  uint8_t next = (nextPossibleSendMs())/1000;
+  if ( next != ui.transmit_v ) {
       ui.transmit_v = next;
       if ( ui.transmit_v == 0 ) {
-        tft.fillRoundRect(xOffset+40,Y_OFFSET,35,Y_SIZE,R_SIZE,TFT_GREEN);        
+        if ( ui.displayed_state == JOIN_FAILED || ui.displayed_state == NOT_JOINED || ui.displayed_state == JOINING ) {
+          tft.fillRoundRect(xOffset+40,yOffset,35,Y_SIZE,R_SIZE,TFT_RED);
+          tft.setTextColor(TFT_WHITE);
+          tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+          tft.drawString("NA",xOffset+43,yOffset+3, GFXFF);  
+        } else {
+          if ( ui.displayed_state == IN_TX ) {
+            tft.fillRoundRect(xOffset+40,yOffset,35,Y_SIZE,R_SIZE,TFT_RED);
+          } else {
+            tft.fillRoundRect(xOffset+40,yOffset,35,Y_SIZE,R_SIZE,TFT_GREEN);
+          }
+        }       
       } else {
-        tft.fillRoundRect(xOffset+40,Y_OFFSET,35,Y_SIZE,R_SIZE,TFT_RED);
+        tft.fillRoundRect(xOffset+40,yOffset,35,Y_SIZE,R_SIZE,TFT_RED);
         tft.setTextColor(TFT_WHITE);
         tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
         char sWait[10];
         sprintf(sWait,"%02d",ui.transmit_v); 
-        tft.drawString(sWait,xOffset+48,Y_OFFSET+3, GFXFF);           
+        tft.drawString(sWait,xOffset+48,yOffset+3, GFXFF);           
       }
-    }
-  } 
+  }
 }
 
 void refreshPower() {
@@ -297,7 +390,7 @@ void refreshRssiHist() {
   int xSz = (HIST_X_SIZE - (HIST_X_OFFSET+HIST_X_BAR_OFFSET + MAXBUFFER*HIST_X_BAR_SPACE)) / MAXBUFFER;
   int xOffset = HIST_X_OFFSET+HIST_X_SIZE-xSz-HIST_X_BAR_SPACE;
   for ( int i = 0 ; i < MAXBUFFER ; i++ ) {
-     tft.fillRect(xOffset,HIST_Y_OFFSET+10,xSz,145,TFT_BLACK);
+     tft.fillRect(xOffset,HIST_Y_OFFSET+1,xSz,154,TFT_BLACK);
      xOffset -= xSz + HIST_X_BAR_SPACE;
   }
   // Redraw lines
@@ -321,7 +414,11 @@ void refreshRssiHist() {
         if ( rssi < -125 ) color = TFT_RED;
         else if (rssi < -100 ) color = TFT_ORANGE;
         else if (rssi < -80 ) color = TFT_DARKGREEN;
-        tft.fillRect(xOffset,HIST_Y_OFFSET+10,xSz,-state.rssi[idx],color);
+        if ( rssi < 0 ) {
+          tft.fillRect(xOffset,HIST_Y_OFFSET+10,xSz,-state.rssi[idx],color);
+        } else {
+          tft.fillRect(xOffset,HIST_Y_OFFSET+10-state.rssi[idx],xSz,state.rssi[idx],color);         
+        }
      } else {
         tft.drawLine(xOffset+1,HIST_Y_OFFSET+3,xOffset+xSz-2,HIST_Y_OFFSET-3,TFT_RED);
         tft.drawLine(xOffset+1,HIST_Y_OFFSET-3,xOffset+xSz-2,HIST_Y_OFFSET+3,TFT_RED);        
