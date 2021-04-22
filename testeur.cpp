@@ -15,6 +15,7 @@ void initState() {
   state.readPtr = 0;
   state.writePtr = 0;
   state.elements = 0;
+  state.hasRefreshed = false;
 }
 
 void addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lost) {
@@ -23,10 +24,12 @@ void addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lo
       state.rssi[state.writePtr] = rssi;
       state.snr[state.writePtr] = snr;
       state.retry[state.writePtr] = retry;
+      state.hs[state.writePtr] = NODATA;
   } else {
       state.rssi[state.writePtr] = 0;
       state.snr[state.writePtr] = 0;
       state.retry[state.writePtr] = LOSTFRAME;
+      state.hs[state.writePtr] = NODATA;
   }
   state.writePtr = (state.writePtr+1) & (MAXBUFFER-1);
   if ( state.writePtr == state.readPtr ) {
@@ -44,6 +47,15 @@ uint8_t getIndexInBuffer(int i) {
   return t;
 }
 
+uint8_t getIndexBySeq(int seq) {
+  int idx = state.readPtr;
+  while ( idx != state.writePtr && state.seq[idx] != seq ) {
+    idx = ( idx + 1 ) & (MAXBUFFER-1);
+  }
+  if ( state.seq[idx] == seq ) return idx;
+  else return MAXBUFFER;
+}
+
 uint8_t getLastIndexWritten() {
   if ( state.writePtr == 0 ) {
     if ( state.readPtr == 0 ) {
@@ -53,6 +65,7 @@ uint8_t getLastIndexWritten() {
   }
   return state.writePtr-1;
 }
+
 
 void tst_setPower(int8_t pwr) {
   if ( pwr < 2 ) pwr = 2;

@@ -37,4 +37,6 @@ void refreshSnrHist();
 void refreshRetryHist();
 void refreshMode();
 void refreshLastFrame();
+void refreshTxRssi();
+void refreshTxHs();
 #endif

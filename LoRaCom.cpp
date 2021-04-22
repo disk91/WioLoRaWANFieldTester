@@ -4,6 +4,7 @@
 #include "keys.h"
 #include "config.h"
 #include "testeur.h"
+#include "ui.h"
 
 //static osjob_t sendjob;
 static boolean isTransmitting;
@@ -107,7 +108,7 @@ boolean canLoRaSend() {
 
  
 static uint8_t countRepeat = 0;
-void do_send(uint8_t * data, uint8_t sz, _dr_configured_t dr, uint8_t pwr, bool acked, uint8_t retries ) {
+void do_send(uint8_t port, uint8_t * data, uint8_t sz, _dr_configured_t dr, uint8_t pwr, bool acked, uint8_t retries ) {
     if ( ! canLoRaSend() ) {
       // Duty cycle limitation
       LOGLN((F("REFUSED_DUTY_CYCLE")));
@@ -120,7 +121,7 @@ void do_send(uint8_t * data, uint8_t sz, _dr_configured_t dr, uint8_t pwr, bool 
         LMIC_setDrTxpow(dr,pwr); 
         // Prepare upstream data transmission at the next possible time.
         countRepeat = 0;
-        lmic_tx_error_t err = LMIC_setTxData2(1, data, sz, ((acked)?1:0));
+        lmic_tx_error_t err = LMIC_setTxData2(port, data, sz, ((acked)?1:0));
         switch ( err ) {
           case LMIC_ERROR_SUCCESS:
               // set number of retry
@@ -180,24 +181,63 @@ void onEvent (ev_t ev) {
             isTransmitting = false;
             break;
         case EV_TXCOMPLETE:
-            Serial.println(F("EV_TXCOMPLETE (includes waiting for RX windows)"));
+            LOGLN(F("TX_COMPLETE"));
             if ( (LMIC.txrxFlags & TXRX_ACK != 0) || LMIC.dataLen > 0 || state.cState == JOINING ) {
-              // Transmission confirmed
-              addInBuffer(LMIC.rssi, LMIC.snr, countRepeat-1, LMIC_getSeqnoUp(), false);
+              boolean isEmptyDownlinkState = ( state.cState == EMPTY_DWNLINK);
+              int uplinkSeqId = LMIC_getSeqnoUp();
+              uplinkSeqId = (uplinkSeqId == 0)?255:uplinkSeqId-1 & 0xFF;
+              
+              // Transmission confirmed, we have the Rx data
+              if ( ! isEmptyDownlinkState ) {              
+                addInBuffer(LMIC.rssi, LMIC.snr, countRepeat-1, uplinkSeqId, false);
+                state.hasRefreshed = true;
+              }
+              if ( ui.selected_mode != MODE_MAX_RATE && ! isEmptyDownlinkState ) {
+                state.cState = EMPTY_DWNLINK;
+              } else {
+                state.cState = JOINED;              
+              }
               if (LMIC.dataLen) {
-                Serial.print(F("Received "));
-                Serial.print(LMIC.dataLen);
-                Serial.println(F(" bytes of payload"));
-                Serial.printf("Rssi %d\r\n",LMIC.rssi);
-                Serial.printf("Snr %d\r\n",LMIC.snr);
-                Serial.printf("More Data %d\r\n",LMIC.moreData);
+                boolean moreData = false;
+                if  (LMIC.dataLen == 6 && LMIC.frame[LMIC.dataBeg-1] == 2) {
+                  // This is the expected downlink message
+                  int downlinkSeqId = LMIC.frame[LMIC.dataBeg];
+                  int idx = getIndexBySeq(downlinkSeqId);
+                  if ( idx != MAXBUFFER ) {
+                    uint8_t * data = &LMIC.frame[LMIC.dataBeg]; 
+                    // valid sequence Id
+                    state.worstRssi[idx]  = data[1];
+                    state.worstRssi[idx] -= 200;
+                    state.bestRssi[idx]   = data[2];
+                    state.bestRssi[idx]  -= 200;
+                    state.hs[idx]         = data[5];
+                    Serial.printf("Seq : %d\r\n",downlinkSeqId);
+                    Serial.printf("worstRssi : %d\r\n",state.worstRssi[idx]);
+                    Serial.printf("bestRssi : %d\r\n",state.bestRssi[idx]);
+                    Serial.printf("hs : %d\r\n",state.hs[idx]);
+                    Serial.printf("moreData : %d\r\n",LMIC.moreData);
+                    state.hasRefreshed = true;
+                  }
+                  if ( LMIC.moreData ) {
+                    // we should have pending data to retreive
+                    state.cState = EMPTY_DWNLINK;
+                  }
+                  int lastWrIdx = getLastIndexWritten();
+                  if ( lastWrIdx != MAXBUFFER ) {
+                    int lastSentIdx = state.seq[lastWrIdx];
+                    if ( isEmptyDownlinkState && idx != lastSentIdx ) {
+                        state.cState = EMPTY_DWNLINK;
+                    }
+                  }
+                }                
               }
             } else {
               // not acked
-              Serial.print(F("Not acked "));
-              addInBuffer(0, 0, state.cRetry, LMIC_getSeqnoUp(), true);              
+              LOGLN(F("Not acked"));
+              addInBuffer(0, 0, state.cRetry, LMIC_getSeqnoUp(), true);
+              state.hasRefreshed = true;
+              state.cState = JOINED;
             }            
-            state.cState = JOINED;
             isTransmitting = false;
             countRepeat=0;
             break;
@@ -228,7 +268,7 @@ void onEvent (ev_t ev) {
         */
         case EV_TXSTART:
             countRepeat++;
-            if ( state.cState != JOINING ) {
+            if ( state.cState != JOINING && state.cState != EMPTY_DWNLINK ) {
               state.cState = ( countRepeat > 1 )? IN_RPT : IN_TX;
             }
             break;

@@ -22,13 +22,13 @@ The solution is based on low cost products, easy to find for about $50:
 	- Rx Snr - ack Snr level
 	- Retries - number of retry before getting a ack
 - Manual / Automatic mode switch
+- Display last frame information
+- Network side RSSI / SNR / #of station
 
 ## Comming soon feature
 - Screen shot and user guide
 - RFM95 Schematics
-- Display last frame information
 - Your favorite network splash screen
-- Network side RSSI / SNR / #of station
 - PCB
 - Serial port LoRaWan setup configuration
 - GPS extension
