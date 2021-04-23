@@ -180,16 +180,16 @@ void onEvent (ev_t ev) {
             state.cState = NOT_JOINED;
             isTransmitting = false;
             break;
-        case EV_TXCOMPLETE:
+        case EV_TXCOMPLETE: {
             LOGLN(F("TX_COMPLETE"));
+            int uplinkSeqId = LMIC_getSeqnoUp();
+            uplinkSeqId = (uplinkSeqId == 0)?255:uplinkSeqId-1 & 0xFF;
             if ( (LMIC.txrxFlags & TXRX_ACK != 0) || LMIC.dataLen > 0 || state.cState == JOINING ) {
               boolean isEmptyDownlinkState = ( state.cState == EMPTY_DWNLINK);
-              int uplinkSeqId = LMIC_getSeqnoUp();
-              uplinkSeqId = (uplinkSeqId == 0)?255:uplinkSeqId-1 & 0xFF;
-              
+                            
               // Transmission confirmed, we have the Rx data
-              if ( ! isEmptyDownlinkState ) {              
-                addInBuffer(LMIC.rssi, LMIC.snr, countRepeat-1, uplinkSeqId, false);
+              if ( ! isEmptyDownlinkState ) { 
+                addInBuffer(LMIC.rssi, LMIC.snr, countRepeat, uplinkSeqId, false);
                 state.hasRefreshed = true;
               }
               if ( ui.selected_mode != MODE_MAX_RATE && ! isEmptyDownlinkState ) {
@@ -211,35 +211,29 @@ void onEvent (ev_t ev) {
                     state.bestRssi[idx]   = data[2];
                     state.bestRssi[idx]  -= 200;
                     state.hs[idx]         = data[5];
-                    Serial.printf("Seq : %d\r\n",downlinkSeqId);
-                    Serial.printf("worstRssi : %d\r\n",state.worstRssi[idx]);
-                    Serial.printf("bestRssi : %d\r\n",state.bestRssi[idx]);
-                    Serial.printf("hs : %d\r\n",state.hs[idx]);
-                    Serial.printf("moreData : %d\r\n",LMIC.moreData);
                     state.hasRefreshed = true;
                   }
                   if ( LMIC.moreData ) {
                     // we should have pending data to retreive
+                    // But in fact we never have moreData set
                     state.cState = EMPTY_DWNLINK;
                   }
                   int lastWrIdx = getLastIndexWritten();
-                  if ( lastWrIdx != MAXBUFFER ) {
-                    int lastSentIdx = state.seq[lastWrIdx];
-                    if ( isEmptyDownlinkState && idx != lastSentIdx ) {
-                        state.cState = EMPTY_DWNLINK;
-                    }
+                  if ( lastWrIdx != MAXBUFFER && isEmptyDownlinkState && idx != lastWrIdx ) {
+                     state.cState = EMPTY_DWNLINK;
                   }
                 }                
               }
             } else {
               // not acked
               LOGLN(F("Not acked"));
-              addInBuffer(0, 0, state.cRetry, LMIC_getSeqnoUp(), true);
+              addInBuffer(0, 0, state.cRetry, uplinkSeqId, true);
               state.hasRefreshed = true;
               state.cState = JOINED;
             }            
             isTransmitting = false;
             countRepeat=0;
+            }
             break;
         case EV_LOST_TSYNC:
             LOGLN((F("EV_LOST_TSYNC")));

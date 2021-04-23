@@ -9,7 +9,9 @@
 #define RFM95_DIO_0     3
 #define RFM95_DIO_1     2
 
-
+#define WITH_SPLASH         1
+#define WITH_SPLASH_HELIUM  1   
+#define WITH_SPLASH_TTN     1
 
 #ifdef DEBUG
   #define LOGLN(x)  Serial.println x

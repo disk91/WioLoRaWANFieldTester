@@ -1,3 +1,4 @@
+#include "TFT_eSPI.h"
 #include "testeur.h"
 
 #ifndef __UI_H
@@ -9,6 +10,17 @@
 #define MODE_MAX_RATE     3     // every time is is possible after DC
 
 #define MODE_MAX          3
+
+#ifdef WITH_SPLASH_HELIUM
+  #ifdef WITH_SPLASH_TTN
+    #define HELIUM_XCENTER (160-100)/2
+    #define TTN_XCENTER 160+(160-100)/2
+  #else
+    #define HELIUM_XCENTER (320-100)/2
+  #endif
+#else
+  #define TTN_XCENTER (320-100)/2
+#endif
 
 typedef struct s_ui {
   uint8_t selected_menu;    // What menu zone is selected for settings
@@ -24,6 +36,7 @@ typedef struct s_ui {
 } ui_t;
 
 extern ui_t ui;
+extern TFT_eSPI tft;
 
 void initScreen();
 void refresUI();
@@ -39,4 +52,6 @@ void refreshMode();
 void refreshLastFrame();
 void refreshTxRssi();
 void refreshTxHs();
+void draw_splash_helium(int xOffset, int yOffset, int density);
+void draw_splash_ttn(int xOffset, int yOffset, int density);
 #endif

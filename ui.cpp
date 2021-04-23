@@ -51,6 +51,23 @@ void initScreen() {
   tft.setRotation(3);
   tft.fillScreen(TFT_BLACK);
 
+  // Totally unusefull so totally mandatory
+  #ifdef WITH_SPLASH 
+    tft.drawRoundRect((320-200)/2,200,200,10,5,TFT_WHITE);
+    for ( int i = 10 ; i < 100 ; i+=4 ) {
+      tft.fillRoundRect((320-200)/2+2,202,((204*i)/100),6,3,TFT_WHITE);
+      #ifdef WITH_SPLASH_HELIUM
+        draw_splash_helium(HELIUM_XCENTER, (240-100)/2, i);
+      #endif
+      #ifdef WITH_SPLASH_TTN  
+        draw_splash_ttn(TTN_XCENTER, (240-85)/2, i);
+      #endif
+  }
+  delay(1500);
+#endif
+
+  tft.fillScreen(TFT_BLACK);
+
   if ( ! readConfig() ) {
     ui.selected_display = DISPLAY_RSSI_HIST;    
     ui.selected_mode = MODE_MANUAL;
@@ -234,7 +251,7 @@ void refresUI() {
   refreshState();
 
   // refresh the graph history part
-  if ( state.hasRefreshed 
+  if ( state.hasRefreshed == true
     || ui.previous_display != ui.selected_display 
   ) {
     ui.lastWrId = state.writePtr;
@@ -255,7 +272,7 @@ void refresUI() {
         refreshTxHs();
         break;
     }
-    if ( state.hasRefreshed ) refreshLastFrame();
+    if ( state.hasRefreshed == true ) refreshLastFrame();
     state.hasRefreshed = false;
   }  
 
@@ -315,9 +332,8 @@ void refreshLastFrame() {
      } else {
        sprintf(tmp,"%04d  LOST",state.seq[idx]);
      }
-     tft.drawString(tmp,xOffset+3,yOffset+3, GFXFF);
+     tft.drawString(tmp,xOffset+3,yOffset+3, GFXFF);     
      if ( state.hs[idx] != NODATA ) {
-// pourquoi je ne rentre pas tjrs là ?      
         sprintf(tmp,">%d / %d< dBm %d hs",state.worstRssi[idx],state.bestRssi[idx],state.hs[idx]);
         tft.drawString(tmp,xOffset+X_SIZE+2,yOffset+Y_SIZE+3, GFXFF);   
      }
@@ -705,7 +721,7 @@ void refreshTxHs() {
   for ( int i = 0 ; i < state.elements ; i++ ) {
      int idx = getIndexInBuffer(state.elements-(i+1));
      if ( idx != MAXBUFFER && state.hs[idx] != NODATA ) {
-       if ( idx != MAXBUFFER && state.hs[idx] != LOSTFRAME ) {
+       if ( idx != MAXBUFFER && state.retry[idx] != LOSTFRAME ) {
           int hs = state.hs[idx];
           if ( hs == 0 ) {
             tft.drawLine(xOffset+1,yOffset+3,xOffset+xSz-2,yOffset-3,TFT_GREEN);

@@ -24,11 +24,11 @@ The solution is based on low cost products, easy to find for about $50:
 - Manual / Automatic mode switch
 - Display last frame information
 - Network side RSSI / SNR / #of station
+- Your favorite network splash screen (select in config.h)
 
 ## Comming soon feature
 - Screen shot and user guide
 - RFM95 Schematics
-- Your favorite network splash screen
 - PCB
 - Serial port LoRaWan setup configuration
 - GPS extension
