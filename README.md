@@ -13,7 +13,7 @@ The solution is based on low cost products, easy to find for about $50:
 - [RFM95](https://www.disk91.com/2019/technology/lora/hoperf-rfm95-and-arduino-a-low-cost-lorawan-solution/)
 
 ## Current status
-- Early development stage, just for hackers ;)
+- Working, documentation in progress to reproduce it on your own.
 
 ## Features
 - Easy selection for Power / Sf / max retries
@@ -35,6 +35,16 @@ The solution is based on low cost products, easy to find for about $50:
 - Serial port LoRaWan setup configuration
 - GPS extension
 - sdcard data storage
+
+## How it works
+
+The LoRaWan Field tester is basically sending a frame on demand or in regular basis and wait for an ACK. We can obtain the ACK RX power, eventually the number of retries needed to get it. Then this message is passed to a backend service. This service is responding in a downlink with the network reception level (TX rssi) and the number of hotspots involved in the reception.
+
++----+-----+
++ <img src="img/mainScreen.jpg" alt="LoRaWan tester" width="250"/> + <img src="img/Mainscreen-2.jpg" alt="LoRaWan tester" width="250"/> +
++----+-----+
+
+
 
 ## Installation
 
