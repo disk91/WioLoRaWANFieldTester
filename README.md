@@ -1,5 +1,7 @@
 # Wio Terminal LoRaWAN Field Tester
 
+![LoRaWan tester](img/splash.jpg)
+
 ## What's is it about
 
 When deploying a LoRaWAN network you want to know your gateway coverage and measure the radio performance in different places. When deploying Helium network you particularly want to know how many Hotspot around can be touched for a given position.
