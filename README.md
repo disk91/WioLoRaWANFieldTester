@@ -27,9 +27,9 @@ The solution is based on low cost products, easy to find for about $50:
 - Display last frame information
 - Network side RSSI / SNR / #of station
 - Your favorite network splash screen (select in config.h)
-
-## Comming soon feature
 - Screen shot and user guide
+
+## Comming soon features
 - RFM95 Schematics
 - PCB
 - Serial port LoRaWan setup configuration
