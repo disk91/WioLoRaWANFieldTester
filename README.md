@@ -77,7 +77,8 @@ All these information can be displays with an historical graph you select using 
 
 <img src="img/RETRY.jpg" alt="Uplink Retry history" width="250"/><img src="img/TXRSSSI.jpg" alt="Network side Rssi history" width="250"/><img src="img/Hotspots.jpg" alt="Hotspots involved history" width="250"/>
 
-
+In the historical graph, a red cross is indicating a packet loss a green cross a 0 value.
+The TX Rssi graph is displaying a min-max bar, this is why you see just a line for a single hotspot response.
 
 ## Installation
 
