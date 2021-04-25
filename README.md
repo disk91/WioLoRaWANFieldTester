@@ -1,6 +1,6 @@
 # Wio Terminal LoRaWAN Field Tester
 
-<img scr="img/splash.jpg" alt="LoRaWan tester" style="width:250px;"/>
+<img src="img/splash.jpg" alt="LoRaWan tester" style="width:250px;"/>
 
 ## What's is it about
 
