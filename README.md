@@ -75,7 +75,7 @@ Rq : due to the way Helium works or due to the TTNv2 to TTNv3 migration, the sec
 All these information can be displays with an historical graph you select using the LEFT & RIGHT buttons:
 <img src="img/RX RSSI.jpg" alt="Ack Rssi history" width="250"/><img src="img/RXSNR.jpg" alt="Ack Snr history" width="250"/>
 
-<img src="img/RETRY.jpg" alt="Uplink Retry history" width="250"/><img src="img/TXRSSI.jpg" alt="Network side Rssi history" width="250"/><img src="img/Hotspots.jpg" alt="Hotspots involved history" width="250"/>
+<img src="img/RETRY.jpg" alt="Uplink Retry history" width="250"/><img src="img/TXRSSSI.jpg" alt="Network side Rssi history" width="250"/><img src="img/Hotspots.jpg" alt="Hotspots involved history" width="250"/>
 
 
 
