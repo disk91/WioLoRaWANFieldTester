@@ -28,10 +28,10 @@ The solution is based on low cost products, easy to find for about $50:
 - Network side RSSI / SNR / #of station
 - Your favorite network splash screen (select in config.h)
 - Screen shot and user guide
+- RFM95 Schematics
 
 ## Comming soon features
-- RFM95 Schematics
-- PCB
+- PCB with advanced options (GPS, LiPo ...)
 - Serial port LoRaWan setup configuration
 - GPS extension
 - sdcard data storage
