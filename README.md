@@ -52,7 +52,8 @@ When none of these parameters are selected, you can change the mode with the UP 
 
 The status is displayed on the screen and can be:
 - Disc - disconnected or not yet connected
-- Join - device joined the network, ready to fire messages
+- Join - device is joining the network
+- Cnx - device has joined, ready to fire messages
 - Tx - transmisison in progress (orange when doing a retry)
 - Dwn - communication in progress to retrieve the downlink containing the network side informations
 
@@ -80,6 +81,12 @@ All these information can be displays with an historical graph you select using 
 In the historical graph, a red cross is indicating a packet loss a green cross a 0 value.
 The TX Rssi graph is displaying a min-max bar, this is why you see just a line for a single hotspot response.
 
+## Schematics
+
+Here is the simplified version of the schematics for DiY implementation.
+<img src="img/Wio-LoRaWan-FieldTester-schema.png" alt="basic schematic" width="500"/> 
+
 ## Installation
 
-Details comming soon.
+The installation details are available in the related [Wio LoRaWan Field tester on disk91.com](https://www.disk91.com/?p=5187) 
+
