@@ -17,10 +17,10 @@
  */  
 #include <Arduino.h>
 #include "config.h"
+#include "fonts.h"
 #include "testeur.h"
 #include "TFT_eSPI.h"
 #include "ui.h"
-#include "Free_Fonts.h"
 #include "LoRaCom.h"
 
 TFT_eSPI tft;

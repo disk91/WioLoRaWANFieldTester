@@ -71,4 +71,5 @@ void refreshTxRssi();
 void refreshTxHs();
 void draw_splash_helium(int xOffset, int yOffset, int density);
 void draw_splash_ttn(int xOffset, int yOffset, int density);
+
 #endif
