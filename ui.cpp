@@ -22,6 +22,7 @@
 #include "TFT_eSPI.h"
 #include "ui.h"
 #include "LoRaCom.h"
+#include "gps.h"
 
 TFT_eSPI tft;
 #define X_OFFSET 2
@@ -267,6 +268,12 @@ void refresUI() {
   // refresh the Join state part
   refreshState();
 
+  // refresg the GPS part
+  #ifdef WITH_GPS
+  refreshGps();
+  #endif
+
+  
   // refresh the graph history part
   if ( state.hasRefreshed == true
     || ui.previous_display != ui.selected_display 
@@ -300,6 +307,7 @@ void refresUI() {
   // avoid re-entreing
   if ( hasAction ) delay(300); 
 }
+
 
 /**
  * Select the way the messages are sent
@@ -757,4 +765,23 @@ void refreshTxHs() {
      }
      xOffset -= xSz + HIST_X_BAR_SPACE;
   } 
+}
+
+/**
+ * Refresh the GPS state indicator
+ */
+void refreshGps() {
+  int xOffset = X_OFFSET+4;
+  int yOffset = Y_OFFSET+2*Y_SIZE+5;
+  if ( gps.isReady ) {
+    if ( gps.hdop < 100 && gps.sats > 6 ) {
+       tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_GREEN);  
+    } else {
+       tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_ORANGE);  
+    }
+  } else {
+     tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_RED);
+  }
+
+  
 }

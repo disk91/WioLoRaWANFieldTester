@@ -25,10 +25,14 @@
 #define RFM95_RST_PIN   1
 #define RFM95_DIO_0     3
 #define RFM95_DIO_1     2
+#define LIPO_ADC        A4
 
 #define WITH_SPLASH         1
 #define WITH_SPLASH_HELIUM  1   
 #define WITH_SPLASH_TTN     1
+
+//#define WITH_GPS
+//#define WITH_LIPO
 
 #ifdef DEBUG
   #define LOGLN(x)  Serial.println x

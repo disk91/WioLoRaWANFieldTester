@@ -69,6 +69,7 @@ void refreshMode();
 void refreshLastFrame();
 void refreshTxRssi();
 void refreshTxHs();
+void refreshGps();
 void draw_splash_helium(int xOffset, int yOffset, int density);
 void draw_splash_ttn(int xOffset, int yOffset, int density);
 

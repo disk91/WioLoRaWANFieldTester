@@ -29,12 +29,13 @@ The solution is based on low cost products, easy to find for about $50:
 - Your favorite network splash screen (select in config.h)
 - Screen shot and user guide
 - RFM95 Schematics
+- GPS position reporting
 
 ## Comming soon features
 - PCB with advanced options (GPS, LiPo ...)
 - Serial port LoRaWan setup configuration
-- GPS extension
 - sdcard data storage
+- LiPo charging mode detection
 
 ## How it works
 
@@ -85,6 +86,13 @@ The TX Rssi graph is displaying a min-max bar, this is why you see just a line f
 
 Here is the simplified version of the schematics for DiY implementation.
 <img src="img/Wio-LoRaWan-FieldTester-schema.png" alt="basic schematic" width="500"/> 
+
+## Required libraries
+* GPS - Adafruit GPS library version 1.5.4
+* File system - Seeed Arduino FS version 2.0.3
+* File system - Seeed Ardunino SFUD version 2.0.1
+* LoRaWAn - Mcci...
+* Flash - FlashStorage by various version 1.0.0
 
 ## Installation
 

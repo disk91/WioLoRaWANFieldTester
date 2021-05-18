@@ -23,9 +23,14 @@
 #include "ui.h"
 #include "testeur.h"
 
+#include "gps.h"
 
+// No more than 10 bytes to suppor DR0 in US915
 static uint8_t myFrame[] = {
-  0x00, 0x00, 0x00, 0x00     // Temperature 16bit x10 High bit first           0 ..  3
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // GPS position 0 if invalid
+  0x00, 0x00,                         // Altitude     
+  0x00,                               // HDOP x 10
+  0x00,                               // Sats
 };
 
 static uint8_t emptyFrame[] = {
@@ -42,11 +47,26 @@ void setup() {
    initState();
    initScreen();
    loraSetup();
+   gpsSetup();
+
+   analogReference(AR_INTERNAL2V23);
 }
 
 
 void loop() {
+
   static long cTime = 0;
+
+#ifdef WITH_LIPO
+  if ( ((millis() / 1000) % 10) == 0 ) {
+    uint32_t v = analogRead(LIPO_ADC);
+    v = 2*( 3000 * v ) / 1024;  // should be 2230 ...
+    Serial.printf("Volt %d mV\n",v);
+    delay(1000);
+  }
+#endif
+  
+
 
   long sTime = millis();
   bool fireMessage = false;
@@ -76,11 +96,28 @@ void loop() {
   } else if ( fireMessage ) {
     // send a new test message on port 1, backend will create a downlink with information about network side reception
     cTime = 0;
+    // Fill the frame
+    if ( gps.isReady ) {
+      uint64_t pos = gpsEncodePosition48b();
+      myFrame[0] = (pos >> 40) & 0xFF;
+      myFrame[1] = (pos >> 32) & 0xFF;
+      myFrame[2] = (pos >> 24) & 0xFF;
+      myFrame[3] = (pos >> 16) & 0xFF;
+      myFrame[4] = (pos >>  8) & 0xFF;
+      myFrame[5] = (pos      ) & 0xFF;
+      myFrame[6] = (gps.altitude >> 8) & 0xFF;
+      myFrame[7] = (gps.altitude     ) & 0xFF;
+      myFrame[8] = (uint8_t)gps.hdop / 10;
+      myFrame[9] = gps.sats;
+    } else {
+      bzero(myFrame, sizeof(myFrame));
+    }
     do_send(1, myFrame, sizeof(myFrame),getCurrentDr(), state.cPwr,true, state.cRetry); 
   }
   
   loraLoop();
-
+  gpsLoop();
+  
   // Wait for the next loop and update time with overflow consideration
   delay(10);
   long duration = millis() - sTime;
