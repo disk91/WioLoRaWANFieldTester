@@ -33,6 +33,7 @@ void initState() {
   state.writePtr = 0;
   state.elements = 0;
   state.hasRefreshed = false;
+  state.batVoltage = 0;
 }
 
 void addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lost) {

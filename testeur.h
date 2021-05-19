@@ -59,6 +59,8 @@ typedef struct s_state {
   int       elements;         // numbre of data in buffer
   boolean   hasRefreshed;     // Data has refreshed
 
+  uint16_t  batVoltage;         // voltage in mV
+
 } state_t;
 
 extern state_t state;

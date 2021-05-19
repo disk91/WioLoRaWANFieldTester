@@ -56,21 +56,19 @@ void setup() {
 void loop() {
 
   static long cTime = 0;
-
-#ifdef WITH_LIPO
-  if ( ((millis() / 1000) % 10) == 0 ) {
-    uint32_t v = analogRead(LIPO_ADC);
-    v = 2*( 3000 * v ) / 1024;  // should be 2230 ...
-    Serial.printf("Volt %d mV\n",v);
-    delay(1000);
-  }
-#endif
-  
-
+  static long batUpdateTime = 0;
 
   long sTime = millis();
   bool fireMessage = false;
 
+  #ifdef WITH_LIPO
+    if ( batUpdateTime > 1000 ) {
+      uint32_t v = analogRead(LIPO_ADC);
+      v = 2*( 3000 * v ) / 1024;  // should be 2230 ...
+      state.batVoltage = v;
+    }
+  #endif
+    
   refresUI();
   switch ( ui.selected_mode ) {
     case MODE_MANUAL:
@@ -123,4 +121,5 @@ void loop() {
   long duration = millis() - sTime;
   if ( duration < 0 ) duration = 10;
   cTime += duration;
+  batUpdateTime += duration;
 }

@@ -97,6 +97,7 @@ void initScreen() {
   ui.previous_display = DISPLAY_UNKNONW;
   ui.lastWrId = MAXBUFFER;
   ui.hasClick = false;
+  ui.alertMode = false;
   
   // draw mask
   refreshPower(); 
@@ -128,6 +129,21 @@ void refresUI() {
   bool hasAction = false;
   bool forceRefresh = false;
   bool configHasChanged = false;
+
+  #ifdef WITH_LIPO
+   if ( refreshLiPo() ) {
+    tft.fillScreen(TFT_BLACK);
+    refreshPower(); 
+    refreshSf();
+    refreshRetry();
+    refreshState();
+    refreshMode();
+    refreshLastFrame();
+    ui.previous_display = DISPLAY_UNKNONW;
+    state.hasRefreshed = true;
+   }
+   if ( ui.alertMode ) return;
+  #endif
   
   if (digitalRead(WIO_KEY_C) == LOW) {
     ui.selected_menu = ( prev_select == SELECTED_POWER )?SELECTED_NONE:SELECTED_POWER;
@@ -268,7 +284,7 @@ void refresUI() {
   // refresh the Join state part
   refreshState();
 
-  // refresg the GPS part
+  // refresh the GPS part
   #ifdef WITH_GPS
   refreshGps();
   #endif
@@ -308,6 +324,44 @@ void refresUI() {
   if ( hasAction ) delay(300); 
 }
 
+/**
+ * Ensure LiPo is not connected to 5V directly
+ * Draw LiPo level status
+ */
+bool refreshLiPo() {
+  // memoriser l'etat pour ne pas redraw a chaque fois
+  // faire un redraw de tout qd back to normal ...
+  
+  if ( state.batVoltage > 4300 ) {
+    // Over Voltage
+     if ( ui.alertMode == false ) {
+      ui.alertMode = true;
+      tft.fillRect(0,120-20,320,40,TFT_RED);
+      tft.setTextColor(TFT_WHITE);
+      tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+      tft.drawString("SWITH LiPo IN CHARGE MODE",30,112, GFXFF);  
+    }
+    return false;
+  } else {
+    // remove Error message
+    if ( ui.alertMode ) {
+      ui.alertMode = false;
+      return true;
+    }
+    // Display bat status
+    int xOffset = X_OFFSET+20;
+    int yOffset = Y_OFFSET+2*Y_SIZE+5;
+    if ( state.batVoltage > 3750 ) {
+      // green status
+      tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_GREEN);  
+    } else if ( state.batVoltage > 3600 ) {
+      tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_ORANGE);  
+    } else {
+      tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_RED);  
+    }
+  }
+  
+}
 
 /**
  * Select the way the messages are sent

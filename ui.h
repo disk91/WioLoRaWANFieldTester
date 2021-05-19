@@ -49,6 +49,7 @@ typedef struct s_ui {
   uint8_t selected_display; // What graph we want to display
   uint8_t previous_display;
   bool    hasClick;         // Hit on button
+  bool    alertMode;        // LiPo alert is on
   
 } ui_t;
 
@@ -70,6 +71,7 @@ void refreshLastFrame();
 void refreshTxRssi();
 void refreshTxHs();
 void refreshGps();
+bool refreshLiPo();
 void draw_splash_helium(int xOffset, int yOffset, int density);
 void draw_splash_ttn(int xOffset, int yOffset, int density);
 
