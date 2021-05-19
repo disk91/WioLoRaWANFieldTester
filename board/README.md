@@ -14,6 +14,9 @@ You can order the board directly to different service on Internet:
 - European PCB maker where the board can be accessed : [Aisler](https://aisler.net/p/MXYVQSVT)
 - North American PCB maker the board can be accessed : [OshPark](https://oshpark.com/shared_projects/1TNqhC7U)
 
+
+**comming soon: kit with all the components to be assembled. I'll update with link**
+
 # BOM
 
 ## LoRaWan only version
