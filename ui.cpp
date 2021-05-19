@@ -332,7 +332,7 @@ bool refreshLiPo() {
   // memoriser l'etat pour ne pas redraw a chaque fois
   // faire un redraw de tout qd back to normal ...
   
-  if ( state.batVoltage > 4300 ) {
+  if ( state.batVoltage > 4700 ) {
     // Over Voltage
      if ( ui.alertMode == false ) {
       ui.alertMode = true;
