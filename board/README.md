@@ -23,7 +23,7 @@ You can order the board directly to different service on Internet:
 |U2 | RFM95 (version 868MHz or 915MHz according to your zone) |
 |R6 | 0 ohm 0603 resistor (a wire can be used) |
 |U3 | Edge PCB SMA connector |
-|---|-----------------------------------------------------------|
+
 Estimated BOM price around $10
 
 ## LoRaWan + GPS version 
@@ -37,7 +37,7 @@ Estimated BOM price around $10
 |C3 | Capacitor 0.1uF 0603 CMS |
 |C4 | Capacitor 4.7uF 0805 CMS |
 |C1 | Capacitor 4.7uF 0805 CMS |
-|---|-----------------------------------------------------------|
+
 Estimated BOM price around $20 
 
 ## Full version 
@@ -60,7 +60,7 @@ Estimated BOM price around $20
 |J2 | JST 2mm LiPo Connector S2B-PH-K-S(LF)(SN)|
 |S1 | Switch C&K - OS102011MA1QN1
 |   | LiPo Battery 3.7V 500mAh - 1600 mAh with JST connector
-|---|-----------------------------------------------------------|
+
 Estimated BOM price around $25 
 
 When connecting a LiPo battery, please make sure of the battery polarity according to the polarity printed on the PCB. There is no rules about LiPo battery polarity.
