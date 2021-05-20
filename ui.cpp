@@ -351,10 +351,10 @@ bool refreshLiPo() {
     // Display bat status
     int xOffset = X_OFFSET+20;
     int yOffset = Y_OFFSET+2*Y_SIZE+5;
-    if ( state.batVoltage > 3750 ) {
+    if ( state.batVoltage > 3650 ) {
       // green status
       tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_GREEN);  
-    } else if ( state.batVoltage > 3600 ) {
+    } else if ( state.batVoltage > 3500 ) {
       tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_ORANGE);  
     } else {
       tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_RED);  

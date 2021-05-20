@@ -37,7 +37,6 @@ static uint8_t emptyFrame[] = {
   0x00
 };
 
-
 void setup() {
   // put your setup code here, to run once:
    #ifdef DEBUG
@@ -49,7 +48,6 @@ void setup() {
    gpsSetup();
 
    analogReference(AR_INTERNAL2V23);
-   
 }
 
 
@@ -67,6 +65,7 @@ void loop() {
       uint32_t v = analogRead(LIPO_ADC);
       v = 2*( 3300 * v ) / 1024;  // should be 2230 ...
       state.batVoltage = v;
+      batUpdateTime = 0;
     }
   #endif
     
