@@ -25,7 +25,8 @@ You can order the board directly to different service on Internet:
 |J1 | 40 pins (2x20) 2.54 header CMS |
 |U2 | RFM95 (version 868MHz or 915MHz according to your zone) |
 |R6 | 0 ohm 0603 resistor (a wire can be used) |
-|U3 | Edge PCB SMA connector |
+|U3 | Edge PCB 1.6mm SMA female connector |
+|   | 868MHz antenna |
 
 Estimated BOM price around $10
 
@@ -35,11 +36,12 @@ Estimated BOM price around $10
 |J1 | 40 pins (2x20) 2.54 header CMS (samtec TSM-120-02-L-DV) |
 |U2 | RFM95 (version 868MHz or 915MHz according to your zone) |
 |R6 | 0 ohm 0603 resistor (a wire can be used) |
-|U3 | Edge PCB SMA connector |
+|U3 | Edge PCB 1.6mm SMA female connector |
 |M1 | Quectel L86 (L80 should be ok) |
 |C3 | Capacitor 0.1uF 0603 CMS |
 |C4 | Capacitor 4.7uF 0805 CMS |
 |C1 | Capacitor 4.7uF 0805 CMS |
+|   | 868MHz antenna |
 
 Estimated BOM price around $20 
 
@@ -49,7 +51,7 @@ Estimated BOM price around $20
 |J1 | 40 pins (2x20) 2.54 header CMS (samtec TSM-120-02-L-DV) |
 |U2 | RFM95 (version 868MHz or 915MHz according to your zone) |
 |R6 | 0 ohm 0603 resistor (a wire can be used) |
-|U3 | Edge PCB SMA connector |
+|U3 | Edge PCB 1.6mm SMA female connector |
 |M1 | Quectel L86 (L80 should be ok) |
 |C3 | Capacitor 0.1uF 0603 CMS |
 |C4 | Capacitor 4.7uF 0805 CMS |
@@ -63,6 +65,7 @@ Estimated BOM price around $20
 |J2 | JST 2mm LiPo Connector S2B-PH-K-S(LF)(SN)|
 |S1 | Switch C&K - OS102011MA1QN1
 |   | LiPo Battery 3.7V 500mAh - 1600 mAh with JST connector
+|   | 868MHz antenna |
 
 Estimated BOM price around $25 
 
