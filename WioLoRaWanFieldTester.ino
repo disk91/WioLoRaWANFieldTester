@@ -103,8 +103,8 @@ void loop() {
       myFrame[3] = (pos >> 16) & 0xFF;
       myFrame[4] = (pos >>  8) & 0xFF;
       myFrame[5] = (pos      ) & 0xFF;
-      myFrame[6] = (gps.altitude >> 8) & 0xFF;
-      myFrame[7] = (gps.altitude     ) & 0xFF;
+      myFrame[6] = ((gps.altitude+1000) >> 8) & 0xFF;
+      myFrame[7] = ((gps.altitude+1000)     ) & 0xFF;
       myFrame[8] = (uint8_t)gps.hdop / 10;
       myFrame[9] = gps.sats;
     } else {

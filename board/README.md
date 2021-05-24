@@ -13,7 +13,7 @@ A single PCB can support the three versions, it just depends on the components y
 You can order the board directly to different service on Internet:
 - European PCB maker where the board can be accessed : [Aisler](https://aisler.net/p/MXYVQSVT)
 - North American PCB maker the board can be accessed : [OshPark](https://oshpark.com/shared_projects/1TNqhC7U)
-
+- Global you can access project on Seeed Fusion Gallery : [Seeed Fusion](http://www.seeedstudio.com/WioTermial-LoRaWan-Low-Cost-Field-tester-and-Helium-mapper-g-1331570)
 
 **comming soon: kit with all the components to be assembled. I'll update with link**
 

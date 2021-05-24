@@ -84,6 +84,8 @@ The TX Rssi graph is displaying a min-max bar, this is why you see just a line f
 
 ## Schematics
 
+Take a look at *board* directory for details on PCB & components.
+
 Here is the simplified version of the schematics for DiY implementation.
 <img src="img/Wio-LoRaWan-FieldTester-schema.png" alt="basic schematic" width="500"/> 
 
