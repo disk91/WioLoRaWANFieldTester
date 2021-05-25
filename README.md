@@ -29,13 +29,14 @@ The solution is based on low cost products, easy to find for about $50:
 - Your favorite network splash screen (select in config.h)
 - Screen shot and user guide
 - RFM95 Schematics
-- GPS position reporting
+- GPS position reporting with Helium mapper integration
+- LiPo charging mode detection
+- PCB availbale
+- Enclosure available
 
 ## Comming soon features
-- PCB with advanced options (GPS, LiPo ...)
 - Serial port LoRaWan setup configuration
 - sdcard data storage
-- LiPo charging mode detection
 
 ## How it works
 
@@ -95,6 +96,13 @@ Here is the simplified version of the schematics for DiY implementation.
 * File system - Seeed Ardunino SFUD version 2.0.1
 * LoRaWAn - Mcci...
 * Flash - FlashStorage by various version 1.0.0
+
+## Enclosure
+
+3D printed enclosure can be found in the enclosure directory. You will find the two parts of the enclosure in different STL files. You will also find the FreeCad source file in case you want to modify /improve it.
+
+The enclosure is closed and attached to the WioTerminal with [2 screws DIN965, M2 L16mm](https://www.bricovis.fr/produit-vis-a-tete-fraisee-pozidriv-acier-zingue-blanc-din-965-tfzzn/#TFZ02/016ZN)
+
 
 ## Installation
 

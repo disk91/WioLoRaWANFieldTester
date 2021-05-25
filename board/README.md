@@ -15,7 +15,7 @@ You can order the board directly to different service on Internet:
 - North American PCB maker the board can be accessed : [OshPark](https://oshpark.com/shared_projects/1TNqhC7U)
 - Global you can access project on Seeed Fusion Gallery : [Seeed Fusion](http://www.seeedstudio.com/WioTermial-LoRaWan-Low-Cost-Field-tester-and-Helium-mapper-g-1331570)
 
-**comming soon: kit with all the components to be assembled. I'll update with link**
+**Kits available on [IngeniousThings shop](https://shop.ingeniousthings.fr/products/helium-lorawan-field-tester-and-mapper-kit)**
 
 # BOM
 
@@ -26,7 +26,8 @@ You can order the board directly to different service on Internet:
 |U2 | RFM95 (version 868MHz or 915MHz according to your zone) |
 |R6 | 0 ohm 0603 resistor (a wire can be used) |
 |U3 | Edge PCB 1.6mm SMA female connector |
-|   | 868MHz antenna |
+|   | 2x Screw 2mm x 16mm (see link in main README.md) 
+|   | 1x 868MHz antenna |
 
 Estimated BOM price around $10
 
@@ -41,7 +42,8 @@ Estimated BOM price around $10
 |C3 | Capacitor 0.1uF 0603 CMS |
 |C4 | Capacitor 4.7uF 0805 CMS |
 |C1 | Capacitor 4.7uF 0805 CMS |
-|   | 868MHz antenna |
+|   | 2x Screw 2mm x 16mm (see link in main README.md) 
+|   | 1x 868MHz antenna |
 
 Estimated BOM price around $20 
 
@@ -64,8 +66,9 @@ Estimated BOM price around $20
 |R1 | 1 Kohm 0603 resistor |
 |J2 | JST 2mm LiPo Connector S2B-PH-K-S(LF)(SN)|
 |S1 | Switch C&K - OS102011MA1QN1
-|   | LiPo Battery 3.7V 500mAh - 1600 mAh with JST connector
-|   | 868MHz antenna |
+|   | 1x LiPo Battery 3.7V 500mAh - 1600 mAh with JST connector
+|   | 2x Screw 2mm x 16mm (see link in main README.md) 
+|   | 1x 868MHz antenna |
 
 Estimated BOM price around $25 
 
