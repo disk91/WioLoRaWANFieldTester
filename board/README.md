@@ -59,7 +59,7 @@ Estimated BOM price around $20
 |C4 | Capacitor 4.7uF 0805 CMS |
 |C1 | Capacitor 4.7uF 0805 CMS |
 |D1 | LED CMS 0805 |
-|U1 | MPC73831 (LiPo Charging Circuit) |
+|U1 | MCP73831 (LiPo Charging Circuit) |
 |R2 | 2 Kohm 0603 resistor |
 |R4 | 1 Mohm 0603 resistor |
 |R3 | 1 Mohm 0603 resistor |
