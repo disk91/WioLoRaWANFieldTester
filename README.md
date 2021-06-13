@@ -113,7 +113,7 @@ The installation details are available in the related [Wio LoRaWan Field tester 
 ## Integration with backend
 
 ### Use disk91 backend
-See (related blogpost)[https://www.disk91.com/2021/technology/lora/low-cost-lorawan-field-tester/] to get all the details. This integration is supporting the loopback feature and the mapper connectivity feature.
+See [related blogpost](https://www.disk91.com/2021/technology/lora/low-cost-lorawan-field-tester/) to get all the details. This integration is supporting the loopback feature and the mapper connectivity feature.
 
 ### Standalone helium mapper integration
 The following integration and payload transformation allows to decode the gps position and report is to mapper. Thank you Seb for the contribution.
