@@ -12,6 +12,8 @@ The solution is based on low cost products, easy to find for about $50:
 - [Wio Terminal](https://wiki.seeedstudio.com/Wio-Terminal-Getting-Started/)
 - [RFM95](https://www.disk91.com/2019/technology/lora/hoperf-rfm95-and-arduino-a-low-cost-lorawan-solution/)
 
+You can directly purchase components Kit with PCB on [ingeniousthings shop](https://shop.ingeniousthings.fr/products/helium-lorawan-field-tester-and-mapper-kit)
+
 ## Current status
 - Working, documentation in progress to reproduce it on your own.
 
@@ -107,4 +109,70 @@ The enclosure is closed and attached to the WioTerminal with [2 screws DIN965, M
 ## Installation
 
 The installation details are available in the related [Wio LoRaWan Field tester on disk91.com](https://www.disk91.com/?p=5187) 
+
+## Integration with backend
+
+### Use disk91 backend
+See (related blogpost)[https://www.disk91.com/2021/technology/lora/low-cost-lorawan-field-tester/] to get all the details. This integration is supporting the loopback feature and the mapper connectivity feature.
+
+### Standalone helium mapper integration
+The following integration and payload transformation allows to decode the gps position and report is to mapper. Thank you Seb for the contribution.
+
+Create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a mapper integration callback as it is described in this (helium mapper integration page)[https://docs.helium.com/use-the-network/coverage-mapping/mappers-quickstart/]
+
+```
+/*
+  Helium console function for LoRaWan Field Tester sending mapping information to mappers backend.
+
+  https://www.disk91.com/2021/technology/lora/low-cost-lorawan-field-tester/
+
+  Result is visible on https://mappers.helium.com/
+
+  Built from information available on:
+    https://docs.helium.com/use-the-network/coverage-mapping/mappers-api/
+    https://github.com/disk91/WioLoRaWANFieldTester/blob/master/WioLoRaWanFieldTester.ino
+    https://www.disk91.com/2015/technology/sigfox/telecom-design-sdk-decode-gps-frame/
+*/
+
+function Decoder(bytes, port) { 
+  var decoded = {};
+  
+  var lonSign = (bytes[0]>>7) & 0x01 ? -1 : 1;
+  var latSign = (bytes[0]>>6) & 0x01 ? -1 : 1;
+  
+  var encLat = ((bytes[0] & 0x3f)<<17)+
+               (bytes[1]<<9)+
+               (bytes[2]<<1)+
+               (bytes[3]>>7);
+
+  var encLon = ((bytes[3] & 0x7f)<<16)+
+               (bytes[4]<<8)+
+               bytes[5];
+  
+  var hdop = bytes[8]/10;
+  var sats = bytes[9];
+  
+  const maxHdop = 2;
+  const minSats = 5;
+  
+  if ((hdop < maxHdop) && (sats >= minSats)) {
+    // Send only acceptable quality of position to mappers
+    decoded.latitude = latSign * (encLat * 108 + 53) / 10000000;
+    decoded.longitude = lonSign * (encLon * 215 + 107) / 10000000;  
+    decoded.altitude = ((bytes[6]<<8)+bytes[7])-1000;
+    decoded.hdop = hdop;
+    decoded.sats = sats;
+  } else {
+    decoded.error = "Need more GPS precision (hdop must be <"+maxHdop+
+      " & sats must be >= "+minSats+") current hdop: "+hdop+" & sats:"+sats;
+  }
+  return decoded;
+}
+
+```
+
+### Cargo integration
+
+The integration above can be used, create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a cargo integration.
+
 
