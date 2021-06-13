@@ -118,7 +118,7 @@ See (related blogpost)[https://www.disk91.com/2021/technology/lora/low-cost-lora
 ### Standalone helium mapper integration
 The following integration and payload transformation allows to decode the gps position and report is to mapper. Thank you Seb for the contribution.
 
-Create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a mapper integration callback as it is described in this (helium mapper integration page)[https://docs.helium.com/use-the-network/coverage-mapping/mappers-quickstart/]
+Create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a mapper integration callback as it is described in this [helium mapper integration page](https://docs.helium.com/use-the-network/coverage-mapping/mappers-quickstart/)
 
 ```
 /*
