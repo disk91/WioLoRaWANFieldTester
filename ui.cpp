@@ -76,10 +76,10 @@ void initScreen() {
     tft.drawRoundRect((320-200)/2,200,200,10,5,TFT_WHITE);
     for ( int i = 10 ; i < 100 ; i+=4 ) {
       tft.fillRoundRect((320-200)/2+2,202,((204*i)/100),6,3,TFT_WHITE);
-      #ifdef WITH_SPLASH_HELIUM
+      #if (defined WITH_SPLASH_HELIUM) && ( WITH_SPLASH_HELIUM == 1 )
         draw_splash_helium(HELIUM_XCENTER, (240-100)/2, i);
       #endif
-      #ifdef WITH_SPLASH_TTN  
+      #if (defined WITH_SPLASH_TTN) && ( WITH_SPLASH_TTN == 1 )
         draw_splash_ttn(TTN_XCENTER, (240-85)/2, i);
       #endif
   }
