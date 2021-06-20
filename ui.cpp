@@ -341,7 +341,7 @@ bool refreshLiPo() {
       tft.fillRect(0,120-20,320,40,TFT_RED);
       tft.setTextColor(TFT_WHITE);
       tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
-      tft.drawString("SWITH LiPo IN CHARGE MODE",30,112, GFXFF);  
+      tft.drawString("SWITCH LiPo IN CHARGE MODE",25,112, GFXFF);  
     }
     return false;
   } else {
