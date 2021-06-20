@@ -20,6 +20,14 @@
 
 #include "lmic.h"
 
+typedef struct {
+  uint8_t deveui[8];
+  uint8_t appeui[8];
+  uint8_t appkey[16];
+} loraConf_t;
+
+extern loraConf_t loraConf;
+
 void loraSetup(void);
 void do_send(uint8_t port, uint8_t * data, uint8_t sz, _dr_configured_t dr, uint8_t pwr, bool acked, uint8_t retries );
 void loraLoop(void);

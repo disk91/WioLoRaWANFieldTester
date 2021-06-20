@@ -37,7 +37,6 @@ TFT_eSPI tft;
 #define TFT_GRAY20  0b0010000110000100
 
 
-
 #define HIST_X_OFFSET 2
 #define HIST_Y_OFFSET 75
 #define HIST_X_SIZE 315
@@ -55,14 +54,17 @@ TFT_eSPI tft;
 #define SELECTED_SF     2
 #define SELECTED_RETRY  3
 
-#define DISPLAY_UNKNONW    0
-#define DISPLAY_RSSI_HIST  1
-#define DISPLAY_SNR_HIST   2
-#define DISPLAY_RETRY_HIST 3
-#define DISPLAY_TXRSSI     4
-#define DISPLAY_TXHS       5
-
 ui_t ui;
+
+void configPending() {
+  tft.begin();
+  tft.setRotation(3);
+  tft.fillScreen(TFT_BLACK);
+  tft.fillRect(0,120-20,320,40,TFT_WHITE);
+  tft.setTextColor(TFT_BLACK);
+  tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+  tft.drawString("SETUP CREDENTIALS",70,112, GFXFF);   
+}
 
 void initScreen() {
   tft.begin();

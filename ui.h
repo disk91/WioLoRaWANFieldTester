@@ -28,6 +28,14 @@
 
 #define MODE_MAX          3
 
+#define DISPLAY_UNKNONW    0
+#define DISPLAY_RSSI_HIST  1
+#define DISPLAY_SNR_HIST   2
+#define DISPLAY_RETRY_HIST 3
+#define DISPLAY_TXRSSI     4
+#define DISPLAY_TXHS       5
+
+
 #ifdef WITH_SPLASH_HELIUM
   #ifdef WITH_SPLASH_TTN
     #define HELIUM_XCENTER (160-100)/2
@@ -56,6 +64,7 @@ typedef struct s_ui {
 extern ui_t ui;
 extern TFT_eSPI tft;
 
+void configPending();
 void initScreen();
 void refresUI();
 

@@ -35,10 +35,54 @@ You can directly purchase components Kit with PCB on [ingeniousthings shop](http
 - LiPo charging mode detection
 - PCB availbale
 - Enclosure available
+- Serial port LoRaWan setup configuration
+- Setup with Cargo (helium tracking platform)
 
 ## Comming soon features
-- Serial port LoRaWan setup configuration
 - sdcard data storage
+
+## Quick installation and setup
+
+### Install Firmware
+
+- You can directly upload the following binaries:
+  * [EU868 with GPS enable](binaries/WioLoRaWANFieldTester_EU868_GPS.uf2)
+  * [EU868 with GPS disable](binaries/WioLoRaWANFieldTester_EU868_NOGPS.uf2)
+  * [US915 with GPS enable](binaries/WioLoRaWANFieldTester_US915_GPS.uf2)
+  * [US915 with GPS disable](binaries/WioLoRaWANFieldTester_US915_NOGPS.uf2)
+- Once downloaded, you load the firwmare just by drag & drop it to the mounted drive when connecting the WioTerminal to your computer
+  * switch the device in programming mode switching reset button ON / RESET / ON / RESET / ON
+  * An "Arduino" disk appear on your computer
+  * Drag and drop the selected firmware into that drive.
+  * Fimware is flashing, device is rebooting, you should see "SETUP CREDENTIALS" on the screen
+
+### Setup LoRaWan Credentials
+  * Open a Serial console (putty or any other serial tool) with speed 9600.
+  * Get credentials from console.helium.com (or any other LoRaWan network server)
+    * deveui
+    * appeui
+    * appkey
+  * Set the parameters in the Serial console following:
+  ```
+  D=DB6B416730000000
+  A=7262F3850E000000
+  K=D2B1F00A451E34931900000000000000
+  ```
+  * You should see on the console
+  ```
+  DEVEUI:DB6B416730000000
+  OK
+  APPEUI:7262F3850E000000
+  OK
+  APPKEY:D2B1F00A451E34931900000000000000
+  OK
+  LoRaWan configuration OK
+  ```
+  * The device will reboot with the new configuration and is ready.
+
+### Setup Helium Console integration with backend
+See [related blogpost](https://www.disk91.com/2021/technology/lora/low-cost-lorawan-field-tester/) to get all the details. This integration is supporting the loopback feature and the mapper connectivity feature.
+
 
 ## How it works
 
@@ -61,8 +105,11 @@ The status is displayed on the screen and can be:
 - Tx - transmisison in progress (orange when doing a retry)
 - Dwn - communication in progress to retrieve the downlink containing the network side informations
 
-On Green / Red square on the righ is indicating the duty-cycle status when applicable. Green is ready to communicate, Red is duty-cycle with the count-down before being ready.
+The Green / Red square on the righ is indicating the duty-cycle status when applicable. Green is ready to communicate, Red is duty-cycle with the count-down before being ready.
 
+The Red / Orange / Green circle on the left is indicating the GPS status (when activated). Red is not yet ready, Orange is position aquired but quality is poor to be reported. Green is good quality position ; it will be reported then.
+
+The Green / Orange / Red bar on the left is indicating the battery level status (when activated)
 
 The last communication result is displayed on the 2 lines under the settings.
 - The first line shows the device side information ( from left to right ):
@@ -116,6 +163,29 @@ The installation details are available in the related [Wio LoRaWan Field tester 
 See [related blogpost](https://www.disk91.com/2021/technology/lora/low-cost-lorawan-field-tester/) to get all the details. This integration is supporting the loopback feature and the mapper connectivity feature.
 
 ### Standalone helium mapper integration
+
+The following Frame format are used:
+**uplink format on port 1:**
+| Byte          | Usage                          |
+|---------------|--------------------------------|
+| `0 - 5`       | GSP position see [here](https://www.disk91.com/2015/technology/sigfox/telecom-design-sdk-decode-gps-frame/) for details. Decoding see below |
+| `6 - 7`       | Altitude in meters + 1000m ( 1100 = 100m ) |
+| `8`           | HDOP * 10 (11 = 1.1) |
+| `9`           | Sats in view |
+
+When the GPS position is invalid of GPS is disable, the frame is full of 0
+
+**donwlink response format on port 2:**
+| Byte          | Usage                          |
+|---------------|--------------------------------|
+| `0`           | Sequence ID % 255              |
+| `1`           | Min Rssi + 200 (160 = -40dBm)  |
+| `2`           | Max Rssi + 200 (160 = -40dBm)  |
+| `3`           | Min SNR + 100 (80 = -20dBm)    |
+| `4`           | Max SNR + 100 (80 = -20dBm)    |
+| `5`           | Seen hotspot                   |
+
+
 The following integration and payload transformation allows to decode the gps position and report is to mapper. Thank you Seb for the contribution.
 
 Create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a mapper integration callback as it is described in this [helium mapper integration page](https://docs.helium.com/use-the-network/coverage-mapping/mappers-quickstart/)
@@ -174,5 +244,13 @@ function Decoder(bytes, port) {
 ### Cargo integration
 
 The integration above can be used, create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a cargo integration.
+
+
+### Creating UF2 files
+
+If you want to create an UF2 file for a drag & drop upload on the WIO Terminal, you can use [uf2 generator](https://seeedjp.github.io/uf2/) online tool. 
+* use address 0x4000
+* select your binary file compiled from Arduino
+* download the file locally
 
 

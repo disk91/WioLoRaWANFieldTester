@@ -19,13 +19,27 @@
 #include <lmic.h>
 #include "config.h"
 #include "testeur.h"
+#include "keys.h"
+#include "ui.h"
+#include "LoRaCom.h"
 
 state_t state;
 void initState() {
   if ( ! readConfig() ) {
+    uint8_t  _DEVEUI[8]= __DEVEUI; 
+    uint8_t  _APPEUI[8]= __APPEUI;  
+    uint8_t  _APPKEY[16] = __APPKEY;
+
+    // Config initial setup
     tst_setPower(MAXPOWER);  
     tst_setSf(SLOWERSF);      
-    tst_setRetry(1);    
+    tst_setRetry(1);
+    ui.selected_display = DISPLAY_RSSI_HIST;    
+    ui.selected_mode = MODE_MANUAL;
+    memcpy(loraConf.deveui, _DEVEUI, 8);
+    memcpy(loraConf.appeui, _APPEUI, 8);
+    memcpy(loraConf.appkey, _APPKEY,16);
+    storeConfig();
   }
   state.cState = NOT_JOINED;
 
@@ -129,10 +143,12 @@ _dr_configured_t getCurrentDr() {
       return DR_SF9;
     case 10:
       return DR_SF10;
+#ifdef CFG_eu868
     case 11:
       return DR_SF11;
     case 12:
       return DR_SF12;
+#endif
     default:
       return DR_SF7;
   }

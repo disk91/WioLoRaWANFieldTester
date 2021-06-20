@@ -62,7 +62,7 @@ void gpsLoop() {
           gps.longitude = GPS.longitude_fixed;
           gps.latitude = GPS.latitude_fixed;
           gps.sats = GPS.satellites;
-          #ifdef DEBUG
+          #ifdef DEBUGGPS
           Serial.printf("La: %d Lo: %d alt: %d sat: %d hdop: %d\n",
              gps.latitude,
              gps.longitude,

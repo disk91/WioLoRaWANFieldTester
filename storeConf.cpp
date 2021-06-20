@@ -18,9 +18,10 @@
 #include <FlashStorage.h>
 #include "testeur.h"
 #include "ui.h"
+#include "LoRaCom.h"
 
 #define MAGIC 0xD154
-#define VERSION 0x01
+#define VERSION 0x02
 
 typedef struct {
   uint16_t  magic;
@@ -30,6 +31,9 @@ typedef struct {
   uint8_t   cRetry;   // Current Number of retry
   uint8_t   selected_display;
   uint8_t   selected_mode;
+  uint8_t   deveui[8];   // device EUI
+  uint8_t   appeui[8];   // App EUI
+  uint8_t   appkey[16];  // App KEY
 } Config;
 
 
@@ -46,11 +50,13 @@ bool readConfig() {
     state.cRetry = c.cRetry;
     ui.selected_display = c.selected_display;
     ui.selected_mode = c.selected_mode;
+    memcpy(loraConf.deveui, c.deveui, 8);
+    memcpy(loraConf.appeui, c.appeui, 8);
+    memcpy(loraConf.appkey, c.appkey,16);
   } else {
     return false;
   }
   return true;
-  
 }
 
 void storeConfig() {
@@ -62,5 +68,8 @@ void storeConfig() {
   c.cRetry = state.cRetry;
   c.selected_display = ui.selected_display;
   c.selected_mode = ui.selected_mode;
+  memcpy(c.deveui, loraConf.deveui, 8);
+  memcpy(c.appeui, loraConf.appeui, 8);
+  memcpy(c.appkey, loraConf.appkey,16);
   my_flash_store.write(c);
 }

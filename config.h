@@ -19,7 +19,8 @@
 #define __CONFIG_H
 
 
-#define DEBUG
+//#define DEBUG
+//#define DEBUGGPS
 
 #define RFM95_NSS_PIN   0
 #define RFM95_RST_PIN   1
@@ -29,10 +30,10 @@
 
 #define WITH_SPLASH         1
 #define WITH_SPLASH_HELIUM  1   
-#define WITH_SPLASH_TTN     1
+//#define WITH_SPLASH_TTN     1
 
-//#define WITH_GPS
-//#define WITH_LIPO
+#define WITH_GPS
+#define WITH_LIPO
 
 #ifdef DEBUG
   #define LOGLN(x)  Serial.println x
@@ -41,6 +42,10 @@
   #define LOGLN(x) 
   #define LOG(x)
 #endif
+
+#define SERIALCONFIG  Serial
+
+#define US915_DUTYCYCLE_MS 10000    // Fair use and preserve DCs in MS
 
 bool readConfig();
 void storeConfig();

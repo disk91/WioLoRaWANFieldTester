@@ -38,16 +38,29 @@ static uint8_t emptyFrame[] = {
 };
 
 void setup() {
-  // put your setup code here, to run once:
-   #ifdef DEBUG
-    Serial.begin(9600);
-   #endif
-   initState();
-   initScreen();
-   loraSetup();
-   gpsSetup();
 
-   analogReference(AR_INTERNAL2V23);
+  #if defined SERIALCONFIG || defined DEBUG 
+     Serial.begin(9600);
+  #endif
+  initState();
+
+
+  // Make sure the LoraWan configuration has been made if not wait for the configuration
+  boolean zero = true;
+  for ( int i = 0 ; i < 8 ; i++ ) {
+    if ( loraConf.deveui[i] != 0 ) zero = false;
+  }
+  if ( zero ) {
+    configPending();
+    while (true) {
+      processLoRaConfig();
+    }
+  }
+
+  initScreen();
+  loraSetup();
+  gpsSetup();
+  analogReference(AR_INTERNAL2V23);
 }
 
 
