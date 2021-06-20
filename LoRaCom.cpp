@@ -223,7 +223,7 @@ void loraSetup(void) {
     LMIC.dn2Dr = SF9; 
     LMIC_setDrTxpow(DR_SF12,14); 
     #elif defined CFG_us915
-      #warning "Make sure the channel implementation is correct"
+      LMIC_selectSubBand(1);
     #else
     #error "Not Yet suported, please add the channels"
     #endif
