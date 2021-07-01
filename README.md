@@ -208,7 +208,6 @@ Create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a mapper 
 */
 
 function Decoder(bytes, port) { 
-  var decoded = {};
   var payload = {};
   
   var lonSign = (bytes[0]>>7) & 0x01 ? -1 : 1;
@@ -239,10 +238,10 @@ function Decoder(bytes, port) {
 
     decoded.payload = payload;
   } else {
-    decoded.error = "Need more GPS precision (hdop must be <"+maxHdop+
+    payload.error = "Need more GPS precision (hdop must be <"+maxHdop+
       " & sats must be >= "+minSats+") current hdop: "+hdop+" & sats:"+sats;
   }
-  return decoded;
+  return payload;
 }
 
 ```
