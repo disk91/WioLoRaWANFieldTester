@@ -202,10 +202,14 @@ Create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a mapper 
     https://docs.helium.com/use-the-network/coverage-mapping/mappers-api/
     https://github.com/disk91/WioLoRaWANFieldTester/blob/master/WioLoRaWanFieldTester.ino
     https://www.disk91.com/2015/technology/sigfox/telecom-design-sdk-decode-gps-frame/
+
+  Integartion:
+    POST https://mappers.helium.com/api/v1/ingest/uplink
 */
 
 function Decoder(bytes, port) { 
   var decoded = {};
+  var payload = {};
   
   var lonSign = (bytes[0]>>7) & 0x01 ? -1 : 1;
   var latSign = (bytes[0]>>6) & 0x01 ? -1 : 1;
@@ -227,11 +231,13 @@ function Decoder(bytes, port) {
   
   if ((hdop < maxHdop) && (sats >= minSats)) {
     // Send only acceptable quality of position to mappers
-    decoded.latitude = latSign * (encLat * 108 + 53) / 10000000;
-    decoded.longitude = lonSign * (encLon * 215 + 107) / 10000000;  
-    decoded.altitude = ((bytes[6]<<8)+bytes[7])-1000;
-    decoded.hdop = hdop;
-    decoded.sats = sats;
+    payload.latitude = latSign * (encLat * 108 + 53) / 10000000;
+    payload.longitude = lonSign * (encLon * 215 + 107) / 10000000;  
+    payload.altitude = ((bytes[6]<<8)+bytes[7])-1000;
+    payload.accuracy = (hdop*2+5)/10
+    if(payload.accuracy>63) payload.accuracy=63
+
+    decoded.payload = payload;
   } else {
     decoded.error = "Need more GPS precision (hdop must be <"+maxHdop+
       " & sats must be >= "+minSats+") current hdop: "+hdop+" & sats:"+sats;
