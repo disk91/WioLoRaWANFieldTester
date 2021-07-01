@@ -222,20 +222,14 @@ function Decoder(bytes, port) {
   var hdop = bytes[8]/10;
   var sats = bytes[9];
   
-  const maxHdop = 2;
-  const minSats = 5;
+  decoded.latitude = latSign * (encLat * 108 + 53) / 10000000;
+  decoded.longitude = lonSign * (encLon * 215 + 107) / 10000000;  
+  decoded.altitude = ((bytes[6]<<8)+bytes[7])-1000;
+  decoded.hdop = hdop;
+  decoded.sats = sats;
+  decoded.accuracy=(hdop*2+5)/10
+  if(decoded.accuracy>63) decoded.accuracy=63
   
-  if ((hdop < maxHdop) && (sats >= minSats)) {
-    // Send only acceptable quality of position to mappers
-    decoded.latitude = latSign * (encLat * 108 + 53) / 10000000;
-    decoded.longitude = lonSign * (encLon * 215 + 107) / 10000000;  
-    decoded.altitude = ((bytes[6]<<8)+bytes[7])-1000;
-    decoded.hdop = hdop;
-    decoded.sats = sats;
-  } else {
-    decoded.error = "Need more GPS precision (hdop must be <"+maxHdop+
-      " & sats must be >= "+minSats+") current hdop: "+hdop+" & sats:"+sats;
-  }
   return decoded;
 }
 
