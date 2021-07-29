@@ -162,7 +162,12 @@ The installation details are available in the related [Wio LoRaWan Field tester 
 ### Use disk91 backend
 See [related blogpost](https://www.disk91.com/2021/technology/lora/low-cost-lorawan-field-tester/) to get all the details. This integration is supporting the loopback feature and the mapper connectivity feature.
 
-### Standalone helium mapper integration
+This allow to automatically get your positions reported to Helium mapper and also allows to obtain network statistics and get them displayed on the WioTerminal. 
+
+
+### Standalone helium mapper integration (if you do not want to use disk91 backend - you will lost part of the statistics)
+
+**Do not use disk91 backend + standalone mapper integration it is redundand** 
 
 The following Frame format are used:
 **uplink format on port 1:**
