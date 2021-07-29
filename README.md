@@ -63,6 +63,7 @@ You can directly purchase components Kit with PCB on [ingeniousthings shop](http
     * appeui
     * appkey
   * Set the parameters in the Serial console following:
+  You need to enter 1 line after the other, replace the differents IDs by the values obtained from the helium console. 
   ```
   D=DB6B416730000000
   A=7262F3850E000000
