@@ -238,10 +238,10 @@ function Decoder(bytes, port) {
 
     decoded.payload = payload;
   } else {
-    payload.error = "Need more GPS precision (hdop must be <"+maxHdop+
+    decoded.error = "Need more GPS precision (hdop must be <"+maxHdop+
       " & sats must be >= "+minSats+") current hdop: "+hdop+" & sats:"+sats;
   }
-  return payload;
+  return decoded;
 }
 
 ```
