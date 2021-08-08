@@ -215,7 +215,6 @@ Create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a mapper 
 
 function Decoder(bytes, port) { 
   var payload = {};
-  var decoded = {};
   
   var lonSign = (bytes[0]>>7) & 0x01 ? -1 : 1;
   var latSign = (bytes[0]>>6) & 0x01 ? -1 : 1;
@@ -241,14 +240,11 @@ function Decoder(bytes, port) {
     payload.longitude = lonSign * (encLon * 215 + 107) / 10000000;  
     payload.altitude = ((bytes[6]<<8)+bytes[7])-1000;
     payload.accuracy = (hdop*5+5)/10
-    if(payload.accuracy>63) payload.accuracy=63
-
-    decoded.payload = payload;
   } else {
-    decoded.error = "Need more GPS precision (hdop must be <"+maxHdop+
+    payload.error = "Need more GPS precision (hdop must be <"+maxHdop+
       " & sats must be >= "+minSats+") current hdop: "+hdop+" & sats:"+sats;
   }
-  return decoded;
+  return payload;
 }
 
 ```
