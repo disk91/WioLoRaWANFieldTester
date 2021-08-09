@@ -44,7 +44,11 @@ The integration is **HTTP** type, it means the data will be redirected to a cust
 
 <img src="../img/HNTv2_Create_an_integration_type_http.png" alt="Helium Integration type HTTP" width="500"/>
 
-Now you need to setup the integration by entering the target endpoint. Ensure the type is **POST** and enter as Endpoint URL **https://dev.disk91.com/fieldtester/helium/v3**. At the end of the form, enter a name of your choice for this integration and click on **Add Integration**
+Now you need to setup the integration by entering the target endpoint. Ensure the type is **POST** and enter as Endpoint URL: 
+```
+https://dev.disk91.com/fieldtester/helium/v3
+```
+At the end of the form, enter a name of your choice for this integration and click on **Add Integration**
 
 <img src="../img/HNTv2_Create_an_integration_type_http_details.png" alt="Helium Integration HTTP details" width="500"/>
 
@@ -88,7 +92,7 @@ Now we need to associate this configuration to the Lable on the **Flow** page
 
 Then click on the **Label** displayed on the Flow background page to edit its setting. Select the **Packets** tab and in this page, enable the corresponding **Multi-packets** configuration.
 
-<img src="../img/HNTv2_Create_a_multipacket_config.png" alt="Helium Label multi-packets association" width="500"/>
+<img src="../img/HNTv2_Create_a_multipacket_config_affect.png" alt="Helium Label multi-packets association" width="500"/>
 
 After doing this, you need to **Save** the flow settings.
 
