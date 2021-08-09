@@ -17,6 +17,13 @@ You can order the board directly to different service on Internet:
 
 **Kits available on [IngeniousThings shop](https://shop.ingeniousthings.fr/products/helium-lorawan-field-tester-and-mapper-kit)**
 
+## Schematics
+
+Take a look at *board* directory for details on PCB & components.
+
+Here is the simplified version of the schematics for DiY implementation.
+<img src="../img/Wio-LoRaWan-FieldTester-schema.png" alt="basic schematic" width="500"/> 
+
 # BOM
 
 ## LoRaWan only version
@@ -73,4 +80,11 @@ Estimated BOM price around $20
 Estimated BOM price around $25 
 
 When connecting a LiPo battery, please make sure of the battery polarity according to the polarity printed on the PCB. There is no rules about LiPo battery polarity.
+
+# Enclosure
+
+3D printed enclosure can be found in the [enclosure directory](../enclosure/). You will find the two parts of the enclosure in different STL files. You will also find the FreeCad source file in case you want to modify /improve it.
+
+The enclosure is closed and attached to the WioTerminal with [2 screws DIN965, M2 L16mm](https://www.bricovis.fr/produit-vis-a-tete-fraisee-pozidriv-acier-zingue-blanc-din-965-tfzzn/#TFZ02/016ZN)
+
 
