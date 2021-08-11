@@ -14,6 +14,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with Wio LoRaWan Field Tester.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *  Author : Paul Pinault (disk91.com)
  */  
 #include <Arduino.h>
 #include "config.h"
