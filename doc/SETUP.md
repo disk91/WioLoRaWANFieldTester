@@ -110,7 +110,7 @@ You can use the command line for the setup instead of using a Serial tool. If yo
 /dev/tty.usbmodem123456
 /dev/tty. ...
 ```
-- Pass the different command seen in the previous section with the following Serial tool, replacing the tty name by the righ value.
+- Pass the different command seen in the previous section with the following Serial tool, replacing the tty name by the right value.
 ```
 [~] screen /dev/tty.usbmodem123456 9600
 D=DB6B416730000000
