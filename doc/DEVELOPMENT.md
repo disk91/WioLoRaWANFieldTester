@@ -56,7 +56,7 @@ LoRaWAN library needs to be setup for you local zone:
 
 - The **key.h** file containes the LoRaWAN credential. When all set to 0, the device will expect a serial port configuration as seen in the setup. 
 
-When developping it is more convenient to use a static configuration to avoid reconfiguring the device on every firmware update. For this, you can get the credential as defined in the [Access Helium device credential for developper](ObtainCredsFromHelium.md) section of the documentation.
+When developing it is more convenient to use a static configuration to avoid reconfiguring the device on every firmware update. For this, you can get the credential as defined in the [Access Helium device credential for developer](ObtainCredsFromHelium.md) section of the documentation.
 
 Then you can directly replace the **key.h** variable content with what you have copy & paste.
 
@@ -123,7 +123,7 @@ Create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a mapper 
     https://github.com/disk91/WioLoRaWANFieldTester/blob/master/WioLoRaWanFieldTester.ino
     https://www.disk91.com/2015/technology/sigfox/telecom-design-sdk-decode-gps-frame/
 
-  Integartion:
+  Integration:
     POST https://mappers.helium.com/api/v1/ingest/uplink
 */
 
