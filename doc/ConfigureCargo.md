@@ -4,10 +4,26 @@
 
 ## Cargo integration
 
-The integration above can be used, create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a cargo integration. 
+[Cargo](https://cargo.helium.com/) is a tool from Helium to display real-time tracking device position on a map. This tool displays your position publically but is really easy to use. As is also displayed the coverage map as an extra layer, it is a usefull tool to find the hexagone not yet tested to complete the coverage map.
+In this tool, you will search your device by its name, the use of a uniq name will help you to find it.
 
-- Create a POST on https://cargo.helium.com/api/payloads
-- Associate the following decoding function
+To make Cargo working with WioLoRaWANFieldTester, we need to create a decoding function to pass it the device coordinate in the righ format.
+
+## Setup a decoding function
+
+Create a decoding function from the [Helium console](https://console.helium.com) dashboard. Click on the **+** button and select **Add function**
+
+<img src="../img/HNTv2_Cargo_Create_Function.png" alt="Helium create new function" width="500"/>
+
+Once in the **Add function** screen, you need to give it a name:
+
+<img src="../img/HNTv2_Cargo_Create_decoder.png" alt="Helium create new function" width="500"/>
+
+Then you can type the decoder function. This function will proceed the payload received from the device and convert it in a structure the Cargo application is able to understand.
+
+<img src="../img/HNTv2_Cargo_decoder_function.png" alt="Helium create new decoder" width="500"/>
+
+Copy & Paste the follwoing JS content into the decoder textarea:
 
 ```
 function Decoder(bytes, port) { 
@@ -47,3 +63,52 @@ function Decoder(bytes, port) {
   return decoded;
 }
 ```
+
+## Setup Cargo integration
+
+Now you need to create an Integration with Cargo, for this, create a new integration
+
+<img src="../img/HNTv2_Create_an_integration_from_console.png" alt="Helium create new integration" width="500"/>
+
+You need to select the type of integration, here it is **Cargo**:
+
+<img src="../img/HNTv2_Create_Cargo_Integration.png" alt="Helium create new Cargo integration" width="500"/>
+
+Please read the warning about data privacy and accept it if you agrea on the terms:
+
+<img src="../img/HNTv2_Create_Cargo_Integration2.png" alt="Helium create new Cargo integration" width="500"/>
+
+Now you can give a name to this integration:
+
+<img src="../img/HNTv2_Create_Cargo_Integration3.png" alt="Helium create new Cargo integration" width="500"/>
+
+As you can see, we do not need to give details about the integration endpoint, by selecting Cargo integration, the console automatically knows how to transfer the informations. 
+
+## Setup Cargo flow
+
+Now, you need to make the link between our **Label**, the created **Function** and the Cargo **Integration**.
+For this you, go the the **Flow** panel:
+
+<img src="../img/HNTv2_Create_a_flow_from_console.png" alt="Helium create new flow" width="500"/>
+
+Once in it, you can extend the Node to access the different tabs:
+
+<img src="../img/HNTv2_Create_Cargo_Flow.png" alt="Helium modify a flow" width="500"/>
+
+Then you need to insert the **Function** previously created by selecting the Function tab, then drag & drop the created function into the flow diagram:
+
+<img src="../img/HNTv2_Create_Cargo_Flow_Add_Function.png" alt="Helium modify a flow" width="500"/>
+
+Then you need to do the same with the Cargo **Integration**. Select the Integration tab and drag & drop the Cargo integration you previously created.
+
+<img src="../img/HNTv2_Create_Cargo_Flow_Add_Integration.png" alt="Helium modify a flow" width="500"/>
+
+All these components, now, need to be linked together to create the flow. Click on the node's connectors and drag your mouse up to the destination.
+
+<img src="../img/HNTv2_Create_Cargo_Flow_Links.png" alt="Helium modify a flow" width="500"/>
+
+To make sure all these changes will be applied, don't forget to **Save** your changes:
+
+<img src="../img/HNTv2_Create_a_multipacket_config_save.png" alt="Helium modify a flow" width="500"/>
+
+## Your Cargo setup is **DONE** you can go back to [installation page](SETUP.md) for the next steps

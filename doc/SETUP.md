@@ -99,7 +99,7 @@ LoRaWan configuration OK
 The device now automatically starts to the main dashboard. You are **DONE !**
 
 
-#### Use the command line
+#### (Alternative) Use the command line
 
 You can use the command line for the setup instead of using a Serial tool. If you proceed the way above, **you do not need to execute this step**.
 
