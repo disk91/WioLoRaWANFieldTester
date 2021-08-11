@@ -1,20 +1,74 @@
 # How to compile and develop WioLoRaWANFieldTester
 
-** Page under construction **
-
 You can use WioLoRaWANFieldTester without a need to compile it by following the [Quick installation guide](SETUP.md). If you want to compile your proper version of it or if you want to contribute on the project by adding feature of fixing some bugs, here are the following steps.
 
 ## Required environement
 
 The installation details are available in the related [Wio LoRaWan Field tester on disk91.com](https://www.disk91.com/?p=5187) 
 
-### Required libraries
+### Required software components
+* Arduino IDE
+* WioTerminal - [Toolsuite](Wio Terminal toolchain)
 * GPS - Adafruit GPS library version 1.5.4
-* LoRaWAn - Mcci...
+* LoRaWAN - MCCI LoRaWAN LMIC library (by IBM, Matthjs Kooljman…) version 3.3.0
 * File system - Seeed Arduino FS version 2.0.3 (not yet implemented)
 * File system - Seeed Ardunino SFUD version 2.0.1 (not yet implemented)
 * Flash - FlashStorage by various version 1.0.0 (not yet implemented)
 
+### Configuring the software components
+
+LoRaWAN library needs to be setup for you local zone: 
+  
+- Edit the file **lmic_project_config.h** located in _Document/Arduino/libraries/MCCI_LoRaWAN_LMIC_library/project_config_
+
+  You need to uncomment the line corresponding to your zone (us915, eu868...) and comment the others.
+  Make sure the other defines are the same as above.
+  ```C
+  //
+  // Select your radio zone and coutry
+  //
+  //#define CFG_eu868 1
+  #define CFG_us915 1
+  //#define CFG_au915 1
+  ...
+  #define CFG_sx1276_radio 1
+  //#define LMIC_USE_INTERRUPTS
+  #define LMIC_LORAWAN_SPEC_VERSION   LMIC_LORAWAN_SPEC_VERSION_1_0_2
+  #define DISABLE_BEACONS
+  #define DISABLE_PING
+  ```
+
+### Configure the WioLoRaWANFieldTester software
+
+- The **config.h** file contains the configuration defines. Enable / Disable what you need
+
+```C
+//#define DEBUG                       // enable extra debug logs on serial
+ 
+#define WITH_SPLASH         1         // Enable splash screen
+#define WITH_SPLASH_HELIUM  1         //   display helium logo
+#define WITH_SPLASH_TTN     1         //   display TTN logo
+
+#define WITH_GPS                      // if defined the GPS code is enable
+#define WITH_LIPO                     // if defined the LiPo status & charging code is enable
+
+```
+
+- The **key.h** file containes the LoRaWAN credential. When all set to 0, the device will expect a serial port configuration as seen in the setup. 
+
+When developping it is more convenient to use a static configuration to avoid reconfiguring the device on every firmware update. For this, you can get the credential as defined in the [Access Helium device credential for developper](ObtainCredsFromHelium.md) section of the documentation.
+
+Then you can directly replace the **key.h** variable content with what you have copy & paste.
+
+```C
+#define __DEVEUI { 0x7B, 0xC9, 0xFF, 0x47, 0xE6, 0x49, 0x41, 0xA7 }
+#define __APPEUI { 0xD3, 0x77, 0x5B, 0x2C, 0x39, 0x93, 0x58, 0x20 }
+#define __APPKEY { 0xE5, 0xC1, 0xD9, 0x44, 0xB4, 0x0D, 0x5D, 0x1C, 0x8B, 0xFB, 0x14, 0x8B, 0x1E, 0x8C, 0x2C, 0xA5 }
+```
+
+### Modify and Compile
+
+There is nothing specific about compilation & upload. If you add feature or fixing bug in you private fork, don't forget to propose a pull-request.
 
 ### Creating UF2 files
 
