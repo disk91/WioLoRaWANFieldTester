@@ -6,7 +6,7 @@ You have previously created a device in the helium console. Now we need to setup
 
 From the [console dashboard](https://console.helium.com), access the device page and search for your device. Click on its name to get the details.
 
-<img src="../img/HNTv2_Access_Device_detail_from_console.png" alt="Helium access device details" width="500"/>
+<img src="../img/HNTv2_Access_device_from_console.png" alt="Helium access device details" width="500"/>
 
 Once you are on the device page, you can access the device credentials. For the standard use of them, you need to get the hexadecimal string of each of the credentials. For this, you can directly use the **Copy to clipboard** icon to get each of the credentials. The DevKEY is displayed clicking on the **eyes** icon before using the **copy to clipboard** icon.
 
