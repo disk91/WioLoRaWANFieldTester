@@ -34,7 +34,7 @@ This operation depends on your network provider:
 
 ### Configure your device with the credentials
 
-The device uses the Serial line (Wioterminal USB) to receives the LoRaWAN configuration. You need to execute a serie of command the WioLoRaWABFieldTester understand to do this setup.
+The device uses the Serial line (Wioterminal USB) to receives the LoRaWAN configuration. You need to execute a series of commands the WioLoRaWABFieldTester understand to do this setup.
 
 For this, you need to use a serial tool or the command line. The tools I recommand are:
 - Windows : [Putty](https://www.putty.org/)
