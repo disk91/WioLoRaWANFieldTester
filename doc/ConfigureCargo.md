@@ -1,7 +1,5 @@
 # Configure cargo
 
-** Work in progress to make this page more User friendly... **
-
 ## Cargo integration
 
 [Cargo](https://cargo.helium.com/) is a tool from Helium to display real-time tracking device position on a map. This tool displays your position publically but is really easy to use. As is also displayed the coverage map as an extra layer, it is a usefull tool to find the hexagone not yet tested to complete the coverage map.
