@@ -5,10 +5,10 @@ Once you have your WioTerminal and your FieldTester add-on board, you need to pr
 ## Install Firmware on the WioTerminal
 
 - You can directly upload the following binaries:
-  * [EU868 with GPS enable](binaries/WioLoRaWANFieldTester_EU868_GPS.uf2)
-  * [EU868 with GPS disable](binaries/WioLoRaWANFieldTester_EU868_NOGPS.uf2)
-  * [US915 with GPS enable](binaries/WioLoRaWANFieldTester_US915_GPS.uf2)
-  * [US915 with GPS disable](binaries/WioLoRaWANFieldTester_US915_NOGPS.uf2)
+  * [EU868 with GPS enable](../binaries/WioLoRaWANFieldTester_EU868_GPS.uf2)
+  * [EU868 with GPS disable](../binaries/WioLoRaWANFieldTester_EU868_NOGPS.uf2)
+  * [US915 with GPS enable](../binaries/WioLoRaWANFieldTester_US915_GPS.uf2)
+  * [US915 with GPS disable](../binaries/WioLoRaWANFieldTester_US915_NOGPS.uf2)
 - Once downloaded
   * Switch the Wio Terminal ON with the lateral button
   * Switch to bootloader mode by puching down power button twice very quickly. Sequence is ON / RESET / ON / RESET / ON. This mount an Arduino drive on the computer.
@@ -124,4 +124,4 @@ D=DB6B416730000000
 
 
 
-onfiguration and is ready.
+Configuration is ready.
