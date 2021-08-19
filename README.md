@@ -4,7 +4,7 @@
 
 ## What's is it about
 
-When deploying a LoRaWAN network you want to know your gateway coverage and measure the radio performance in different places. When deploying Helium network you particularly want to know how many Hotspot around can be touched for a given position.
+When deploying a LoRaWAN network you want to know your gateway coverage and measure the radio performance in different places. When deploying Helium network you particularly want to know how many Hotspot around can be touched for a given position. Then you want to enrich the network mappers to know and share the real network coverage.
 
 There are some existing tools for such application but the cost is about $200. The idea of this project is to propose a simple tool you can build on your own with low cost hardware to fulfill this purpose.
 
@@ -13,10 +13,11 @@ The solution is based on low cost products, easy to find for about $50:
 - [RFM95](https://www.disk91.com/2019/technology/lora/hoperf-rfm95-and-arduino-a-low-cost-lorawan-solution/)
 - Quectel L80 / L86 GNSS
 
-### Current status
-- Ready, documentation in progress.
+## How it works 
 
-### Features
+To get a better understanding on how WioLoRaWANFieldTester works, [read this page](doc/HowItWorks.md).
+
+## Features
 - Easy selection for Power / Sf / max retries
 - Duty cycle status display
 - Last setting flash memory backup
@@ -44,7 +45,8 @@ The solution is based on low cost products, easy to find for about $50:
 
 The WioLoRaWANFieldTester board can be
 - [Make](board/README.md)
-- [Buy](https://shop.ingeniousthings.fr/products/helium-lorawan-field-tester-and-mapper-kit) as a kit
+- [Buy & DiY](https://shop.ingeniousthings.fr/products/helium-lorawan-field-tester-and-mapper-kit) as a kit
+- Plug & Play (comming soon)
 
 ## Quick installation and setup
 
@@ -57,11 +59,5 @@ Read the [User Guide documentation](doc/UserGuide.md)
 ## Contribute to developement
 
 Read the [developer documentation](doc/DEVELOPMENT.md)
-
-
-
-
-
-
 
 
