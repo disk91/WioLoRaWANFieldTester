@@ -504,7 +504,7 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
   }
   if ( loraContext.lastRetry != retries ) {
     // set retries
-    sprintf(_cmd,"AT+RETRY=%d",retries);
+    sprintf(_cmd,"AT+RETRY=%d",retries+1);
     if ( sendATCommand(_cmd,"+RETRY:","+RETRY: ERR","",DEFAULT_TIMEOUT,false,NULL) ) {
       loraContext.lastRetry = retries;
     } else {
