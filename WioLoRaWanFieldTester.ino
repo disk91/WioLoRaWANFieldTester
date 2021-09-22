@@ -21,7 +21,6 @@
 #include "Arduino.h"
 #include <SPI.h>
 #include "LoRaCom.h"
-#include <Wire.h>
 #include "config.h"
 #include "ui.h"
 #include "testeur.h"
@@ -67,7 +66,7 @@ void setup() {
 }
 
 
-void loop() {
+void loop(void) {
 
   static long cTime = 0;
   static long batUpdateTime = 0;

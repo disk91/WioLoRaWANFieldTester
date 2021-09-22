@@ -10,13 +10,18 @@ The installation details are available in the related [Wio LoRaWan Field tester 
 * Arduino IDE
 * WioTerminal - [Toolsuite](Wio Terminal toolchain)
 * GPS - Adafruit GPS library version 1.5.4
+
+#### RFM95 version
 * LoRaWAN - MCCI LoRaWAN LMIC library (by IBM, Matthjs Kooljman…) version 3.3.0
+
+#### Later
 * File system - Seeed Arduino FS version 2.0.3 (not yet implemented)
 * File system - Seeed Ardunino SFUD version 2.0.1 (not yet implemented)
 * Flash - FlashStorage by various version 1.0.0 (not yet implemented)
 
 ### Configuring the software components
 
+#### For RFM95 version
 LoRaWAN library needs to be setup for you local zone: 
   
 - Edit the file **lmic_project_config.h** located in _Document/Arduino/libraries/MCCI_LoRaWAN_LMIC_library/project_config_
@@ -37,6 +42,36 @@ LoRaWAN library needs to be setup for you local zone:
   #define DISABLE_BEACONS
   #define DISABLE_PING
   ```
+
+#### For LoRa-E5 version
+You need to setup the Mode as Slave (because they did not correctly wired the Serial line on E5 so this is a trick to bypass this hardware problem)
+
+Different setups needs to be performed in Libraries (so you know why I don't really like Arduino eco-system)
+- In SoftwareSerial Library (Libraries/Arduino15/packages/seeeduino/hardware/samd/1.8.2/libraries/SoftwareSerial/), in SoftwareSerial.h, change the Buffer Size
+```C
+   #define _SS_MAX_RX_BUFF 128 // RX buffer size
+```
+- In variant.cpp (Libraries/Arduino15/packages/seeeduino/hardware/samd/1.8.2/library/Wire/Wire.cpp), add in  the follwoing lines (they are conflicting with Wire from the same package) ( && defined FALSE ). This is to wait a fix from Seeed on their package.
+``` 
+#if WIRE_INTERFACES_COUNT > 1
+  TwoWire Wire1(&PERIPH_WIRE1, PIN_WIRE1_SDA, PIN_WIRE1_SCL);
+
+  void WIRE1_IT_HANDLER(void) {
+    Wire1.onService();
+  }
+
+  #if defined(__SAMD51__) && defined FALSE
+    void WIRE1_IT_HANDLER_0(void) { Wire1.onService(); }
+    void WIRE1_IT_HANDLER_1(void) { Wire1.onService(); }
+    void WIRE1_IT_HANDLER_2(void) { Wire1.onService(); }
+    void WIRE1_IT_HANDLER_3(void) { Wire1.onService(); }
+  #endif // __SAMD51__
+#endif
+```
+- In Adafruit_GOS_Library (Documents/Arduino/libraries/Adafruit_GPS_Library/src), in Adafruit_GPS.h, add the following define to allow SoftwareSerial
+```C
+  #define ESP8266 // Hack
+``
 
 ### Configure the WioLoRaWANFieldTester software
 

@@ -20,22 +20,44 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-
+// 1 - select if you want some debug
 //#define DEBUG
 //#define DEBUGGPS
 
-#define RFM95_NSS_PIN   0
-#define RFM95_RST_PIN   1
-#define RFM95_DIO_0     3
-#define RFM95_DIO_1     2
-#define LIPO_ADC        A4
 
+#define RFM95      0
+#define LORAE5     1
+
+// 2 - select the target board, original one based on RFM95 or Seed LoRa E5 version
+#define HWTARGET            LORAE5
+
+#if HWTARGET == LORAE5
+// 3 - select the zone
+//  #define CFG_us915
+  #define CFG_eu868
+//  #define CFG_as923
+//  #define CFG_kr920
+//  #define CFG_ir865
+  #define WITH_GPS
+  #define SERIALE5  Serial1
+#endif
+
+#if HWTARGET == RFM95
+  #define RFM95_NSS_PIN   0
+  #define RFM95_RST_PIN   1
+  #define RFM95_DIO_0     3
+  #define RFM95_DIO_1     2
+  #define LIPO_ADC        A4
+// 3 - select possible options
+  #define WITH_GPS
+  #define WITH_LIPO
+#endif
+
+// 4 - Active on of the possible Splash screen ( or none or both )
 #define WITH_SPLASH         1
 #define WITH_SPLASH_HELIUM  1   
 //#define WITH_SPLASH_TTN     1
 
-#define WITH_GPS
-#define WITH_LIPO
 
 #ifdef DEBUG
   #define LOGLN(x)  Serial.println x

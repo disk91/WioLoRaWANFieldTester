@@ -13,6 +13,11 @@ The solution is based on low cost products, easy to find for about $50:
 - [RFM95](https://www.disk91.com/2019/technology/lora/hoperf-rfm95-and-arduino-a-low-cost-lorawan-solution/)
 - Quectel L80 / L86 GNSS
 
+The solution also supports ready for use hardware:
+- [Wio Terminal](https://wiki.seeedstudio.com/Wio-Terminal-Getting-Started/)
+- [LoRaWan Chassis](https://www.seeedstudio.com/Wio-Terminal-Chassis-LoRa-E5-and-GNSS-p-5053.html)
+- [Battery Chassis](https://www.seeedstudio.com/Wio-Terminal-Chassis-Battery-650mAh-p-4756.html)
+
 ## How it works 
 
 To get a better understanding on how WioLoRaWANFieldTester works, [read this page](doc/HowItWorks.md).
@@ -46,7 +51,7 @@ To get a better understanding on how WioLoRaWANFieldTester works, [read this pag
 The WioLoRaWANFieldTester board can be
 - [Make](board/README.md)
 - [Buy & DiY](https://shop.ingeniousthings.fr/products/helium-lorawan-field-tester-and-mapper-kit) as a kit
-- Plug & Play (comming soon)
+- [Buy](https://www.seeedstudio.com/Wio-Terminal-Chassis-LoRa-E5-and-GNSS-p-5053.html)
 
 ## Quick installation and setup
 

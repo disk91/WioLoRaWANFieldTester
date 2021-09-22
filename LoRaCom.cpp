@@ -18,12 +18,14 @@
  *  Author : Paul Pinault (disk91.com)
  */  
 #include <Arduino.h>
+#include "config.h"
+#include "LoRaCom.h"
+#if HWTARGET == RFM95
+
 #include <lmic.h>
 #include <hal/hal.h>
-#include "config.h"
 #include "testeur.h"
 #include "ui.h"
-#include "LoRaCom.h"
 
 //static osjob_t sendjob;
 static boolean isTransmitting;
@@ -37,7 +39,6 @@ const lmic_pinmap lmic_pins = {
     .dio = {RFM95_DIO_0, RFM95_DIO_1, LMIC_UNUSED_PIN},
 };
 
-loraConf_t loraConf;
 
 // Normal order
 void os_getArtEui (u1_t* buf) { 
@@ -56,151 +57,6 @@ void os_getDevEui (u1_t* buf) {
 // practice, a key taken from ttnctl can be copied as-is.
 void os_getDevKey (u1_t* buf) {   
   memcpy_P(buf, loraConf.appkey, 16);
-}
-
-// Manage the customer device IDs setup over the serial line
-uint8_t __charToHex(uint8_t c) {
-  if ( c >= 'A' && c <= 'F' ) {
-    return 0xa + ( c - 'A' );
-  }
-  if ( c >= 'a' && c <= 'f' ) {
-    return 0xa + ( c - 'a' );
-  }
-  if ( c >= '0' && c <= '9' ) {
-    return ( c - '0' );
-  }
-  return 0xFF;
-}
-
-#define __LCONF_STATE_NONE    0
-#define __LCONF_STATE_DEVEUI  1
-#define __LCONF_STATE_APPEUI  2
-#define __LCONF_STATE_APPKEY  4
-#define __LCONF_STATE_ALL_DONE  7
-void processLoRaConfig(void) {
-  static uint8_t state=__LCONF_STATE_NONE;
-  static uint8_t confStatus=__LCONF_STATE_NONE;
-  static uint8_t pos;
-  static uint8_t confirmed;
-  while ( SERIALCONFIG.available() ) {
-    uint8_t c = SERIALCONFIG.read();
-    if ( state == __LCONF_STATE_NONE ) {
-      switch (c) {
-        case 'D' : // device EUI
-                   state = __LCONF_STATE_DEVEUI;
-                   break;
-        case 'A' : // App EUI
-                   state = __LCONF_STATE_APPEUI;
-                   break;
-        case 'K' : // App KEY
-                   state = __LCONF_STATE_APPKEY;
-                   break;
-        case '\n': // forget
-        case '\r': 
-                   break;
-        default: // invalid Value
-                   SERIALCONFIG.println("KO");
-                   break;
-      }
-      confirmed = 0;
-    } else {
-      if ( confirmed == 0 ) {
-        // here, we are expecting "="
-        if ( c == '=' ) {
-          confirmed = 1;
-          pos = 0;
-        } else {
-          SERIALCONFIG.println("KO");
-          state = __LCONF_STATE_NONE;
-        }
-      } else {
-        // Now we are processing the Hex Values
-        switch (state) {
-          case __LCONF_STATE_DEVEUI: {
-            uint8_t v = __charToHex(c);
-            if ( v == 0xFF ) goto invalid;
-            if ( pos >= 16 ) goto invalid;
-            if ( (pos & 1) == 0 ) { // High quartet
-              loraConf.deveui[pos/2] = 16*v;
-            } else {
-              loraConf.deveui[pos/2] += v;
-            }
-            pos++;
-            if ( pos == 16 ) {
-              // end of setup
-              SERIALCONFIG.print("DEVEUI:");
-              for (int i = 0 ; i < 8 ; i++) {
-                SERIALCONFIG.printf("%02X",loraConf.deveui[i]);
-              }
-              SERIALCONFIG.println();
-              SERIALCONFIG.println("OK");
-              confStatus |= __LCONF_STATE_DEVEUI;
-              state = __LCONF_STATE_NONE;
-            }
-          }
-          break;
-          case __LCONF_STATE_APPEUI: {
-            uint8_t v = __charToHex(c);
-            if ( v == 0xFF ) goto invalid;
-            if ( pos >= 16 ) goto invalid;
-            if ( (pos & 1) == 0 ) { // High quartet
-              loraConf.appeui[pos/2] = 16*v;
-            } else {
-              loraConf.appeui[pos/2] += v;
-            }
-            pos++;
-            if ( pos == 16 ) {
-              // end of setup
-              SERIALCONFIG.print("APPEUI:");
-              for (int i = 0 ; i < 8 ; i++) {
-                SERIALCONFIG.printf("%02X",loraConf.appeui[i]);
-              }
-              SERIALCONFIG.println();
-              SERIALCONFIG.println("OK");
-              confStatus |= __LCONF_STATE_APPEUI;
-              state = __LCONF_STATE_NONE;
-            }
-          }
-          break;            
-          case __LCONF_STATE_APPKEY: {
-            uint8_t v = __charToHex(c);
-            if ( v == 0xFF ) goto invalid;
-            if ( pos >= 32 ) goto invalid;
-            if ( (pos & 1) == 0 ) { // High quartet
-              loraConf.appkey[pos/2] = 16*v;
-            } else {
-              loraConf.appkey[pos/2] += v;
-            }
-            pos++;
-            if ( pos == 32 ) {
-              // end of setup
-              SERIALCONFIG.print("APPKEY:");
-              for (int i = 0 ; i < 16 ; i++) {
-                SERIALCONFIG.printf("%02X",loraConf.appkey[i]);
-              }
-              SERIALCONFIG.println();
-              SERIALCONFIG.println("OK");
-              confStatus |= __LCONF_STATE_APPKEY;
-              state = __LCONF_STATE_NONE;
-            }
-          }
-          break;            
-        }
-      }
-    }  
-  }
-  // Terminate setting when everything is ok
-  if ( confStatus == __LCONF_STATE_ALL_DONE ) {
-    // Save & reboot
-    storeConfig();
-    SERIALCONFIG.println("LoRaWan configuration OK");
-    NVIC_SystemReset();
-  }
-  return;
-invalid:
-     SERIALCONFIG.println("KO");
-     state = __LCONF_STATE_NONE;
-     return;
 }
 
 void loraSetup(void) {
@@ -272,7 +128,17 @@ boolean canLoRaSend() {
 
  
 static uint8_t countRepeat = 0;
-void do_send(uint8_t port, uint8_t * data, uint8_t sz, _dr_configured_t dr, uint8_t pwr, bool acked, uint8_t retries ) {
+void do_send(uint8_t port, uint8_t * data, uint8_t sz, _dr_configured_t _dr, uint8_t pwr, bool acked, uint8_t retries ) {
+
+    _dr_configured_t dr;
+    switch ( _dr ) {
+      case 12 : dr = DR_SF12; break;
+      case 11 : dr = DR_SF11; break;
+      case 10 : dr = DR_SF10; break;
+      case 9 : dr = DR_SF9; break;
+      case 8 : dr = DR_SF8; break;
+      default : dr = DR_SF7; break;
+    }
   
     if ( ! canLoRaSend() ) {
       // Duty cycle limitation
@@ -458,4 +324,158 @@ void onEvent (ev_t ev) {
         //    Serial.println((unsigned) ev);
             break;
     }
+}
+#endif
+
+
+/* =======================================================
+ * Manage LoRaWan configuration IDs 
+ * =======================================================
+ */
+loraConf_t loraConf;
+
+// Manage the customer device IDs setup over the serial line
+uint8_t __charToHex(uint8_t c) {
+  if ( c >= 'A' && c <= 'F' ) {
+    return 0xa + ( c - 'A' );
+  }
+  if ( c >= 'a' && c <= 'f' ) {
+    return 0xa + ( c - 'a' );
+  }
+  if ( c >= '0' && c <= '9' ) {
+    return ( c - '0' );
+  }
+  return 0xFF;
+}
+
+
+#define __LCONF_STATE_NONE    0
+#define __LCONF_STATE_DEVEUI  1
+#define __LCONF_STATE_APPEUI  2
+#define __LCONF_STATE_APPKEY  4
+#define __LCONF_STATE_ALL_DONE  7
+void processLoRaConfig(void) {
+  static uint8_t state=__LCONF_STATE_NONE;
+  static uint8_t confStatus=__LCONF_STATE_NONE;
+  static uint8_t pos;
+  static uint8_t confirmed;
+  while ( SERIALCONFIG.available() ) {
+    uint8_t c = SERIALCONFIG.read();
+    if ( state == __LCONF_STATE_NONE ) {
+      switch (c) {
+        case 'D' : // device EUI
+                   state = __LCONF_STATE_DEVEUI;
+                   break;
+        case 'A' : // App EUI
+                   state = __LCONF_STATE_APPEUI;
+                   break;
+        case 'K' : // App KEY
+                   state = __LCONF_STATE_APPKEY;
+                   break;
+        case '\n': // forget
+        case '\r': 
+                   break;
+        default: // invalid Value
+                   SERIALCONFIG.println("KO");
+                   break;
+      }
+      confirmed = 0;
+    } else {
+      if ( confirmed == 0 ) {
+        // here, we are expecting "="
+        if ( c == '=' ) {
+          confirmed = 1;
+          pos = 0;
+        } else {
+          SERIALCONFIG.println("KO");
+          state = __LCONF_STATE_NONE;
+        }
+      } else {
+        // Now we are processing the Hex Values
+        switch (state) {
+          case __LCONF_STATE_DEVEUI: {
+            uint8_t v = __charToHex(c);
+            if ( v == 0xFF ) goto invalid;
+            if ( pos >= 16 ) goto invalid;
+            if ( (pos & 1) == 0 ) { // High quartet
+              loraConf.deveui[pos/2] = 16*v;
+            } else {
+              loraConf.deveui[pos/2] += v;
+            }
+            pos++;
+            if ( pos == 16 ) {
+              // end of setup
+              SERIALCONFIG.print("DEVEUI:");
+              for (int i = 0 ; i < 8 ; i++) {
+                SERIALCONFIG.printf("%02X",loraConf.deveui[i]);
+              }
+              SERIALCONFIG.println();
+              SERIALCONFIG.println("OK");
+              confStatus |= __LCONF_STATE_DEVEUI;
+              state = __LCONF_STATE_NONE;
+            }
+          }
+          break;
+          case __LCONF_STATE_APPEUI: {
+            uint8_t v = __charToHex(c);
+            if ( v == 0xFF ) goto invalid;
+            if ( pos >= 16 ) goto invalid;
+            if ( (pos & 1) == 0 ) { // High quartet
+              loraConf.appeui[pos/2] = 16*v;
+            } else {
+              loraConf.appeui[pos/2] += v;
+            }
+            pos++;
+            if ( pos == 16 ) {
+              // end of setup
+              SERIALCONFIG.print("APPEUI:");
+              for (int i = 0 ; i < 8 ; i++) {
+                SERIALCONFIG.printf("%02X",loraConf.appeui[i]);
+              }
+              SERIALCONFIG.println();
+              SERIALCONFIG.println("OK");
+              confStatus |= __LCONF_STATE_APPEUI;
+              state = __LCONF_STATE_NONE;
+            }
+          }
+          break;            
+          case __LCONF_STATE_APPKEY: {
+            uint8_t v = __charToHex(c);
+            if ( v == 0xFF ) goto invalid;
+            if ( pos >= 32 ) goto invalid;
+            if ( (pos & 1) == 0 ) { // High quartet
+              loraConf.appkey[pos/2] = 16*v;
+            } else {
+              loraConf.appkey[pos/2] += v;
+            }
+            pos++;
+            if ( pos == 32 ) {
+              // end of setup
+              SERIALCONFIG.print("APPKEY:");
+              for (int i = 0 ; i < 16 ; i++) {
+                SERIALCONFIG.printf("%02X",loraConf.appkey[i]);
+              }
+              SERIALCONFIG.println();
+              SERIALCONFIG.println("OK");
+              confStatus |= __LCONF_STATE_APPKEY;
+              state = __LCONF_STATE_NONE;
+            }
+          }
+          break;            
+        }
+      }
+    }  
+  }
+  // Terminate setting when everything is ok
+  if ( confStatus == __LCONF_STATE_ALL_DONE ) {
+    // Save & reboot
+    storeConfig();
+    SERIALCONFIG.println("LoRaWan configuration OK");
+    NVIC_SystemReset();
+  }
+  return;
+invalid:
+     SERIALCONFIG.println("KO");
+     state = __LCONF_STATE_NONE;
+     return;
 }

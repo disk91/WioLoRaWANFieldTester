@@ -39,12 +39,32 @@ uint64_t gpsEncodePosition48b() {
 
 #else
 #include <Adafruit_GPS.h>
-#define GPSSerial Serial1
+
+#if HWTARGET == LORAE5
+  #ifndef ESP8266
+  #error "you need to add #define ESP8266 in the Adafruit_GPS.h file in AdafruitGPS library
+  #endif
+  #include <SoftwareSerial.h>
+  SoftwareSerial softSerial(3,2);
+  #define GPSSerial softSerial
+#else
+  #define GPSSerial Serial1
+#endif
+
 Adafruit_GPS GPS(&GPSSerial);
 
 
 void gpsSetup() {
-  GPS.begin(9600);
+  #if HWTARGET == LORAE5
+    #if _SS_MAX_RX_BUFF < 128
+    #error "You must change the SoftSerial Buffer size in SoftSerial.h for 128"
+    #endif
+    delay(250);
+    GPS.begin(9600);
+    GPSSerial.listen();
+  #else
+    GPS.begin(9600);
+  #endif
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);
   //GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ); // 1 Hz update rate
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_200_MILLIHERTZ); // 5s update rate
@@ -59,9 +79,11 @@ void gpsSetup() {
   
 
 void gpsLoop() {
-
+  
   char c = GPS.read();
+  //Serial.print(c);
   if (GPS.newNMEAreceived()) {
+    //  Serial.print(GPS.lastNMEA());
     if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
       return; // we can fail to parse a sentence in which case we should just wait for another
   }
