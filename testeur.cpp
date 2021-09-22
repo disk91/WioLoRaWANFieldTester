@@ -18,7 +18,6 @@
  *  Author : Paul Pinault (disk91.com)
  */  
 #include <Arduino.h>
-#include <lmic.h>
 #include "config.h"
 #include "testeur.h"
 #include "keys.h"
@@ -108,6 +107,8 @@ void tst_setPower(int8_t pwr) {
    pwr &= 0xFE;
   #elif defined CFG_us915
     if ( pwr > 20 ) pwr = 20;
+  #elif defined CFG_as923
+    if ( pwr > 16 ) pwr = 16;
   #else
     #error "Not Yet implemented"
   #endif
@@ -121,6 +122,8 @@ void tst_setSf(uint8_t sf) {
     if ( sf > 12 ) sf = 12;
   #elif defined CFG_us915
     if ( sf > 10 ) sf = 10;
+  #elif defined CFG_as923
+    if ( sf > 12 ) sf = 12;
   #else
     #error "Not Yet implemented"
   #endif
@@ -129,29 +132,12 @@ void tst_setSf(uint8_t sf) {
 }
 
 void tst_setRetry(uint8_t retry) {
-  if ( retry > TXCONF_ATTEMPTS ) retry = TXCONF_ATTEMPTS;
+  if ( retry > MAX_RETRY ) retry = MAX_RETRY;
   if ( retry < 0 ) retry = 0;
   state.cRetry = retry;
 }
 
 
-_dr_configured_t getCurrentDr() {
-  switch (state.cSf) {
-    case 7:
-      return DR_SF7;
-    case 8:
-      return DR_SF8;
-    case 9:
-      return DR_SF9;
-    case 10:
-      return DR_SF10;
-#ifdef CFG_eu868
-    case 11:
-      return DR_SF11;
-    case 12:
-      return DR_SF12;
-#endif
-    default:
-      return DR_SF7;
-  }
+uint8_t getCurrentSf() {
+  return state.cSf;
 }

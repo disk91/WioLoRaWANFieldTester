@@ -451,22 +451,22 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
    #if defined CFG_eu868 || defined CFG_as923 || defined CFG_kr920 || defined CFG_ir865
     // DR0 - SF12 / DR5 - SF7
     switch (_dr) {
-      case DR_SF7:
+      case 7:
            retDr = sendATCommand("AT+DR=DR5","+DR: ***** DR5","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
            break;
-      case DR_SF8:
+      case 8:
            retDr = sendATCommand("AT+DR=DR4","+DR: ***** DR4","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
            break;
-      case DR_SF9:
+      case 9:
            retDr = sendATCommand("AT+DR=DR3","+DR: ***** DR3","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
            break;
-      case DR_SF10:
+      case 10:
            retDr = sendATCommand("AT+DR=DR2","+DR: ***** DR2","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
            break;
-      case DR_SF11:
+      case 11:
            retDr = sendATCommand("AT+DR=DR1","+DR: ***** DR1","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
            break;
-      case DR_SF12:
+      case 12:
            retDr = sendATCommand("AT+DR=DR0","+DR: ***** DR0","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
            break;
       default:
@@ -476,16 +476,16 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
    #elif defined CFG_us915
     // DR0 - SF10 / DR3 - SF7
     switch (_dr) {
-      case DR_SF7:
+      case 7:
            retDr = sendATCommand("AT+DR=DR3","+DR: ***** DR3","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
            break;
-      case DR_SF8:
+      case 8:
            retDr = sendATCommand("AT+DR=DR2","+DR: ***** DR2","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
            break;
-      case DR_SF9:
+      case 9:
            retDr = sendATCommand("AT+DR=DR1","+DR: ***** DR1","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
            break;
-      case DR_SF10:
+      case 10:
            retDr = sendATCommand("AT+DR=DR0","+DR: ***** DR0","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
            break;
       default:
@@ -520,12 +520,12 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
     // 1% based on SF and data size (24 Bytes)
     // @TODO also consider ack
     switch (_dr) {
-      case DR_SF7:  loraContext.estimatedDCMs = 8200;  break;
-      case DR_SF8:  loraContext.estimatedDCMs = 14400; break;
-      case DR_SF9:  loraContext.estimatedDCMs = 26700; break;
-      case DR_SF10: loraContext.estimatedDCMs = 49400; break;
-      case DR_SF11: loraContext.estimatedDCMs = 106900; break;
-      case DR_SF12: loraContext.estimatedDCMs = 197400;break;
+      case 7:  loraContext.estimatedDCMs = 8200;  break;
+      case 8:  loraContext.estimatedDCMs = 14400; break;
+      case 9:  loraContext.estimatedDCMs = 26700; break;
+      case 10: loraContext.estimatedDCMs = 49400; break;
+      case 11: loraContext.estimatedDCMs = 106900; break;
+      case 12: loraContext.estimatedDCMs = 197400;break;
       default:
            LOGLN(("Invalid SF"));
            return;
@@ -542,12 +542,12 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
        // @TODO also consider ack
        // @TODO make this more generic considering payload size
        switch (_dr) {
-        case DR_SF7:  loraContext.estimatedDCMs = 6200;  break;
-        case DR_SF8:  loraContext.estimatedDCMs = 11300; break;
-        case DR_SF9:  loraContext.estimatedDCMs = 20600; break;
-        case DR_SF10: loraContext.estimatedDCMs = 37100; break;
-        case DR_SF11: loraContext.estimatedDCMs = 82300; break;
-        case DR_SF12: loraContext.estimatedDCMs = 148300;break;
+        case 7:  loraContext.estimatedDCMs = 6200;  break;
+        case 8:  loraContext.estimatedDCMs = 11300; break;
+        case 9:  loraContext.estimatedDCMs = 20600; break;
+        case 10: loraContext.estimatedDCMs = 37100; break;
+        case 11: loraContext.estimatedDCMs = 82300; break;
+        case 12: loraContext.estimatedDCMs = 148300;break;
         default:
              LOGLN(("Invalid SF"));
              return;

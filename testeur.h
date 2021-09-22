@@ -17,7 +17,6 @@
  *
  *  Author : Paul Pinault (disk91.com)
  */  
-#include "lmic.h"
 #ifndef __TESTER_H
 #define __TESTER_H
 
@@ -75,6 +74,6 @@ void addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lo
 uint8_t getIndexInBuffer(int i);
 uint8_t getLastIndexWritten();
 uint8_t getIndexBySeq(int seq);
-_dr_configured_t getCurrentDr();
+uint8_t getCurrentSf();
 
 #endif

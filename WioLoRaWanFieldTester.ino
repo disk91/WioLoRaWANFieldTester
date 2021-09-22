@@ -105,7 +105,7 @@ void loop(void) {
   if ( state.cState == EMPTY_DWNLINK && canLoRaSend() ) {
     // clean the downlink queue
     // send messages on port2 : the backend will not proceed port 2.
-    do_send(2, emptyFrame, sizeof(emptyFrame),getCurrentDr(), state.cPwr,true, state.cRetry); 
+    do_send(2, emptyFrame, sizeof(emptyFrame),getCurrentSf(), state.cPwr,true, state.cRetry); 
   } else if ( fireMessage ) {
     // send a new test message on port 1, backend will create a downlink with information about network side reception
     cTime = 0;
@@ -125,7 +125,7 @@ void loop(void) {
     } else {
       bzero(myFrame, sizeof(myFrame));
     }
-    do_send(1, myFrame, sizeof(myFrame),getCurrentDr(), state.cPwr,true, state.cRetry); 
+    do_send(1, myFrame, sizeof(myFrame),getCurrentSf(), state.cPwr,true, state.cRetry); 
   }
   
   loraLoop();

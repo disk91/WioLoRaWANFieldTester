@@ -20,6 +20,8 @@
 #ifndef __LORACOM_H__
 #define __LORACOM_H__
 
+#define MAX_RETRY 5 
+
 typedef struct {
   uint8_t deveui[8];
   uint8_t appeui[8];

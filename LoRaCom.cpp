@@ -39,6 +39,26 @@ const lmic_pinmap lmic_pins = {
     .dio = {RFM95_DIO_0, RFM95_DIO_1, LMIC_UNUSED_PIN},
 };
 
+_dr_configured_t getCurrentDr() {
+  switch (getCurrentSf()) {
+    case 7:
+      return DR_SF7;
+    case 8:
+      return DR_SF8;
+    case 9:
+      return DR_SF9;
+    case 10:
+      return DR_SF10;
+#ifdef CFG_eu868
+    case 11:
+      return DR_SF11;
+    case 12:
+      return DR_SF12;
+#endif
+    default:
+      return DR_SF7;
+  }
+}
 
 // Normal order
 void os_getArtEui (u1_t* buf) { 
