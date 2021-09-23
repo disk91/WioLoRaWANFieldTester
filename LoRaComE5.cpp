@@ -152,6 +152,7 @@ bool processATResponse() {
   if ( duration > loraContext.maxDuration ) {
     loraContext.runningCommand = false;
     loraContext.statusCommand = false;
+    LOGLN(("LoRa timeout"));
     return true;
   }
   // process serial line response
@@ -177,6 +178,7 @@ bool processATResponse() {
               }
               loraContext.statusCommand = false;
               loraContext.respIndex = 0;
+              LOGLN(("LoRa Error"));
               return !loraContext.withEndingCondition;
           }
           if ( strlen(loraContext.bufOkResp) > 0 && startsWith(loraContext.bufResponse,loraContext.bufOkResp) ) {
@@ -553,7 +555,7 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
              return;
         }
       #endif
-      loraContext.estimatedDCMs *= retries;
+      loraContext.estimatedDCMs *= (retries+1);
       // Set Pport
       sprintf(_cmd,"AT+PORT=%d",port);
       if ( !sendATCommand(_cmd,"+PORT:","+PORT: ERR","",DEFAULT_TIMEOUT,false,NULL) ) {

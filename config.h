@@ -62,9 +62,11 @@
 #ifdef DEBUG
   #define LOGLN(x)  Serial.println x
   #define LOG(x) Serial.print x
+  #define LOGF(x) Serial.printf x
 #else
   #define LOGLN(x) 
   #define LOG(x)
+  #define LOGF(x)
 #endif
 
 #define SERIALCONFIG  Serial
