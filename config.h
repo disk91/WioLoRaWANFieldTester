@@ -29,15 +29,10 @@
 #define LORAE5     1
 
 // 2 - select the target board, original one based on RFM95 or Seed LoRa E5 version
-#define HWTARGET            LORAE5
+#define HWTARGET   LORAE5
 
 #if HWTARGET == LORAE5
-// 3 - select the zone
-//  #define CFG_us915
-  #define CFG_eu868
-//  #define CFG_as923
-//  #define CFG_kr920
-//  #define CFG_ir865
+  #define CFG_anyZone
   #define WITH_GPS
   #define SERIALE5  Serial1
 #endif

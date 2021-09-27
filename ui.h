@@ -68,6 +68,7 @@ extern TFT_eSPI tft;
 
 void configPending();
 void initScreen();
+void screenSetup();
 void refresUI();
 
 void refreshPower(); 
@@ -85,5 +86,23 @@ void refreshGps();
 bool refreshLiPo();
 void draw_splash_helium(int xOffset, int yOffset, int density);
 void draw_splash_ttn(int xOffset, int yOffset, int density);
+bool manageConfigScreen(bool interactive, bool firstRun);
+bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t action, bool refreshAll);
 
+#define CONF_ACTION_NONE     0
+#define CONF_ACTION_MODIFY   1
+#define CONF_ACTION_NEXTITEM 2
+#define CONF_ACTION_PREVITEM 3
+#define CONF_ACTION_NEXTCOL  4
+#define CONF_ACTION_PREVCOL  5
+#define CONF_ACTION_UP1      6
+#define CONF_ACTION_UP2      7
+#define CONF_ACTION_UP4      8
+
+#define CONF_ITEM_ZONE       1 
+#define CONF_ITEM_DEVEUI     2 
+#define CONF_ITEM_APPEUI     3 
+#define CONF_ITEM_APPKEY     4 
+#define CONF_ITEM_LAST       CONF_ITEM_APPKEY
+#define CONF_ITEM_FIRST      CONF_ITEM_ZONE
 #endif

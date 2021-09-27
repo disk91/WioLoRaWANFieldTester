@@ -45,21 +45,31 @@ void setup() {
      Serial.begin(9600);
   #endif
   initState();
-
+  initScreen();
 
   // Make sure the LoraWan configuration has been made if not wait for the configuration
   boolean zero = true;
   for ( int i = 0 ; i < 8 ; i++ ) {
     if ( loraConf.deveui[i] != 0 ) zero = false;
   }
+  bool first = true;
+  bool hasChange = false;
   if ( zero ) {
-    configPending();
+    //configPending();
     while (true) {
-      processLoRaConfig();
+      if ( manageConfigScreen(true, first || hasChange ) ){
+        NVIC_SystemReset();
+      }
+      first = false;
+      hasChange = processLoRaConfig();
     }
+  } else if ( digitalRead(WIO_5S_PRESS) == LOW ) {
+    while ( digitalRead(WIO_5S_PRESS) == LOW );
+    manageConfigScreen(false,true);
+    NVIC_SystemReset();
   }
 
-  initScreen();
+  screenSetup();
   loraSetup();
   gpsSetup();
   analogReference(AR_INTERNAL2V23);

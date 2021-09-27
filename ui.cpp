@@ -59,9 +59,6 @@ TFT_eSPI tft;
 ui_t ui;
 
 void configPending() {
-  tft.begin();
-  tft.setRotation(3);
-  tft.fillScreen(TFT_BLACK);
   tft.fillRect(0,120-20,320,40,TFT_WHITE);
   tft.setTextColor(TFT_BLACK);
   tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
@@ -72,10 +69,24 @@ void initScreen() {
   tft.begin();
   tft.setRotation(3);
   tft.fillScreen(TFT_BLACK);
+  pinMode(WIO_KEY_A, INPUT_PULLUP);
+  pinMode(WIO_KEY_B, INPUT_PULLUP);
+  pinMode(WIO_KEY_C, INPUT_PULLUP);
+  pinMode(WIO_5S_UP, INPUT_PULLUP);
+  pinMode(WIO_5S_DOWN, INPUT_PULLUP);
+  pinMode(WIO_5S_LEFT, INPUT_PULLUP);
+  pinMode(WIO_5S_RIGHT, INPUT_PULLUP);
+  pinMode(WIO_5S_PRESS, INPUT_PULLUP); 
+}
+
+void screenSetup() {
 
   // Totally unusefull so totally mandatory
   #ifdef WITH_SPLASH 
     tft.drawRoundRect((320-200)/2,200,200,10,5,TFT_WHITE);
+    tft.setTextColor(TFT_GRAY);
+    tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+    tft.drawString("disk91.com",(320-90)/2,215, GFXFF);  
     for ( int i = 10 ; i < 100 ; i+=4 ) {
       tft.fillRoundRect((320-200)/2+2,202,((204*i)/100),6,3,TFT_WHITE);
       #if (defined WITH_SPLASH_HELIUM) && ( WITH_SPLASH_HELIUM == 1 )
@@ -84,11 +95,10 @@ void initScreen() {
       #if (defined WITH_SPLASH_TTN) && ( WITH_SPLASH_TTN == 1 )
         draw_splash_ttn(TTN_XCENTER, (240-85)/2, i);
       #endif
-  }
-  delay(1500);
-#endif
-
-  tft.fillScreen(TFT_BLACK);
+    }
+    delay(1500);
+    tft.fillScreen(TFT_BLACK);
+  #endif
 
   if ( ! readConfig() ) {
     ui.selected_display = DISPLAY_RSSI_HIST;    
@@ -110,15 +120,6 @@ void initScreen() {
   refreshState();
   refreshMode();
   refreshLastFrame();
-
-  pinMode(WIO_KEY_A, INPUT_PULLUP);
-  pinMode(WIO_KEY_B, INPUT_PULLUP);
-  pinMode(WIO_KEY_C, INPUT_PULLUP);
-  pinMode(WIO_5S_UP, INPUT_PULLUP);
-  pinMode(WIO_5S_DOWN, INPUT_PULLUP);
-  pinMode(WIO_5S_LEFT, INPUT_PULLUP);
-  pinMode(WIO_5S_RIGHT, INPUT_PULLUP);
-  pinMode(WIO_5S_PRESS, INPUT_PULLUP); 
 }
 
 /**
@@ -840,6 +841,315 @@ void refreshGps() {
   } else {
      tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_RED);
   }
+}
 
+/** ********************************************************************
+ * Configuration screen
+ */
+/*
+#define CONF_ACTION_NONE     0
+#define CONF_ACTION_MODIFY   1
+#define CONF_ACTION_NEXTITEM 2
+#define CONF_ACTION_PREVITEM 3
+#define CONF_ACTION_NEXTCOL  4
+#define CONF_ACTION_PREVCOL  5
+#define CONF_ACTION_UP1      6
+#define CONF_ACTION_UP2      7
+#define CONF_ACTION_UP4      8
+
+#define CONF_ITEM_ZONE       1 
+#define CONF_ITEM_DEVEUI     2 
+#define CONF_ITEM_APPEUI     3 
+#define CONF_ITEM_APPKEY     4 
+*/
+
+// Return true when the configuration is valid
+static uint8_t _currentItem = CONF_ITEM_ZONE;
+static uint8_t _currentColumn = 0;
+bool manageConfigScreen(bool interactive, bool firstRun) {
+  uint8_t change = 0;
+  bool keyGet = false;
+  if ( firstRun ) {
+    displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NONE,true);
+  }
+  do {
+    if (digitalRead(WIO_5S_RIGHT) == LOW) {
+       if ( displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NEXTCOL,false) ) {
+         _currentColumn++;
+       }
+       keyGet = true;
+    } else if (digitalRead(WIO_5S_LEFT) == LOW) {
+       if ( displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_PREVCOL,false) ) {
+         _currentColumn--;
+       }
+       keyGet = true;
+    } else if (digitalRead(WIO_5S_UP) == LOW) {
+       if ( displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_PREVITEM,false) ) {
+         _currentItem--;
+         _currentColumn = 0;
+       }
+       keyGet = true;
+    } else if (digitalRead(WIO_5S_DOWN) == LOW) {
+       if ( displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NEXTITEM,false) ) {
+         _currentItem++;
+         _currentColumn = 0;
+       }
+       keyGet = true;
+    } else if (digitalRead(WIO_KEY_A) == LOW) {
+      change = 4;
+       keyGet = true;
+    } else if (digitalRead(WIO_KEY_B) == LOW) {
+      change = 2;
+       keyGet = true;
+    } else if (digitalRead(WIO_KEY_C) == LOW) {
+      change = 1;
+       keyGet = true;
+    } else if (digitalRead(WIO_5S_PRESS) == LOW) {
+      // save config once verified
+      uint32_t sumOfDevEUI = 0, sumOfAppEUI = 0, sumOfAppKEY = 0;
+      for ( int i = 0 ; i < 8 ; i++ ) {
+        sumOfDevEUI+= loraConf.deveui[i];
+        sumOfAppEUI+= loraConf.appeui[i];
+        sumOfAppKEY+= loraConf.appkey[i];
+        sumOfAppKEY+= loraConf.appkey[i+8];
+      }
+      if (    loraConf.zone != ZONE_UNDEFINED 
+           && sumOfDevEUI > 0
+           && sumOfAppEUI > 0
+           && sumOfAppKEY > 0
+         ) {
+          // make sure values are still valid for the new zone
+          tst_setPower(state.cPwr);
+          tst_setSf(state.cSf);
+          // assuming the conf is valid
+          storeConfig();
+          return true;
+      } else {
+        return false;
+      }
+      keyGet = true;
+    }
+    if ( change > 0 ) {
+      switch (_currentItem) {
+        case CONF_ITEM_ZONE:
+          #if HWTARGET == LORAE5
+           loraConf.zone = loraConf.zone + 1;
+           if ( loraConf.zone > ZONE_MAX ) loraConf.zone = ZONE_MIN;
+          #endif
+          break;
+        case CONF_ITEM_DEVEUI:
+          if ( _currentColumn & 1 ) {
+            // low quartet
+            loraConf.deveui[_currentColumn/2] = ( (loraConf.deveui[_currentColumn/2]+change) & 0x0F ) | ( loraConf.deveui[_currentColumn/2] & 0xF0);
+          } else {
+            // high quartet
+            loraConf.deveui[_currentColumn/2] = ( (loraConf.deveui[_currentColumn/2]+(16*change)) & 0xF0 ) |  (loraConf.deveui[_currentColumn/2] & 0x0F );
+          }          
+          break;
+        case CONF_ITEM_APPEUI:
+          if ( _currentColumn & 1 ) {
+            // low quartet
+            loraConf.appeui[_currentColumn/2] = ( (loraConf.appeui[_currentColumn/2]+change) & 0x0F ) | ( loraConf.appeui[_currentColumn/2] & 0xF0);
+          } else {
+            // high quartet
+            loraConf.appeui[_currentColumn/2] = ( (loraConf.appeui[_currentColumn/2]+(16*change)) & 0xF0 ) |  (loraConf.appeui[_currentColumn/2] & 0x0F );
+          }          
+          break;
+        case CONF_ITEM_APPKEY:
+          if ( _currentColumn & 1 ) {
+            // low quartet
+            loraConf.appkey[_currentColumn/2] = ( (loraConf.appkey[_currentColumn/2]+change) & 0x0F ) | ( loraConf.appkey[_currentColumn/2] & 0xF0);
+          } else {
+            // high quartet
+            loraConf.appkey[_currentColumn/2] = ( (loraConf.appkey[_currentColumn/2]+(16*change)) & 0xF0 ) |  (loraConf.appkey[_currentColumn/2] & 0x0F );
+          }          
+          break;
+      }
+      displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NONE,false);
+      change = 0;
+    }
+    if ( keyGet ) delay(200);
+  } while ( ! interactive );
+  return false;
+}
+
+void highlightOneElement(uint8_t selectedItem, uint8_t selectedColumn, bool displayed);
+#define TXT_ZONE_OFF_Y      (HIST_Y_OFFSET+10)
+#define TXT_DEVEUI_OFF_Y    (HIST_Y_OFFSET+35)
+#define TXT_APPEUI_OFF_Y    (HIST_Y_OFFSET+60)
+#define TXT_APPKEY_OFF_Y    (HIST_Y_OFFSET+85)
+#define TXT_APPKEY_OFF_Y2   (HIST_Y_OFFSET+110)
+#define TXT_ALL_OFF_X       (HIST_X_OFFSET+5)
+#define TXT_ALL_VALUE_OFF_X (HIST_X_OFFSET+5+85)
+
+// return true when action executed
+bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t action, bool refreshAll) {
+  
+  // No need to refresh everytime
+  if ( refreshAll ) {
+    tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET-18,HIST_X_TXTSIZE,18,TFT_BLACK);
+    tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,TFT_BLACK);
+    tft.setFreeFont(FF25);    
+    tft.setTextColor(TFT_WHITE);
+    tft.drawString("Configuration",HIST_X_OFFSET,HIST_Y_OFFSET-18,GFXFF);
+    tft.drawRoundRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,R_SIZE,TFT_WHITE);
+  } 
+  tft.fillRect(TXT_ALL_VALUE_OFF_X,TXT_ZONE_OFF_Y-2,200,120,TFT_BLACK);
+  highlightOneElement(selectedItem,selectedColumn,true);
+
+  // Print configuration
+  char sTmp[128];
+  tft.setFreeFont(FM9);    
+  tft.setTextColor(TFT_GRAY);
+
+  char sZone[10];
+  switch (loraConf.zone) {
+    default:
+    case ZONE_UNDEFINED:
+        sprintf(sZone,"NA");
+        break;
+    case ZONE_EU868:
+        sprintf(sZone,"EU868");
+        break;
+    case ZONE_US915:
+        sprintf(sZone,"US915");
+        break;
+    case ZONE_AS923:
+        sprintf(sZone,"AS923");
+        break;
+    case ZONE_KR920:    
+        sprintf(sZone,"KR920");
+        break;
+    case ZONE_IN865:    
+        sprintf(sZone,"IN865");
+        break;
+  }
+  sprintf(sTmp,"Zone:   %s", sZone); 
+  tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_ZONE_OFF_Y,GFXFF);
+
+  sprintf(sTmp,"DevEUI: %02X%02X%02X%02X%02X%02X%02X%02X",
+    loraConf.deveui[0],loraConf.deveui[1],
+    loraConf.deveui[2],loraConf.deveui[3],
+    loraConf.deveui[4],loraConf.deveui[5],
+    loraConf.deveui[6],loraConf.deveui[7]
+  ); 
+  tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_DEVEUI_OFF_Y,GFXFF);
+  
+  sprintf(sTmp,"AppEUI: %02X%02X%02X%02X%02X%02X%02X%02X",
+    loraConf.appeui[0],loraConf.appeui[1],
+    loraConf.appeui[2],loraConf.appeui[3],
+    loraConf.appeui[4],loraConf.appeui[5],
+    loraConf.appeui[6],loraConf.appeui[7]
+  ); 
+  tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPEUI_OFF_Y,GFXFF);
+
+  sprintf(sTmp,"AppKEY: %02X%02X%02X%02X%02X%02X%02X%02X",
+    loraConf.appkey[0],loraConf.appkey[1],
+    loraConf.appkey[2],loraConf.appkey[3],
+    loraConf.appkey[4],loraConf.appkey[5],
+    loraConf.appkey[6],loraConf.appkey[7]
+  ); 
+  tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPKEY_OFF_Y,GFXFF);
+
+  sprintf(sTmp,"        %02X%02X%02X%02X%02X%02X%02X%02X",
+    loraConf.appkey[8],loraConf.appkey[9],
+    loraConf.appkey[10],loraConf.appkey[11],
+    loraConf.appkey[12],loraConf.appkey[13],
+    loraConf.appkey[14],loraConf.appkey[15]
+  ); 
+  tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPKEY_OFF_Y2,GFXFF);
+
+  // Previous Item & column
+  uint8_t prevCol = selectedColumn;
+  uint8_t prevItem = selectedItem;
+  
+  // Clean previous
+  switch ( action ) {
+    case CONF_ACTION_NEXTITEM:
+          if ( selectedItem < CONF_ITEM_LAST) {
+            selectedItem++;
+            selectedColumn=0;
+          }
+          else return false;
+          break;
+    case CONF_ACTION_PREVITEM:
+          if ( selectedItem > CONF_ITEM_FIRST) {
+            selectedItem--;
+            selectedColumn=0;
+          }
+          else return false;
+          break;
+    case CONF_ACTION_NEXTCOL:
+          switch ( selectedItem ) {
+            case CONF_ITEM_ZONE: return false;
+            case CONF_ITEM_DEVEUI: 
+            case CONF_ITEM_APPEUI:
+              if ( selectedColumn < 15 ) {
+                selectedColumn++;
+              } else return false;
+              break;
+            case CONF_ITEM_APPKEY:
+              if ( selectedColumn < 31 ){
+                selectedColumn++;
+              } else return false;
+              break;
+          }
+          break;
+    case CONF_ACTION_PREVCOL:
+          switch ( selectedItem ) {
+            case CONF_ITEM_ZONE: return false;
+            case CONF_ITEM_DEVEUI: 
+            case CONF_ITEM_APPEUI:
+            case CONF_ITEM_APPKEY:
+              if ( selectedColumn > 0 ) selectedColumn--;
+              else return false;
+              break;
+          }
+          break;
+  }
+
+  // update drawing
+  highlightOneElement(prevItem,prevCol,false);
+  highlightOneElement(selectedItem,selectedColumn,true);
+  return true;
+  
+}
+
+
+// draw a box around 1 field selected by Item and Column
+// the max numbers are not computed here
+// displayed indicates if we draw or remove the box
+void highlightOneElement(uint8_t selectedItem, uint8_t selectedColumn, bool displayed) {
+
+  uint16_t x,y;
+  int color = (displayed)?TFT_GREEN:TFT_BLACK;
+  
+  switch ( selectedItem ) {
+    case CONF_ITEM_ZONE:
+      x = TXT_ALL_VALUE_OFF_X;
+      y = TXT_ZONE_OFF_Y-2;
+      tft.drawRoundRect(x,y,60,18,4,color);
+      break;
+    case CONF_ITEM_DEVEUI:
+      x = 3+TXT_ALL_VALUE_OFF_X+selectedColumn*11;
+      y = TXT_DEVEUI_OFF_Y-2;
+      tft.drawRoundRect(x,y,12,18,4,color);
+      break;
+    case CONF_ITEM_APPEUI:
+      x = 3+TXT_ALL_VALUE_OFF_X+selectedColumn*11;
+      y = TXT_APPEUI_OFF_Y-2;
+      tft.drawRoundRect(x,y,12,18,4,color);
+      break;
+    case CONF_ITEM_APPKEY:
+      if ( selectedColumn >= 16 ) {
+         y = TXT_APPKEY_OFF_Y2-2;
+         selectedColumn -= 16;
+      } else {
+         y = TXT_APPKEY_OFF_Y-2;
+      }
+      x = 3+TXT_ALL_VALUE_OFF_X+selectedColumn*11;
+      tft.drawRoundRect(x,y,12,18,4,color);
+      break;
+  }
   
 }

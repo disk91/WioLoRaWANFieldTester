@@ -36,6 +36,7 @@ typedef struct {
   uint8_t   deveui[8];   // device EUI
   uint8_t   appeui[8];   // App EUI
   uint8_t   appkey[16];  // App KEY
+  uint8_t   zone;        // Zone EU868... cf loracom.h ZONE_XXX
 } Config;
 
 
@@ -55,6 +56,7 @@ bool readConfig() {
     memcpy(loraConf.deveui, c.deveui, 8);
     memcpy(loraConf.appeui, c.appeui, 8);
     memcpy(loraConf.appkey, c.appkey,16);
+    loraConf.zone = c.zone;
   } else {
     return false;
   }
@@ -70,6 +72,7 @@ void storeConfig() {
   c.cRetry = state.cRetry;
   c.selected_display = ui.selected_display;
   c.selected_mode = ui.selected_mode;
+  c.zone = loraConf.zone;
   memcpy(c.deveui, loraConf.deveui, 8);
   memcpy(c.appeui, loraConf.appeui, 8);
   memcpy(c.appkey, loraConf.appkey,16);

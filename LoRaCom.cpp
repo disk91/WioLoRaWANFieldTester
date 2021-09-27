@@ -373,12 +373,26 @@ uint8_t __charToHex(uint8_t c) {
 #define __LCONF_STATE_DEVEUI  1
 #define __LCONF_STATE_APPEUI  2
 #define __LCONF_STATE_APPKEY  4
-#define __LCONF_STATE_ALL_DONE  7
-void processLoRaConfig(void) {
+#define __LCONF_STATE_ZONE    8
+#define __LCONF_STATE_ALL_DONE  15
+
+// return true when config has been partially changed 
+bool processLoRaConfig(void) {
   static uint8_t state=__LCONF_STATE_NONE;
   static uint8_t confStatus=__LCONF_STATE_NONE;
   static uint8_t pos;
   static uint8_t confirmed;
+  static char sZone[6];
+  bool updated = false;
+  #if HWTARGET == RFM95
+   // hardcoded
+   confStatus |= __LCONF_STATE_ZONE;
+   #if defined CFG_eu868 
+     loraConf.zone = ZONE_EU868;
+   #elif defined CFG_us915
+     loraConf.zone = ZONE_US915;
+   #endif
+  #endif
   while ( SERIALCONFIG.available() ) {
     uint8_t c = SERIALCONFIG.read();
     if ( state == __LCONF_STATE_NONE ) {
@@ -391,6 +405,9 @@ void processLoRaConfig(void) {
                    break;
         case 'K' : // App KEY
                    state = __LCONF_STATE_APPKEY;
+                   break;
+        case 'Z' : // Zone
+                   state = __LCONF_STATE_ZONE;
                    break;
         case '\n': // forget
         case '\r': 
@@ -433,6 +450,7 @@ void processLoRaConfig(void) {
               SERIALCONFIG.println("OK");
               confStatus |= __LCONF_STATE_DEVEUI;
               state = __LCONF_STATE_NONE;
+              updated = true;
             }
           }
           break;
@@ -456,6 +474,7 @@ void processLoRaConfig(void) {
               SERIALCONFIG.println("OK");
               confStatus |= __LCONF_STATE_APPEUI;
               state = __LCONF_STATE_NONE;
+              updated = true;
             }
           }
           break;            
@@ -479,9 +498,58 @@ void processLoRaConfig(void) {
               SERIALCONFIG.println("OK");
               confStatus |= __LCONF_STATE_APPKEY;
               state = __LCONF_STATE_NONE;
+              updated = true;
             }
           }
-          break;            
+          break; 
+          case __LCONF_STATE_ZONE: {
+            #if HWTARGET == LORAE5
+               sZone[pos] = c;  
+               pos++;      
+               if ( pos == 5 ) {
+                  // We should have the zone
+                  sZone[5] = '\0';
+                  if ( strcmp(sZone,"EU868") == 0 ) {
+                    loraConf.zone = ZONE_EU868;
+                    SERIALCONFIG.println("ZONE: EU868");
+                    SERIALCONFIG.println("OK");
+                    confStatus |= __LCONF_STATE_ZONE;
+                    updated = true;
+                  } else if ( strcmp(sZone,"US915") == 0 ) {
+                    loraConf.zone = ZONE_US915;
+                    SERIALCONFIG.println("ZONE: US915");
+                    SERIALCONFIG.println("OK");
+                    confStatus |= __LCONF_STATE_ZONE;
+                    updated = true;
+                  } else if ( strcmp(sZone,"AS923") == 0 ) {
+                    loraConf.zone = ZONE_AS923;
+                    SERIALCONFIG.println("ZONE: AS923");
+                    SERIALCONFIG.println("OK");
+                    confStatus |= __LCONF_STATE_ZONE;
+                    updated = true;
+                  } else if ( strcmp(sZone,"KR920") == 0 ) {
+                    loraConf.zone = ZONE_KR920;
+                    SERIALCONFIG.println("ZONE: KR920");
+                    SERIALCONFIG.println("OK");
+                    confStatus |= __LCONF_STATE_ZONE;
+                    updated = true;
+                  } else if ( strcmp(sZone,"IN865") == 0 ) {
+                    loraConf.zone = ZONE_IN865;
+                    SERIALCONFIG.println("ZONE: IN865");
+                    SERIALCONFIG.println("OK");
+                    confStatus |= __LCONF_STATE_ZONE;
+                    updated = true;
+                  } else {
+                    SERIALCONFIG.println("KO");
+                  }
+                  state = __LCONF_STATE_NONE;
+               }
+          }
+          #else
+            SERIALCONFIG.println("KO");
+            state = __LCONF_STATE_NONE;
+          #endif
+          break;
         }
       }
     }  
@@ -493,9 +561,9 @@ void processLoRaConfig(void) {
     SERIALCONFIG.println("LoRaWan configuration OK");
     NVIC_SystemReset();
   }
-  return;
+  return updated;
 invalid:
      SERIALCONFIG.println("KO");
      state = __LCONF_STATE_NONE;
-     return;
+     return false;
 }

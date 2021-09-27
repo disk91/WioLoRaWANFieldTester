@@ -26,6 +26,7 @@ typedef struct {
   uint8_t deveui[8];
   uint8_t appeui[8];
   uint8_t appkey[16];
+  uint8_t zone;
 } loraConf_t;
 
 extern loraConf_t loraConf;
@@ -36,7 +37,15 @@ void loraLoop(void);
 boolean canLoraSleep(void);
 boolean canLoRaSend();
 uint32_t nextPossibleSendMs();
-void processLoRaConfig(void);
+bool processLoRaConfig(void);
 
+#define ZONE_UNDEFINED  0
+#define ZONE_EU868      1
+#define ZONE_US915      2
+#define ZONE_AS923      3
+#define ZONE_KR920      4
+#define ZONE_IN865      5
+#define ZONE_MAX        ZONE_IN865
+#define ZONE_MIN        ZONE_EU868
 
 #endif

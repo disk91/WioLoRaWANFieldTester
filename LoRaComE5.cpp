@@ -230,7 +230,7 @@ void loraSetup(void) {
   sendATCommand("AT+UART=TIMEOUT,0","+UART: TIMEOUT","","",DEFAULT_TIMEOUT,false, NULL);
 
   // Setup region
-  #if defined CFG_eu868
+  if ( loraConf.zone == ZONE_EU868 ) {
     sendATCommand("AT+DR=EU868","+DR: EU868","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
     sendATCommand("AT+CH=3,867.1,0,5","+CH: 3,8671","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
     sendATCommand("AT+CH=4,867.3,0,5","+CH: 4,8673","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
@@ -239,18 +239,19 @@ void loraSetup(void) {
     sendATCommand("AT+CH=7,867.9,0,5","+CH: 7,8679","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
     sendATCommand("AT+LW=DC,OFF","+LW: DC, OFF","+LW: ERR","",DEFAULT_TIMEOUT,false,NULL); // manually managed to avoid conflicts
     sendATCommand("AT+LW=JDC,OFF","+LW: JDC, OFF","+LW: ERR","",DEFAULT_TIMEOUT,false,NULL); // manually managed to avoid conflicts  
-  #elif defined CFG_us915
+  } else if ( loraConf.zone == ZONE_US915 ) {
     sendATCommand("AT+DR=US915","+DR: US915","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-  #elif defined CFG_as923
+  } else if ( loraConf.zone == ZONE_AS923 ) {
     sendATCommand("AT+DR=AS923","+DR: AS923","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-  #elif defined CFG_kr920
+  } else if ( loraConf.zone == ZONE_KR920 ) {
     sendATCommand("AT+DR=KR920","+DR: KR920","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-  #elif defined CFG_ir865
-    sendATCommand("AT+DR=IR865","+DR: IR865","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-  #else
-    #error "You must define a region in config.h file
-  #endif
-    sendATCommand("AT+ADR=OFF","+ADR: OFF","+ADR: ON","",DEFAULT_TIMEOUT,false,NULL);
+  } else if ( loraConf.zone == ZONE_IN865 ) {
+    sendATCommand("AT+DR=IN865","+DR: IN865","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+  } else {
+    LOGLN("Invalid Zone selected");
+    return;
+  }
+  sendATCommand("AT+ADR=OFF","+ADR: OFF","+ADR: ON","",DEFAULT_TIMEOUT,false,NULL);
 
   // Setup Ids
     sprintf(_cmd,"AT+ID=DevEUI,%02X%02X%02X%02X%02X%02X%02X%02X",
@@ -450,53 +451,53 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
   if ( loraContext.lastDr != _dr ) {
     // set dr ( for real dr is not dr but SF)
     boolean retDr = true;
-   #if defined CFG_eu868 || defined CFG_as923 || defined CFG_kr920 || defined CFG_ir865
-    // DR0 - SF12 / DR5 - SF7
-    switch (_dr) {
-      case 7:
-           retDr = sendATCommand("AT+DR=DR5","+DR: ***** DR5","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-           break;
-      case 8:
-           retDr = sendATCommand("AT+DR=DR4","+DR: ***** DR4","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-           break;
-      case 9:
-           retDr = sendATCommand("AT+DR=DR3","+DR: ***** DR3","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-           break;
-      case 10:
-           retDr = sendATCommand("AT+DR=DR2","+DR: ***** DR2","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-           break;
-      case 11:
-           retDr = sendATCommand("AT+DR=DR1","+DR: ***** DR1","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-           break;
-      case 12:
-           retDr = sendATCommand("AT+DR=DR0","+DR: ***** DR0","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-           break;
-      default:
-           LOGLN(("Invalid SF"));
-           return;
+    if ( loraConf.zone == ZONE_EU868 || loraConf.zone == ZONE_AS923 || loraConf.zone == ZONE_KR920 || loraConf.zone == ZONE_IN865 ) {
+      // DR0 - SF12 / DR5 - SF7
+      switch (_dr) {
+        case 7:
+             retDr = sendATCommand("AT+DR=DR5","+DR: ***** DR5","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+             break;
+        case 8:
+             retDr = sendATCommand("AT+DR=DR4","+DR: ***** DR4","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+             break;
+        case 9:
+             retDr = sendATCommand("AT+DR=DR3","+DR: ***** DR3","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+             break;
+        case 10:
+             retDr = sendATCommand("AT+DR=DR2","+DR: ***** DR2","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+             break;
+        case 11:
+             retDr = sendATCommand("AT+DR=DR1","+DR: ***** DR1","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+             break;
+        case 12:
+             retDr = sendATCommand("AT+DR=DR0","+DR: ***** DR0","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+             break;
+        default:
+             LOGLN(("Invalid SF"));
+             return;
+      }
+    } else if ( loraConf.zone == ZONE_US915 ) {
+      // DR0 - SF10 / DR3 - SF7
+      switch (_dr) {
+        case 7:
+             retDr = sendATCommand("AT+DR=DR3","+DR: ***** DR3","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+             break;
+        case 8:
+             retDr = sendATCommand("AT+DR=DR2","+DR: ***** DR2","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+             break;
+        case 9:
+             retDr = sendATCommand("AT+DR=DR1","+DR: ***** DR1","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+             break;
+        case 10:
+             retDr = sendATCommand("AT+DR=DR0","+DR: ***** DR0","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+             break;
+        default:
+             LOGLN(("Invalid SF"));
+             return;
+      }
+    } else {
+      retDr = false;
     }
-   #elif defined CFG_us915
-    // DR0 - SF10 / DR3 - SF7
-    switch (_dr) {
-      case 7:
-           retDr = sendATCommand("AT+DR=DR3","+DR: ***** DR3","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-           break;
-      case 8:
-           retDr = sendATCommand("AT+DR=DR2","+DR: ***** DR2","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-           break;
-      case 9:
-           retDr = sendATCommand("AT+DR=DR1","+DR: ***** DR1","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-           break;
-      case 10:
-           retDr = sendATCommand("AT+DR=DR0","+DR: ***** DR0","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-           break;
-      default:
-           LOGLN(("Invalid SF"));
-           return;
-    }
-   #else
-    #error "You must define a region in config.h file
-   #endif
     if ( ! retDr ) {
            LOGLN(("Failed to change SF"));
            return;       
@@ -536,25 +537,25 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
     loraContext.isJoining = true;
     state.cState = JOINING;
   } else {
-      #if defined CFG_us915 || defined CFG_as923 || defined CFG_kr920 || defined CFG_ir865
+      if ( loraConf.zone == ZONE_US915 || loraConf.zone == ZONE_AS923 || loraConf.zone == ZONE_KR920 || loraConf.zone == ZONE_IN865 ) {
        // No Duty Cycle zones, set a minimum time
        loraContext.estimatedDCMs = US915_DUTYCYCLE_MS;
-      #else
-       // 1% based on SF and data size (10 Bytes)
-       // @TODO also consider ack
-       // @TODO make this more generic considering payload size
-       switch (_dr) {
-        case 7:  loraContext.estimatedDCMs = 6200;  break;
-        case 8:  loraContext.estimatedDCMs = 11300; break;
-        case 9:  loraContext.estimatedDCMs = 20600; break;
-        case 10: loraContext.estimatedDCMs = 37100; break;
-        case 11: loraContext.estimatedDCMs = 82300; break;
-        case 12: loraContext.estimatedDCMs = 148300;break;
-        default:
-             LOGLN(("Invalid SF"));
-             return;
-        }
-      #endif
+      } else {
+        // 1% based on SF and data size (10 Bytes)
+        // @TODO also consider ack
+        // @TODO make this more generic considering payload size
+         switch (_dr) {
+          case 7:  loraContext.estimatedDCMs = 6200;  break;
+          case 8:  loraContext.estimatedDCMs = 11300; break;
+          case 9:  loraContext.estimatedDCMs = 20600; break;
+          case 10: loraContext.estimatedDCMs = 37100; break;
+          case 11: loraContext.estimatedDCMs = 82300; break;
+          case 12: loraContext.estimatedDCMs = 148300;break;
+          default:
+               LOGLN(("Invalid SF"));
+               return;
+          }
+      }
       loraContext.estimatedDCMs *= (retries+1);
       // Set Pport
       sprintf(_cmd,"AT+PORT=%d",port);

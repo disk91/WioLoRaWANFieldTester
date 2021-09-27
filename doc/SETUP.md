@@ -12,7 +12,7 @@ Once you have your WioTerminal and your FieldTester add-on board, you need to pr
   * [EU868 for LoRa E5 Chassis](../binaries/WioLoRaWANFieldTester_LoRaE5_EU868.uf2)
   * [US915 for LoRa E5 Chassis](../binaries/WioLoRaWANFieldTester_LoRaE5_US915.uf2)
   * [AS923 for LoRa E5 Chassis](../binaries/WioLoRaWANFieldTester_LoRaE5_AS923.uf2)
-  
+
 - Once downloaded
   * Switch the Wio Terminal ON with the lateral button
   * Switch to bootloader mode by puching down power button twice very quickly. Sequence is ON / RESET / ON / RESET / ON. This mount an Arduino drive on the computer.
@@ -36,7 +36,20 @@ This operation depends on your network provider:
 
 - For Helium, read the documentation to [obtain them from the console](ObtainCredsFromHelium.md)  
 
-### Configure your device with the credentials
+### Configure your device with the credentials (UI way)
+
+On the first boot, the setup screen will be displayed. You can setup the credential and the Zone (when using Wio Terminal chassis LoRa-E5)
+ - To navigate into the different items to setup, use the up/down keys
+ - To select the right column, use the left/right keys
+ - To change the value, use the 1/2/3 button on the top side, they change the value adding respectively 1/2/4 to the current value.
+ - To validate and save your configuration, press the 5 direction button.
+
+The device will reboot with the new configuration. 
+
+Once done, if you need to verify or change this setup, restart the device pressing the 5 direction button. After 1 second after rebooting, stop pushing the 5 direction button, you should see the setup screen displayed. 
+
+
+### Configure your device with the credentials (Serial way)
 
 The device uses the Serial line (Wioterminal USB) to receives the LoRaWAN configuration. You need to execute a series of commands the WioLoRaWABFieldTester understand to do this setup.
 
@@ -49,6 +62,20 @@ For this, you need to use a serial tool or the command line. The tools I recomma
 Once you have connected your WioTermial to USB connector of your computer and switch your WioTerminal ON, you may see a new device or com port appearing. Select it in the Serial tool and configure it with a speed of 9600 bits/s, 8 bits, parity None, Stop bit 1.
 
 Now, we will have to pass the different credentials one by one:
+
+* (for Wio Terminal chassis lora E5 only) Set the Zone
+```
+Z=<Zone> where zone can be EU868, US915, AS923, KR920, IN865
+```
+As an exemple the line to enter in the Serial tool looks like
+```
+Z=EU868
+```
+If it works, you should see in the console:
+```
+ZONE:EU868
+OK
+```
 
 * Get the DevEUI from the previous step and insert it in the following line:
 ```

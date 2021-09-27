@@ -41,6 +41,7 @@ To get a better understanding on how WioLoRaWANFieldTester works, [read this pag
 - PCB availbale
 - Enclosure available
 - Serial port LoRaWan setup configuration
+- End-user setup screen
 - Setup with Cargo (helium tracking platform)
 
 ### Comming soon features

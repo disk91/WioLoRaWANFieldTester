@@ -40,6 +40,7 @@ void initState() {
     memcpy(loraConf.deveui, _DEVEUI, 8);
     memcpy(loraConf.appeui, _APPEUI, 8);
     memcpy(loraConf.appkey, _APPKEY,16);
+    loraConf.zone = __ZONE;
     storeConfig();
   }
   state.cState = NOT_JOINED;
@@ -102,31 +103,29 @@ uint8_t getLastIndexWritten() {
 
 void tst_setPower(int8_t pwr) {
   if ( pwr < 2 ) pwr = 2;
-  #if defined CFG_eu868
-   if ( pwr > 16 ) pwr = 16;
-   pwr &= 0xFE;
-  #elif defined CFG_us915
-    if ( pwr > 20 ) pwr = 20;
-  #elif defined CFG_as923
+  if ( loraConf.zone == ZONE_EU868 || loraConf.zone == ZONE_AS923 || loraConf.zone == ZONE_KR920 ) {
     if ( pwr > 16 ) pwr = 16;
-  #else
-    #error "Not Yet implemented"
-  #endif
+    pwr &= 0xFE;
+  } else if ( loraConf.zone == ZONE_US915 ) {
+    if ( pwr > 20 ) pwr = 20;
+  } else {
+    LOGLN("Zone not supported for power limit");
+    if ( pwr > 16 ) pwr = 16;
+  }
   state.cPwr = pwr;
 }
 
 void tst_setSf(uint8_t sf) {
 
   if ( sf < 7 ) sf = 7;
-  #if defined CFG_eu868
+  if ( loraConf.zone == ZONE_EU868 || loraConf.zone == ZONE_AS923 || loraConf.zone == ZONE_KR920 || loraConf.zone == ZONE_IN865 ) {
     if ( sf > 12 ) sf = 12;
-  #elif defined CFG_us915
+  } else if ( loraConf.zone == ZONE_US915 ) {
     if ( sf > 10 ) sf = 10;
-  #elif defined CFG_as923
-    if ( sf > 12 ) sf = 12;
-  #else
-    #error "Not Yet implemented"
-  #endif
+  } else {
+    LOGLN("Zone not supported for SF limit");
+    if ( sf > 10 ) sf = 10;
+  }
   state.cSf = sf;
   
 }
