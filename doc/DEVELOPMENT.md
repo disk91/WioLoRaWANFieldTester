@@ -163,7 +163,6 @@ Create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a mapper 
 */
 
 function Decoder(bytes, port) { 
-  var payload = {};
   var decoded = {};
   
   var lonSign = (bytes[0]>>7) & 0x01 ? -1 : 1;
@@ -186,13 +185,11 @@ function Decoder(bytes, port) {
   
   if ((hdop < maxHdop) && (sats >= minSats)) {
     // Send only acceptable quality of position to mappers
-    payload.latitude = latSign * (encLat * 108 + 53) / 10000000;
-    payload.longitude = lonSign * (encLon * 215 + 107) / 10000000;  
-    payload.altitude = ((bytes[6]<<8)+bytes[7])-1000;
-    payload.accuracy = (hdop*5+5)/10
-    if(payload.accuracy>63) payload.accuracy=63
-
-    decoded.payload = payload;
+    decoded.latitude = latSign * (encLat * 108 + 53) / 10000000;
+    decoded.longitude = lonSign * (encLon * 215 + 107) / 10000000;  
+    decoded.altitude = ((bytes[6]<<8)+bytes[7])-1000;
+    decoded.accuracy = (hdop*5+5)/10
+    if(decoded.accuracy>63) decoded.accuracy=63
   } else {
     decoded.error = "Need more GPS precision (hdop must be <"+maxHdop+
       " & sats must be >= "+minSats+") current hdop: "+hdop+" & sats:"+sats;
