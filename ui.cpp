@@ -112,6 +112,7 @@ void screenSetup() {
   ui.lastWrId = MAXBUFFER;
   ui.hasClick = false;
   ui.alertMode = false;
+  ui.lastGpsUpdateTime = 0;
   
   // draw mask
   refreshPower(); 
@@ -235,6 +236,13 @@ void refresUI() {
          ui.selected_display = DISPLAY_TXHS;
          forceRefresh = true;
          break;
+#ifdef WITH_GPS
+      case DISPLAY_TXHS:
+         ui.previous_display = ui.selected_display;
+         ui.selected_display = DISPLAY_GPS;
+         forceRefresh = true;
+         break;
+#endif        
       default:
          break;   
     }  
@@ -242,6 +250,13 @@ void refresUI() {
   } else if (digitalRead(WIO_5S_LEFT) == LOW) {
     configHasChanged = true;
     switch ( ui.selected_display ) {
+#ifdef WITH_GPS
+      case DISPLAY_GPS:
+         ui.previous_display = ui.selected_display;
+         ui.selected_display = DISPLAY_TXHS;
+         forceRefresh = true;
+         break;
+#endif        
       case DISPLAY_TXHS:
          ui.previous_display = ui.selected_display;
          ui.selected_display = DISPLAY_TXRSSI;
@@ -292,6 +307,15 @@ void refresUI() {
   // refresh the GPS part
   #ifdef WITH_GPS
   refreshGps();
+  if ( ui.selected_display == DISPLAY_GPS  && gps.updateTime > ui.lastGpsUpdateTime) {
+     ui.lastGpsUpdateTime = gps.updateTime;
+     refreshGpsDetails();
+  }
+  if ( ui.selected_display == DISPLAY_GPS && !gps.isReady && gps.updateTime == ui.lastGpsUpdateTime ) {
+     // clear display when GPS signal lost
+     ui.lastGpsUpdateTime = gps.updateTime+1;
+     refreshGpsDetails();    
+  }
   #endif
 
   
@@ -315,6 +339,9 @@ void refresUI() {
         break;
       case DISPLAY_TXHS:
         refreshTxHs();
+        break;
+      case DISPLAY_GPS:
+        refreshGpsDetails();
         break;
     }
     if ( state.hasRefreshed == true ) refreshLastFrame();
@@ -833,7 +860,7 @@ void refreshGps() {
   int xOffset = X_OFFSET+4;
   int yOffset = Y_OFFSET+2*Y_SIZE+5;
   if ( gps.isReady ) {
-    if ( gps.hdop < 100 && gps.sats > 6 ) {
+    if ( gps.hdop < 150 && gps.sats > 3 ) {
        tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_GREEN);  
     } else {
        tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_ORANGE);  
@@ -843,25 +870,72 @@ void refreshGps() {
   }
 }
 
+/**
+ * Display GPS data (mostly for debugging purpose and curiosity)
+ */
+#define TXT_TIME_OFF_Y      (HIST_Y_OFFSET+10)
+#define TXT_LAT_OFF_Y       (HIST_Y_OFFSET+35)
+#define TXT_LNG_OFF_Y       (HIST_Y_OFFSET+60)
+#define TXT_ALT_OFF_Y       (HIST_Y_OFFSET+85)
+#define TXT_QUA_OFF_Y       (HIST_Y_OFFSET+110)
+#define TXT_ALL_OFF_X       (HIST_X_OFFSET+5)
+#define TXT_ALL_VALUE_OFF_X (HIST_X_OFFSET+5+85)
+void refreshGpsDetails() {
+  if ( ui.previous_display != ui.selected_display ) {
+    tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET-18,HIST_X_TXTSIZE,18,TFT_BLACK);
+    tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,TFT_BLACK);
+    tft.setFreeFont(FF25);    
+    tft.setTextColor(TFT_WHITE);
+    tft.drawString("GPS",HIST_X_OFFSET,HIST_Y_OFFSET-18,GFXFF);
+    tft.drawRoundRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,R_SIZE,TFT_WHITE);
+    ui.previous_display = ui.selected_display;
+  }
+  tft.fillRect(TXT_ALL_VALUE_OFF_X,TXT_TIME_OFF_Y-2,200,120,TFT_BLACK);
+
+  char sTmp[64];
+  tft.setFreeFont(FM9);    
+  tft.setTextColor(TFT_GRAY);
+
+  if ( gps.isReady ) {
+
+    sprintf(sTmp,"Time:      %02d:%02d:%02d", gps.hour, gps.minute, gps.second); 
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_TIME_OFF_Y,GFXFF);
+  
+    sprintf(sTmp,"Latitude:  %f", gps.latitude/10000000.0);
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_LAT_OFF_Y,GFXFF);
+  
+    sprintf(sTmp,"Longitude: %f", gps.longitude/10000000.0);
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_LNG_OFF_Y,GFXFF);
+  
+    sprintf(sTmp,"Altitude:  %d", gps.altitude);
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_ALT_OFF_Y,GFXFF);
+  
+    sprintf(sTmp,"Hdop:      %d.%d Sats: %d", gps.hdop/100,gps.hdop-100*(gps.hdop/100), gps.sats);
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_QUA_OFF_Y,GFXFF);
+
+  } else {
+
+    sprintf(sTmp,"Time:      %02d:%02d:%02d", 0, 0, 0); 
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_TIME_OFF_Y,GFXFF);
+  
+    sprintf(sTmp,"Latitude:  %f", 0.0);
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_LAT_OFF_Y,GFXFF);
+  
+    sprintf(sTmp,"Longitude: %f", 0.0);
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_LNG_OFF_Y,GFXFF);
+  
+    sprintf(sTmp,"Altitude:  %d", 0);
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_ALT_OFF_Y,GFXFF);
+  
+    sprintf(sTmp,"Hdop:      %d.%d Sats: %d", 0,0, 0);
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_QUA_OFF_Y,GFXFF);
+
+  }
+}
+
 /** ********************************************************************
  * Configuration screen
  */
-/*
-#define CONF_ACTION_NONE     0
-#define CONF_ACTION_MODIFY   1
-#define CONF_ACTION_NEXTITEM 2
-#define CONF_ACTION_PREVITEM 3
-#define CONF_ACTION_NEXTCOL  4
-#define CONF_ACTION_PREVCOL  5
-#define CONF_ACTION_UP1      6
-#define CONF_ACTION_UP2      7
-#define CONF_ACTION_UP4      8
-
-#define CONF_ITEM_ZONE       1 
-#define CONF_ITEM_DEVEUI     2 
-#define CONF_ITEM_APPEUI     3 
-#define CONF_ITEM_APPKEY     4 
-*/
 
 // Return true when the configuration is valid
 static uint8_t _currentItem = CONF_ITEM_ZONE;

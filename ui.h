@@ -36,6 +36,7 @@
 #define DISPLAY_RETRY_HIST 3
 #define DISPLAY_TXRSSI     4
 #define DISPLAY_TXHS       5
+#define DISPLAY_GPS        6
 
 
 #ifdef WITH_SPLASH_HELIUM
@@ -60,7 +61,7 @@ typedef struct s_ui {
   uint8_t previous_display;
   bool    hasClick;         // Hit on button
   bool    alertMode;        // LiPo alert is on
-  
+  uint32_t lastGpsUpdateTime; // Last GPS display update time
 } ui_t;
 
 extern ui_t ui;
@@ -82,6 +83,7 @@ void refreshMode();
 void refreshLastFrame();
 void refreshTxRssi();
 void refreshTxHs();
+void refreshGpsDetails();
 void refreshGps();
 bool refreshLiPo();
 void draw_splash_helium(int xOffset, int yOffset, int density);
