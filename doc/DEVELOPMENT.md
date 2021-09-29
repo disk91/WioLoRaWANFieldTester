@@ -8,8 +8,13 @@ The installation details are available in the related [Wio LoRaWan Field tester 
 
 ### Required software components
 * Arduino IDE
-* WioTerminal - [Toolsuite](Wio Terminal toolchain)
+* WioTerminal - [Toolsuite](Whttps://wiki.seeedstudio.com/Wio-Terminal-Getting-Started/)
 * GPS - Adafruit GPS library version 1.5.4
+
+:warning: Remove any local library `TFT_eSPI` from your Arduino library folder, if not, it will use the local one with wrong pins definition resulting in black screen on boot. This library is included with Seeed SAMD package installed thru Boards Manager.
+```
+https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
+```
 
 #### RFM95 version
 * LoRaWAN - MCCI LoRaWAN LMIC library (by IBM, Matthjs Kooljman…) version 3.3.0
