@@ -63,7 +63,7 @@ Now, we will have to pass the different credentials one by one:
 
 * (for Wio Terminal chassis lora E5 only) Set the Zone
 ```
-Z=<Zone> where zone can be EU868, US915, AS923, KR920, IN865
+Z=<Zone> where zone can be EU868, US915, AS923, KR920, IN865, AU915
 ```
 As an exemple the line to enter in the Serial tool looks like
 ```

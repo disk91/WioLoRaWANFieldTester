@@ -539,6 +539,12 @@ bool processLoRaConfig(void) {
                     SERIALCONFIG.println("OK");
                     confStatus |= __LCONF_STATE_ZONE;
                     updated = true;
+                  } else if ( strcmp(sZone,"AU915") == 0 ) {
+                    loraConf.zone = ZONE_AU915;
+                    SERIALCONFIG.println("ZONE: AU915");
+                    SERIALCONFIG.println("OK");
+                    confStatus |= __LCONF_STATE_ZONE;
+                    updated = true;
                   } else {
                     SERIALCONFIG.println("KO");
                   }
