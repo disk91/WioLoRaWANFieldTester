@@ -108,8 +108,14 @@ void tst_setPower(int8_t pwr) {
   if ( loraConf.zone == ZONE_EU868 || loraConf.zone == ZONE_AS923 || loraConf.zone == ZONE_KR920 ) {
     if ( pwr > 16 ) pwr = 16;
     pwr &= 0xFE;
-  } else if ( loraConf.zone == ZONE_US915 || loraConf.zone == ZONE_AU915 ) {
-    if ( pwr > 20 ) pwr = 20;
+  } else if ( loraConf.zone == ZONE_US915 || loraConf.zone == ZONE_AU915 || loraConf.zone == ZONE_IN865 ) {
+    #if HWTARGET == LORAE5
+      if ( pwr > 22 ) pwr = 22;
+    #elif HWTARGET == RFM95
+      if ( pwr > 20 ) pwr = 20;
+    #else
+      #error "Invalid Target"
+    #endif
   } else {
     LOGLN("Zone not supported for power limit");
     if ( pwr > 16 ) pwr = 16;
