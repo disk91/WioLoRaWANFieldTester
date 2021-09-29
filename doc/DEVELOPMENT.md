@@ -14,6 +14,9 @@ The installation details are available in the related [Wio LoRaWan Field tester 
 #### RFM95 version
 * LoRaWAN - MCCI LoRaWAN LMIC library (by IBM, Matthjs Kooljman…) version 3.3.0
 
+#### LoRa-E5 version
+* Battery Chassis - Sparkfun BQ27441
+
 #### Later
 * File system - Seeed Arduino FS version 2.0.3 (not yet implemented)
 * File system - Seeed Ardunino SFUD version 2.0.1 (not yet implemented)

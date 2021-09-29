@@ -69,6 +69,7 @@ extern TFT_eSPI tft;
 
 void configPending();
 void initScreen();
+void displaySplash();
 void screenSetup();
 void refresUI();
 

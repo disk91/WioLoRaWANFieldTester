@@ -29,6 +29,7 @@ uint64_t gpsEncodePosition48b();
 
 typedef struct {
   bool      isReady;        // when false, no need to process these informations
+  bool      rxStuff;
   
   uint32_t  updateTime;     // last update time in second within the day
   uint8_t   hour;

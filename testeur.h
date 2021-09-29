@@ -61,6 +61,8 @@ typedef struct s_state {
   boolean   hasRefreshed;     // Data has refreshed
 
   uint16_t  batVoltage;         // voltage in mV
+  uint8_t   batPercent;       // bat percent
+  bool      batOk;            // battery detected
 
 } state_t;
 

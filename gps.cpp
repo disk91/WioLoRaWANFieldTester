@@ -75,6 +75,7 @@ void gpsSetup() {
   
   delay(1000);
   gps.isReady = false;
+  gps.rxStuff = false;
 }
   
 
@@ -84,6 +85,7 @@ void gpsLoop() {
   //Serial.print(c);
   if (GPS.newNMEAreceived()) {
     //  Serial.print(GPS.lastNMEA());
+    gps.rxStuff = true;
     if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
       return; // we can fail to parse a sentence in which case we should just wait for another
   }

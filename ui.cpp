@@ -79,9 +79,8 @@ void initScreen() {
   pinMode(WIO_5S_PRESS, INPUT_PULLUP); 
 }
 
-void screenSetup() {
-
-  // Totally unusefull so totally mandatory
+void displaySplash() {
+  // Totally useless so totally mandatory
   #ifdef WITH_SPLASH 
     tft.drawRoundRect((320-200)/2,200,200,10,5,TFT_WHITE);
     tft.setTextColor(TFT_GRAY);
@@ -99,6 +98,10 @@ void screenSetup() {
     delay(1500);
     tft.fillScreen(TFT_BLACK);
   #endif
+
+}
+
+void screenSetup() {
 
   if ( ! readConfig() ) {
     ui.selected_display = DISPLAY_RSSI_HIST;    
@@ -380,17 +383,30 @@ bool refreshLiPo() {
       ui.alertMode = false;
       return true;
     }
-    // Display bat status
     int xOffset = X_OFFSET+20;
     int yOffset = Y_OFFSET+2*Y_SIZE+5;
-    if ( state.batVoltage > 3650 ) {
-      // green status
-      tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_GREEN);  
-    } else if ( state.batVoltage > 3500 ) {
-      tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_ORANGE);  
+    if ( state.batPercent > 0 ) {
+      // we have this information (Battery Chassis)
+      int color = TFT_RED;
+      if ( state.batPercent > 50 ) color = TFT_GREEN;
+      else if ( state.batPercent > 20 ) color = TFT_ORANGE;
+      else if ( state.batPercent < 10 ) {
+         tft.fillRoundRect(xOffset,yOffset,10 + (40*state.batPercent) / 100 ,10,5,TFT_BLACK);
+         delay(100);
+      }
+      tft.fillRoundRect(xOffset,yOffset,10 + (40*state.batPercent) / 100 ,10,5,color);  
     } else {
-      tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_RED);  
+      // Display bat status
+      if ( state.batVoltage > 3650 ) {
+        // green status
+        tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_GREEN);  
+      } else if ( state.batVoltage > 3500 ) {
+        tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_ORANGE);  
+      } else {
+        tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_RED);  
+      }      
     }
+    
   }
   
 }
@@ -866,6 +882,11 @@ void refreshGps() {
        tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_ORANGE);  
     }
   } else {
+     if ( gps.rxStuff ) {
+       tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_BLACK);   
+       delay(50);   
+       gps.rxStuff=false;
+     }
      tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_RED);
   }
 }

@@ -24,8 +24,13 @@
 #include "config.h"
 #include "ui.h"
 #include "testeur.h"
-
 #include "gps.h"
+
+#if HWTARGET == LORAE5 && defined WITH_LIPO
+  #include <SparkFunBQ27441.h>
+  const unsigned int BATTERY_CAPACITY = 600; 
+#endif
+
 
 // No more than 10 bytes to suppor DR0 in US915
 static uint8_t myFrame[] = {
@@ -43,6 +48,14 @@ void setup() {
 
   #if defined SERIALCONFIG || defined DEBUG 
      Serial.begin(9600);
+  #endif
+  #if HWTARGET == LORAE5 && defined WITH_LIPO
+     if ( lipo.begin() ) {
+       state.batOk = true;
+       lipo.setCapacity(BATTERY_CAPACITY);
+     } else {
+       state.batOk = false;
+     }
   #endif
   initState();
   initScreen();
@@ -69,9 +82,11 @@ void setup() {
     NVIC_SystemReset();
   }
 
-  screenSetup();
-  loraSetup();
   gpsSetup();
+  displaySplash();
+  loraSetup();
+
+  screenSetup();
   analogReference(AR_INTERNAL2V23);
 }
 
@@ -87,9 +102,21 @@ void loop(void) {
 
   #ifdef WITH_LIPO
     if ( batUpdateTime > 1000 ) {
-      uint32_t v = analogRead(LIPO_ADC);
-      v = 2*( 3300 * v ) / 1024;  // should be 2230 ...
-      state.batVoltage = v;
+      #if HWTARGET == RFM95
+        uint32_t v = analogRead(LIPO_ADC);
+        v = 2*( 3300 * v ) / 1024;  // should be 2230 ...
+        state.batVoltage = v;
+      #elif HWTARGET == LORAE5
+        if ( state.batOk ) {
+          unsigned int soc = lipo.soc();  // Read state-of-charge (%)
+          unsigned int volts = lipo.voltage(); // Read battery voltage (mV)
+          //unsigned int fullCapacity = lipo.capacity(FULL); // Read full capacity (mAh)
+          //unsigned int capacity = lipo.capacity(REMAIN); // Read remaining capacity (mAh)
+          //Serial.printf("charge %d / volt : %d / full : %d / remain : %d\r\n",soc,volts,fullCapacity,capacity);
+          state.batVoltage = volts;
+          state.batPercent = soc;
+        }
+      #endif
       batUpdateTime = 0;
     }
   #endif

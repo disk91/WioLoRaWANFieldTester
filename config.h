@@ -35,6 +35,7 @@
   #define CFG_anyZone
   #define WITH_GPS
   #define SERIALE5  Serial1
+  #define WITH_LIPO
 #endif
 
 #if HWTARGET == RFM95
