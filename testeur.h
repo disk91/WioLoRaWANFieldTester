@@ -63,6 +63,7 @@ typedef struct s_state {
   uint16_t  batVoltage;         // voltage in mV
   uint8_t   batPercent;       // bat percent
   bool      batOk;            // battery detected
+  bool      batUpdated;       // battery value has been updated
 
 } state_t;
 

@@ -51,6 +51,7 @@ void initState() {
   state.hasRefreshed = false;
   state.batVoltage = 0;
   state.batPercent = 0;
+  state.batUpdated = false;
 }
 
 void addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lost) {

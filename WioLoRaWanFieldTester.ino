@@ -117,6 +117,7 @@ void loop(void) {
           state.batPercent = soc;
         }
       #endif
+      state.batUpdated = true;
       batUpdateTime = 0;
     }
   #endif

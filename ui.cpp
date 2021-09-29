@@ -383,32 +383,36 @@ bool refreshLiPo() {
       ui.alertMode = false;
       return true;
     }
-    int xOffset = X_OFFSET+20;
-    int yOffset = Y_OFFSET+2*Y_SIZE+5;
-    if ( state.batPercent > 0 ) {
-      // we have this information (Battery Chassis)
-      int color = TFT_RED;
-      if ( state.batPercent > 50 ) color = TFT_GREEN;
-      else if ( state.batPercent > 20 ) color = TFT_ORANGE;
-      else if ( state.batPercent < 10 ) {
-         tft.fillRoundRect(xOffset,yOffset,10 + (40*state.batPercent) / 100 ,10,5,TFT_BLACK);
-         delay(100);
-      }
-      tft.fillRoundRect(xOffset,yOffset,10 + (40*state.batPercent) / 100 ,10,5,color);  
-    } else {
-      // Display bat status
-      if ( state.batVoltage > 3650 ) {
-        // green status
-        tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_GREEN);  
-      } else if ( state.batVoltage > 3500 ) {
-        tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_ORANGE);  
+    if ( state.batUpdated ) {
+      int xOffset = X_OFFSET+20;
+      int yOffset = Y_OFFSET+2*Y_SIZE+5;
+      if ( state.batPercent > 0 ) {
+        // we have this information (Battery Chassis)
+        tft.fillRect(xOffset,yOffset,50 ,10,TFT_BLACK);
+        int color = TFT_RED;
+        if ( state.batPercent > 50 ) color = TFT_GREEN;
+        else if ( state.batPercent > 20 ) color = TFT_ORANGE;
+        else if ( state.batPercent < 10 ) {
+           delay(100);
+           tft.drawRoundRect(xOffset,yOffset,50 ,10,5,TFT_WHITE);
+        }
+        tft.fillRoundRect(xOffset,yOffset,10 + (40*state.batPercent) / 100 ,10,5,color);
       } else {
-        tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_RED);  
-      }      
+        // Display bat status
+        if ( state.batVoltage > 3650 ) {
+          // green status
+          tft.fillRoundRect(xOffset,yOffset,50,10,5,TFT_GREEN);  
+        } else if ( state.batVoltage > 3500 ) {
+          tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_ORANGE);  
+        } else {
+          tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_RED);  
+        }      
+      }
+      tft.drawRoundRect(xOffset,yOffset,50 ,10,5,TFT_WHITE);
+      state.batUpdated = false;
     }
-    
   }
-  
+  return false;
 }
 
 /**
