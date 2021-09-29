@@ -86,11 +86,13 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
 
 ### Configure the WioLoRaWANFieldTester software
 
-- The **config.h** file contains the configuration defines. Enable / Disable what you need
+- The `config.h` file contains the configuration defines. Enable / Disable what you need
 
 ```C
 //#define DEBUG                       // enable extra debug logs on serial
  
+#define HWTARGET            LORAE5    // Select the target E5 vs RFM95
+
 #define WITH_SPLASH         1         // Enable splash screen
 #define WITH_SPLASH_HELIUM  1         //   display helium logo
 #define WITH_SPLASH_TTN     1         //   display TTN logo
@@ -100,7 +102,7 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
 
 ```
 
-- The **key.h** file containes the LoRaWAN credential. When all set to 0, the device will expect a serial port configuration as seen in the setup. 
+- The `key.h` file containes the LoRaWAN credential. When all set to 0, the device will expect a serial port configuration as seen in the setup. 
 
 When developing it is more convenient to use a static configuration to avoid reconfiguring the device on every firmware update. For this, you can get the credential as defined in the [Access Helium device credential for developer](ObtainCredsFromHelium.md) section of the documentation.
 
