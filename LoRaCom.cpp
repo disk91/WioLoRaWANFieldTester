@@ -502,8 +502,9 @@ bool processLoRaConfig(void) {
             }
           }
           break; 
-          case __LCONF_STATE_ZONE: {
+          case __LCONF_STATE_ZONE: 
             #if HWTARGET == LORAE5
+            {
                sZone[pos] = c;  
                pos++;      
                if ( pos == 5 ) {
@@ -550,12 +551,12 @@ bool processLoRaConfig(void) {
                   }
                   state = __LCONF_STATE_NONE;
                }
+            }
             #else
               SERIALCONFIG.println("KO");
               state = __LCONF_STATE_NONE;
             #endif
           break;
-          }
         }
       }
     }  
