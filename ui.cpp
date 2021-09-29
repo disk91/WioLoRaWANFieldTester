@@ -1122,6 +1122,9 @@ bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t a
     case ZONE_IN865:    
         sprintf(sZone,"IN865");
         break;
+    case ZONE_AU915:
+        sprintf(sZone,"AU915");
+        break;
   }
   sprintf(sTmp,"Zone:   %s", sZone); 
   tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_ZONE_OFF_Y,GFXFF);

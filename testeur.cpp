@@ -108,7 +108,7 @@ void tst_setPower(int8_t pwr) {
   if ( loraConf.zone == ZONE_EU868 || loraConf.zone == ZONE_AS923 || loraConf.zone == ZONE_KR920 ) {
     if ( pwr > 16 ) pwr = 16;
     pwr &= 0xFE;
-  } else if ( loraConf.zone == ZONE_US915 ) {
+  } else if ( loraConf.zone == ZONE_US915 || loraConf.zone == ZONE_AU915 ) {
     if ( pwr > 20 ) pwr = 20;
   } else {
     LOGLN("Zone not supported for power limit");
@@ -120,7 +120,7 @@ void tst_setPower(int8_t pwr) {
 void tst_setSf(uint8_t sf) {
 
   if ( sf < 7 ) sf = 7;
-  if ( loraConf.zone == ZONE_EU868 || loraConf.zone == ZONE_AS923 || loraConf.zone == ZONE_KR920 || loraConf.zone == ZONE_IN865 ) {
+  if ( loraConf.zone == ZONE_EU868 || loraConf.zone == ZONE_AS923 || loraConf.zone == ZONE_KR920 || loraConf.zone == ZONE_IN865 || loraConf.zone == ZONE_AU915 ) {
     if ( sf > 12 ) sf = 12;
   } else if ( loraConf.zone == ZONE_US915 ) {
     if ( sf > 10 ) sf = 10;

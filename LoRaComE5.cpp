@@ -247,6 +247,8 @@ void loraSetup(void) {
     sendATCommand("AT+DR=KR920","+DR: KR920","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
   } else if ( loraConf.zone == ZONE_IN865 ) {
     sendATCommand("AT+DR=IN865","+DR: IN865","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+  } else if ( loraConf.zone == ZONE_AU915 ) {
+    sendATCommand("AT+DR=IN865","+DR: AU915","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);    
   } else {
     LOGLN("Invalid Zone selected");
     return;
@@ -451,7 +453,7 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
   if ( loraContext.lastDr != _dr ) {
     // set dr ( for real dr is not dr but SF)
     boolean retDr = true;
-    if ( loraConf.zone == ZONE_EU868 || loraConf.zone == ZONE_AS923 || loraConf.zone == ZONE_KR920 || loraConf.zone == ZONE_IN865 ) {
+    if ( loraConf.zone == ZONE_EU868 || loraConf.zone == ZONE_AS923 || loraConf.zone == ZONE_KR920 || loraConf.zone == ZONE_IN865 || loraConf.zone == ZONE_AU915 ) {
       // DR0 - SF12 / DR5 - SF7
       switch (_dr) {
         case 7:
