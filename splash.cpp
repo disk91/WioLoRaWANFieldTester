@@ -25,7 +25,7 @@
 
 void draw_splash_helium(int xOffset, int yOffset, int density) {
 
-  char * logo = helium_data;
+  const char * logo = helium_data;
   for ( int y = yOffset ; y < yOffset+helium_height ; y++ ) {
     for ( int x  = xOffset ; x < xOffset+helium_width ; x++) {
         uint8_t pixel[3];
@@ -44,7 +44,7 @@ void draw_splash_helium(int xOffset, int yOffset, int density) {
 
 void draw_splash_ttn(int xOffset, int yOffset, int density) {
 
-  char * logo = ttn_data;
+  const char * logo = ttn_data;
   for ( int y = yOffset ; y < yOffset+ttn_height ; y++ ) {
     for ( int x  = xOffset ; x < xOffset+ttn_width ; x++) {
         uint8_t pixel[3];
