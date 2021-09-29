@@ -148,7 +148,7 @@ boolean canLoRaSend() {
 
  
 static uint8_t countRepeat = 0;
-void do_send(uint8_t port, uint8_t * data, uint8_t sz, _dr_configured_t _dr, uint8_t pwr, bool acked, uint8_t retries ) {
+void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr, bool acked, uint8_t retries ) {
 
     _dr_configured_t dr;
     switch ( _dr ) {
@@ -550,12 +550,12 @@ bool processLoRaConfig(void) {
                   }
                   state = __LCONF_STATE_NONE;
                }
-          }
-          #else
-            SERIALCONFIG.println("KO");
-            state = __LCONF_STATE_NONE;
-          #endif
+            #else
+              SERIALCONFIG.println("KO");
+              state = __LCONF_STATE_NONE;
+            #endif
           break;
+          }
         }
       }
     }  

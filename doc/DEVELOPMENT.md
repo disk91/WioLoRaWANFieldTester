@@ -8,8 +8,13 @@ The installation details are available in the related [Wio LoRaWan Field tester 
 
 ### Required software components
 * Arduino IDE
-* WioTerminal - [Toolsuite](Wio Terminal toolchain)
+* WioTerminal - [Toolsuite](Whttps://wiki.seeedstudio.com/Wio-Terminal-Getting-Started/)
 * GPS - Adafruit GPS library version 1.5.4
+
+:warning: Remove any local library `TFT_eSPI` from your Arduino library folder, if not, it will use the local one with wrong pins definition resulting in black screen on boot. This library is included with Seeed SAMD package installed thru Boards Manager.
+```
+https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
+```
 
 #### RFM95 version
 * LoRaWAN - MCCI LoRaWAN LMIC library (by IBM, Matthjs Kooljman…) version 3.3.0
@@ -54,8 +59,8 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
 ```C
    #define _SS_MAX_RX_BUFF 128 // RX buffer size
 ```
-- In variant.cpp (Libraries/Arduino15/packages/seeeduino/hardware/samd/1.8.2/library/Wire/Wire.cpp), add in  the follwoing lines (they are conflicting with Wire from the same package) ( && defined FALSE ). This is to wait a fix from Seeed on their package.
-``` 
+- In `variant.cpp` (Libraries/Arduino15/packages/seeeduino/hardware/samd/1.8.2/library/Wire/Wire.cpp), add in  the follwoing lines (they are conflicting with Wire from the same package) ( `&& defined FALSE` ). This is to wait a fix from Seeed on their package.
+```cpp 
 #if WIRE_INTERFACES_COUNT > 1
   TwoWire Wire1(&PERIPH_WIRE1, PIN_WIRE1_SDA, PIN_WIRE1_SCL);
 
@@ -71,10 +76,13 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
   #endif // __SAMD51__
 #endif
 ```
-- In Adafruit_GOS_Library (Documents/Arduino/libraries/Adafruit_GPS_Library/src), in Adafruit_GPS.h, add the following define to allow SoftwareSerial
+
+- In Adafruit_GPS_Library (Documents/Arduino/libraries/Adafruit_GPS_Library/src), in `Adafruit_GPS.h`, add the following define to allow SoftwareSerial
 ```C
-  #define ESP8266 // Hack
-``
+#if defined ARDUINO_WIO_TERMINAL
+#define ESP8266
+#endif 
+```
 
 ### Configure the WioLoRaWANFieldTester software
 
@@ -148,7 +156,7 @@ Such a decoder can be use if you do not want to use my backend to report the coo
 
 Create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a mapper integration callback as it is described in this [helium mapper integration page](https://docs.helium.com/use-the-network/coverage-mapping/mappers-quickstart/)
 
-```
+```js
 /*
   Helium console function for LoRaWan Field Tester sending mapping information to mappers backend.
 

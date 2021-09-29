@@ -42,7 +42,7 @@ uint64_t gpsEncodePosition48b() {
 
 #if HWTARGET == LORAE5
   #ifndef ESP8266
-  #error "you need to add #define ESP8266 in the Adafruit_GPS.h file in AdafruitGPS library
+  #error "you need to add #define ESP8266 in the Adafruit_GPS.h file in AdafruitGPS library"
   #endif
   #include <SoftwareSerial.h>
   SoftwareSerial softSerial(3,2);
