@@ -151,7 +151,7 @@ Such a decoder can be use if you do not want to use my backend to report the coo
 
 Create a _Functions_ type _Decoder_ / _Custom Script_ and attach it to a mapper integration callback as it is described in this [helium mapper integration page](https://docs.helium.com/use-the-network/coverage-mapping/mappers-quickstart/)
 
-```
+```js
 /*
   Helium console function for LoRaWan Field Tester sending mapping information to mappers backend.
 
