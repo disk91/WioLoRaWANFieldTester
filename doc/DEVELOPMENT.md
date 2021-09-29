@@ -72,13 +72,14 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
 #endif
 ```~~
 
-- Deprecated, Adafruit_GPS_Library define by default USE_SW_SERIAL ~~In Adafruit_GPS_Library (Documents/Arduino/libraries/Adafruit_GPS_Library/src), in `Adafruit_GPS.h`, add the following define to allow SoftwareSerial
+- Deprecated, Adafruit_GPS_Library define by default USE_SW_SERIAL ~In Adafruit_GPS_Library (Documents/Arduino/libraries/Adafruit_GPS_Library/src), in `Adafruit_GPS.h`, add the following define to allow SoftwareSerial~
+~
 ```C
 #if defined ARDUINO_WIO_TERMINAL
 #define USE_SW_SERIAL 
 #endif 
 ```
-~~
+~
 
 ### Configure the WioLoRaWANFieldTester software
 
