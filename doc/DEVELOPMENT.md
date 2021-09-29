@@ -54,8 +54,8 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
 ```C
    #define _SS_MAX_RX_BUFF 128 // RX buffer size
 ```
-- In variant.cpp (Libraries/Arduino15/packages/seeeduino/hardware/samd/1.8.2/library/Wire/Wire.cpp), add in  the follwoing lines (they are conflicting with Wire from the same package) ( && defined FALSE ). This is to wait a fix from Seeed on their package.
-``` 
+- In `variant.cpp` (Libraries/Arduino15/packages/seeeduino/hardware/samd/1.8.2/library/Wire/Wire.cpp), add in  the follwoing lines (they are conflicting with Wire from the same package) ( `&& defined FALSE` ). This is to wait a fix from Seeed on their package.
+```cpp 
 #if WIRE_INTERFACES_COUNT > 1
   TwoWire Wire1(&PERIPH_WIRE1, PIN_WIRE1_SDA, PIN_WIRE1_SCL);
 
@@ -70,11 +70,15 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
     void WIRE1_IT_HANDLER_3(void) { Wire1.onService(); }
   #endif // __SAMD51__
 #endif
-```
-- In Adafruit_GOS_Library (Documents/Arduino/libraries/Adafruit_GPS_Library/src), in Adafruit_GPS.h, add the following define to allow SoftwareSerial
+```~~
+
+- Deprecated, Adafruit_GPS_Library define by default USE_SW_SERIAL ~~In Adafruit_GPS_Library (Documents/Arduino/libraries/Adafruit_GPS_Library/src), in `Adafruit_GPS.h`, add the following define to allow SoftwareSerial
 ```C
-  #define ESP8266 // Hack
-``
+#if defined ARDUINO_WIO_TERMINAL
+#define USE_SW_SERIAL 
+#endif 
+```
+~~
 
 ### Configure the WioLoRaWANFieldTester software
 
