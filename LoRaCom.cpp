@@ -119,7 +119,7 @@ boolean canLoraSleep(void) {
   return !isTransmitting;
 }
 
-static int32_t lastSend = -US915_DUTYCYCLE_MS;
+static int32_t lastSend = -NONDCZONE_DUTYCYCLE_MS;
 // return in Ms time to wait before a new communication in respect of the Duty Cycle
 uint32_t nextPossibleSendMs() {
   #ifdef CFG_eu868
