@@ -262,6 +262,10 @@ void onEvent (ev_t ev) {
                     state.worstRssi[idx] -= 200;
                     state.bestRssi[idx]   = data[2];
                     state.bestRssi[idx]  -= 200;
+                    state.minDistance[idx]  = data[3];
+                    state.minDistance[idx] *= 250;
+                    state.maxDistance[idx]  = data[4];
+                    state.maxDistance[idx] *= 250;
                     state.hs[idx]         = data[5];
                     state.hasRefreshed = true;
                   }

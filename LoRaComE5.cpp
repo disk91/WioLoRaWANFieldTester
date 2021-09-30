@@ -450,6 +450,10 @@ bool processTx(void) {
              state.bestRssi[idx]  -= 200;
              if ( state.bestRssi[idx] > 5 ) state.bestRssi[idx] = 5;
              if ( state.bestRssi[idx] < -145 ) state.bestRssi[idx] = -145;
+             state.minDistance[idx]  = downlink[3];
+             state.minDistance[idx] *= 250;
+             state.maxDistance[idx]  = downlink[4];
+             state.maxDistance[idx] *= 250;
              state.hs[idx]         = downlink[5];
              if ( state.hs[idx] > 20 ) state.hs[idx] = 20;
              if ( state.hs[idx] < 0 ) state.hs[idx] = 0;

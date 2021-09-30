@@ -27,9 +27,13 @@ To get a better understanding on how WioLoRaWANFieldTester works, [read this pag
 - Duty cycle status display
 - Last setting flash memory backup
 - Graph selection display
-	- Rx Rssi - ack Rssi level 
-	- Rx Snr - ack Snr level
+	- Rx Rssi - acked Rssi level 
+	- Rx Snr - acked Snr level
 	- Retries - number of retry before getting a ack
+	- Tx Rssi - network side Rssi 
+	- Hotspots - network side hotspot 
+	- Distance - hotspot distance (in progress)
+	- GPS status - current GPS status
 - Manual / Automatic mode switch
 - Display last frame information
 - Network side RSSI / SNR / #of station

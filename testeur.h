@@ -54,6 +54,8 @@ typedef struct s_state {
   uint16_t  hs[MAXBUFFER];        // number HS receiving
   int16_t   bestRssi[MAXBUFFER];  // best Rssi
   int16_t   worstRssi[MAXBUFFER]; // worst Rssi
+  uint16_t  minDistance[MAXBUFFER]; // nearest hotspot
+  uint16_t  maxDistance[MAXBUFFER]; // farest hotspot
 
   int       readPtr;          // circular buffer
   int       writePtr;

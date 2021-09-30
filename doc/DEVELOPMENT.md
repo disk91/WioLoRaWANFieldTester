@@ -102,7 +102,7 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
 
 ```
 
-- The `key.h` file containes the LoRaWAN credential. When all set to 0, the device will expect a serial port configuration as seen in the setup. 
+- The `key.h file containes the LoRaWAN credential. When all set to 0, the device will expect a serial port configuration as seen in the setup. 
 
 When developing it is more convenient to use a static configuration to avoid reconfiguring the device on every firmware update. For this, you can get the credential as defined in the [Access Helium device credential for developer](ObtainCredsFromHelium.md) section of the documentation.
 
@@ -145,10 +145,11 @@ When the GPS position is invalid of GPS is disable, the frame is full of 0
 | `0`           | Sequence ID % 255              |
 | `1`           | Min Rssi + 200 (160 = -40dBm)  |
 | `2`           | Max Rssi + 200 (160 = -40dBm)  |
-| `3`           | Min SNR + 100 (80 = -20dBm)    |
-| `4`           | Max SNR + 100 (80 = -20dBm)    |
+| `3`           | Min Distance step 250m         |
+| `4`           | Max Distance step 250m         |
 | `5`           | Seen hotspot                   |
 
+The distance is calculated from the GPS position and the hotspot position returned by console meta-data. Under 250m value is 250m, over 32km value is 32km. 0 is considered as invalid response
 
 The following integration and payload transformation allows to decode the gps position and report is to mapper. Thank you Seb for the contribution.
 
