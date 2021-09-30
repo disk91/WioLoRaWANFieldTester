@@ -131,10 +131,10 @@ void loop(void) {
       }
       break;
     case MODE_AUTO_5MIN:
-      if ( cTime >= ( 5 * 60 * 1000 ) ) fireMessage = true;
+      if ( cTime >= ( 5 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
       break;
     case MODE_AUTO_1MIN:
-      if ( cTime >= ( 1 * 60 * 1000 ) ) fireMessage = true;
+      if ( cTime >= ( 1 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
       break;
     case MODE_MAX_RATE:
       if ( canLoRaSend() ) fireMessage = true;
@@ -148,7 +148,7 @@ void loop(void) {
     // send a new test message on port 1, backend will create a downlink with information about network side reception
     cTime = 0;
     // Fill the frame
-    if ( gps.isReady ) {
+    if ( gps.isReady && gpsQualityIsGoodEnough() ) {
       uint64_t pos = gpsEncodePosition48b();
       myFrame[0] = (pos >> 40) & 0xFF;
       myFrame[1] = (pos >> 32) & 0xFF;

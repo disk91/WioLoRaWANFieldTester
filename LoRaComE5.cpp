@@ -27,7 +27,7 @@
 #define DEFAULT_TIMEOUT 2000
 #define PASSTHROUGH_TIMEOUT 15000
 #define JOIN_TIMEOUT 12000
-#define SEND_TIMEOUT 20000
+#define SEND_TIMEOUT_BASE 5000
 #define MAX_RESP_BUF_SZ  64
 
 typedef struct {
@@ -89,7 +89,7 @@ bool sendATCommand(const char * cmd, const char * okResp, const char * errResp, 
   loraContext.lineProcessing = lineProcessing;
   
   SERIALE5.printf("%s\r\n",cmd);
-  // DEBUG - Serial.println(cmd);
+  LOGLORALN((cmd));
   bool done = false;
   if ( !async ) {
     while ( ! processATResponse() );
@@ -163,7 +163,7 @@ bool processATResponse() {
         if ( loraContext.respIndex > 0 ) {
           // process line response
           loraContext.bufResponse[loraContext.respIndex] = '\0';
-          // DEBUG - Serial.println(loraContext.bufResponse);
+          LOGLORALN((loraContext.bufResponse));
           int i;
           if ( loraContext.lineProcessing != NULL ) {
             if ( loraContext.lineProcessing() ) {
@@ -251,7 +251,7 @@ void loraSetup(void) {
   } else if ( loraConf.zone == ZONE_AU915 ) {
     sendATCommand("AT+DR=IN865","+DR: AU915","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);    
   } else {
-    LOGLN("Invalid Zone selected");
+    LOGLN(("Invalid Zone selected"));
     return;
   }
   sendATCommand("AT+ADR=OFF","+ADR: OFF","+ADR: ON","",DEFAULT_TIMEOUT,false,NULL);
@@ -353,6 +353,30 @@ bool extractHexStr(const char * src, uint8_t * dst, uint8_t * sz) {
    return true;
 }
 
+// estimate DutyCycle duration for a single transmission in ms of pause
+uint32_t interFrameDutyCycleEstimate(uint8_t _dr) {
+   if ( loraConf.zone == ZONE_EU868 ) {
+      // EU868
+      // 1% based on SF and data size (10 Bytes)
+      // @TODO also consider ack
+      // @TODO make this more generic considering payload size
+      switch (_dr) {
+          case 7:  return 6200; 
+          case 8:  return 11300; 
+          case 9:  return 20600; 
+          case 10: return 37100; 
+          case 11: return 82300; 
+          case 12: return 148300;
+          default:
+               LOGLN(("Invalid SF"));
+               return 200000;
+      }
+   } else {
+      // No Duty Cycle zones, set a minimum time
+      return NONDCZONE_DUTYCYCLE_MS;
+   }
+}
+
 // ---------------------------------------------------------------------
 // Manage transmission response asynchronously
 bool processTx(void) {
@@ -386,12 +410,14 @@ bool processTx(void) {
       } else {
           state.cState = JOINED;              
       }
+      loraContext.estimatedDCMs = interFrameDutyCycleEstimate(loraContext.lastDr)*retries;
     } else {
       //Serial.printf("Add Data for seq(%d) rssi(%d) snr(%d) [Lost]\r\n",loraContext.currentSeqId,(int16_t)0, (int16_t)0);
       addInBuffer(0, 0, loraContext.lastRetry, loraContext.currentSeqId, true);
       state.hasRefreshed = true;
       state.cState = JOINED;
     }
+    // update the Duty cycle based on real retry estimate
     loraContext.currentSeqId = (loraContext.currentSeqId + 1) & 0xFF ;
   } else if ( startsWith(loraContext.bufResponse,"+CMSGHEX: FPEND") ) {
     // downlink pending
@@ -438,6 +464,7 @@ bool processTx(void) {
   }
   return false;
 }
+
 
 void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr, bool acked, uint8_t retries ) {
   char _cmd[128];
@@ -518,6 +545,14 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
       return;
     }
   }
+
+  // Set Pport
+  sprintf(_cmd,"AT+PORT=%d",port);
+  if ( !sendATCommand(_cmd,"+PORT:","+PORT: ERR","",DEFAULT_TIMEOUT,false,NULL) ) {
+     LOGLN(("Invalid Port"));
+     return;
+  }
+
   
   loraContext.lastSendMs = millis();
   if ( ! loraContext.hasJoined ) {
@@ -540,47 +575,24 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
     loraContext.isJoining = true;
     state.cState = JOINING;
   } else {
-      if ( loraConf.zone == ZONE_US915 || loraConf.zone == ZONE_AS923 || loraConf.zone == ZONE_KR920 || loraConf.zone == ZONE_IN865 ) {
-       // No Duty Cycle zones, set a minimum time
-       loraContext.estimatedDCMs = US915_DUTYCYCLE_MS;
-      } else {
-        // 1% based on SF and data size (10 Bytes)
-        // @TODO also consider ack
-        // @TODO make this more generic considering payload size
-         switch (_dr) {
-          case 7:  loraContext.estimatedDCMs = 6200;  break;
-          case 8:  loraContext.estimatedDCMs = 11300; break;
-          case 9:  loraContext.estimatedDCMs = 20600; break;
-          case 10: loraContext.estimatedDCMs = 37100; break;
-          case 11: loraContext.estimatedDCMs = 82300; break;
-          case 12: loraContext.estimatedDCMs = 148300;break;
-          default:
-               LOGLN(("Invalid SF"));
-               return;
-          }
-      }
-      loraContext.estimatedDCMs *= (retries+1);
-      // Set Pport
-      sprintf(_cmd,"AT+PORT=%d",port);
-      if ( !sendATCommand(_cmd,"+PORT:","+PORT: ERR","",DEFAULT_TIMEOUT,false,NULL) ) {
-        LOGLN(("Invalid Port"));
-        return;
-      }
       
-      if (acked) {
-        sprintf(_cmd,"AT+CMSGHEX=");
-      } else {
-        sprintf(_cmd,"AT+MSGHEX=");
-      }
-      int k = strlen(_cmd);
-      for ( int i = 0 ; i < sz && k < 125 ; i++ ) {
-        sprintf(&_cmd[k],"%02X",data[i]);
-        k+=2;
-      }
-      loraContext.hasAcked = false;
-      loraContext.downlinkPending = false;
-      state.cState = IN_TX;
-      sendATCommand(_cmd,"+CMSGHEX: Done","","",SEND_TIMEOUT,true,processTx);     
+    loraContext.estimatedDCMs  = interFrameDutyCycleEstimate(_dr);
+      
+    if (acked) {
+      sprintf(_cmd,"AT+CMSGHEX=");
+      loraContext.estimatedDCMs *= (retries+1);
+    } else {
+      sprintf(_cmd,"AT+MSGHEX=");
+    }
+    int k = strlen(_cmd);
+    for ( int i = 0 ; i < sz && k < 115 ; i++ ) {
+      sprintf(&_cmd[k],"%02X",data[i]);
+      k+=2;
+    }
+    loraContext.hasAcked = false;
+    loraContext.downlinkPending = false;
+    state.cState = IN_TX;
+    sendATCommand(_cmd,"+CMSGHEX: Done","","",SEND_TIMEOUT_BASE*(retries+1),true,processTx);     
   }
   
 }

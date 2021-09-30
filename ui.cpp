@@ -880,7 +880,7 @@ void refreshGps() {
   int xOffset = X_OFFSET+4;
   int yOffset = Y_OFFSET+2*Y_SIZE+5;
   if ( gps.isReady ) {
-    if ( gps.hdop < 150 && gps.sats > 3 ) {
+    if (  gpsQualityIsGoodEnough() ) {
        tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_GREEN);  
     } else {
        tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_ORANGE);  
@@ -934,7 +934,12 @@ void refreshGpsDetails() {
   
     sprintf(sTmp,"Altitude:  %d", gps.altitude);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_ALT_OFF_Y,GFXFF);
-  
+
+    if ( gpsQualityIsGoodEnough() ) {
+        tft.setTextColor(TFT_GRAY);
+    } else {
+        tft.setTextColor(TFT_ORANGE);
+    }
     sprintf(sTmp,"Hdop:      %d.%d Sats: %d", gps.hdop/100,gps.hdop-100*(gps.hdop/100), gps.sats);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_QUA_OFF_Y,GFXFF);
 

@@ -117,7 +117,7 @@ void tst_setPower(int8_t pwr) {
       #error "Invalid Target"
     #endif
   } else {
-    LOGLN("Zone not supported for power limit");
+    LOGLN(("Zone not supported for power limit"));
     if ( pwr > 16 ) pwr = 16;
   }
   state.cPwr = pwr;
@@ -131,7 +131,7 @@ void tst_setSf(uint8_t sf) {
   } else if ( loraConf.zone == ZONE_US915 ) {
     if ( sf > 10 ) sf = 10;
   } else {
-    LOGLN("Zone not supported for SF limit");
+    LOGLN(("Zone not supported for SF limit"));
     if ( sf > 10 ) sf = 10;
   }
   state.cSf = sf;

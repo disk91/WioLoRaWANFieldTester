@@ -23,6 +23,7 @@
 // 1 - select if you want some debug
 //#define DEBUG
 //#define DEBUGGPS
+//#define DEBUGLORA
 
 
 #define RFM95      0
@@ -65,9 +66,20 @@
   #define LOGF(x)
 #endif
 
+#ifdef DEBUGLORA
+  #define LOGLORALN(x)  Serial.println x
+  #define LOGLORA(x) Serial.print x
+  #define LOGLORAF(x) Serial.printf x
+#else
+  #define LOGLORALN(x) 
+  #define LOGLORA(x)
+  #define LOGLORAF(x)
+#endif
+
+
 #define SERIALCONFIG  Serial
 
-#define US915_DUTYCYCLE_MS 10000    // Fair use and preserve DCs in MS
+#define NONDCZONE_DUTYCYCLE_MS 5000    // Fair use and preserve DCs in MS
 
 bool readConfig();
 void storeConfig();

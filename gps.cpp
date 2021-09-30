@@ -96,7 +96,7 @@ void gpsLoop() {
     uint32_t cTime = GPS.hour * 3600 + GPS.minute * 60 + GPS.seconds; 
     if ( ! gps.isReady || cTime != gps.updateTime ) {
       gps.hdop = (uint16_t)(GPS.HDOP*100.0);
-      if ( gps.hdop < 300 && GPS.satellites >= 4 ) {
+      if ( GPS.satellites >= 2 ) {
           gps.isReady = true;
           gps.updateTime = cTime;
           gps.hour = GPS.hour;
@@ -125,7 +125,11 @@ void gpsLoop() {
   
 }
 
+bool gpsQualityIsGoodEnough() {
 
+  return (gps.isReady && gps.hdop < GPS_MAX_HDOP && gps.sats > GPS_MIN_SAT ); 
+  
+}
 /**
  * Compact encoding of the current position
  * The result is stored in the **output** uint64_t variable
