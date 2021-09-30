@@ -53,6 +53,16 @@ uint64_t gpsEncodePosition48b() {
 
 Adafruit_GPS GPS(&GPSSerial);
 
+// empty pending char from GPS with a timeout before leaving
+void clearGpsPendingChar(uint32_t timeout) {
+  uint32_t start = millis();
+  while ( GPS.available() || (millis() - start) < timeout ) {
+    if ( GPS.available() ) {
+      start = millis();
+      GPS.read();
+    }
+  }
+}
 
 void gpsSetup() {
   #if HWTARGET == LORAE5
@@ -65,15 +75,23 @@ void gpsSetup() {
   #else
     GPS.begin(9600);
   #endif
+  
+  delay(500);
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);
+  clearGpsPendingChar(100);
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);  // make sure
+  clearGpsPendingChar(100);
   //GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ); // 1 Hz update rate
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_200_MILLIHERTZ); // 5s update rate
+  clearGpsPendingChar(100);
   // Request no updates on antenna status, comment out to keep quiet
   GPS.sendCommand(PGCMD_NOANTENNA);
+  clearGpsPendingChar(100);
   // Request no update on GPTXT
   GPS.sendCommand("$PQTXT,W,0,0*22");
+  clearGpsPendingChar(100);
   
-  delay(1000);
+  delay(500);
   gps.isReady = false;
   gps.rxStuff = false;
 }
@@ -82,9 +100,10 @@ void gpsSetup() {
 void gpsLoop() {
   
   char c = GPS.read();
+  
   //Serial.print(c);
   if (GPS.newNMEAreceived()) {
-    //  Serial.print(GPS.lastNMEA());
+    // DEBUG -- Serial.print(GPS.lastNMEA());
     gps.rxStuff = true;
     if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
       return; // we can fail to parse a sentence in which case we should just wait for another
