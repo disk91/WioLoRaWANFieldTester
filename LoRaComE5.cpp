@@ -25,6 +25,7 @@
 #include "ui.h"
 
 #define DEFAULT_TIMEOUT 2000
+#define PASSTHROUGH_TIMEOUT 15000
 #define JOIN_TIMEOUT 12000
 #define SEND_TIMEOUT 20000
 #define MAX_RESP_BUF_SZ  64
@@ -88,7 +89,7 @@ bool sendATCommand(const char * cmd, const char * okResp, const char * errResp, 
   loraContext.lineProcessing = lineProcessing;
   
   SERIALE5.printf("%s\r\n",cmd);
-  //Serial.println(cmd);
+  // DEBUG - Serial.println(cmd);
   bool done = false;
   if ( !async ) {
     while ( ! processATResponse() );
@@ -162,7 +163,7 @@ bool processATResponse() {
         if ( loraContext.respIndex > 0 ) {
           // process line response
           loraContext.bufResponse[loraContext.respIndex] = '\0';
-          //Serial.println(loraContext.bufResponse);
+          // DEBUG - Serial.println(loraContext.bufResponse);
           int i;
           if ( loraContext.lineProcessing != NULL ) {
             if ( loraContext.lineProcessing() ) {
@@ -584,9 +585,34 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
   
 }
 
+bool processPassThrough(void) {
+  Serial.println(loraContext.bufResponse);
+  return false;
+}
 
 void loraLoop(void) {
-   if ( processATResponse() ) {
+    // --- LoRa E5 passthrough
+    // allow to send AT command from Serial line
+    static char _buffer[64];
+    static uint8_t _bufferIdx = 0;
+    while ( Serial.available() && _bufferIdx < 64 ) {
+      _buffer[_bufferIdx] = Serial.read();
+      if ( _buffer[_bufferIdx] == '\r' || _buffer[_bufferIdx] == '\n' ) {
+        _buffer[_bufferIdx] = '\0';
+        if ( _bufferIdx > 1 ) {
+           if ( ! sendATCommand(_buffer,"","","",PASSTHROUGH_TIMEOUT,true,processPassThrough)) {
+             Serial.println("Busy");
+           }
+        }
+        _bufferIdx=0;
+      } else {
+        _bufferIdx++;
+      }
+    }
+    if ( _bufferIdx == 64 ) _bufferIdx = 0;
+    // ---- end of passthrough
+    
+    if ( processATResponse() ) {
       // process command ended
       
       // Was a join
