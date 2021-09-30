@@ -26,8 +26,8 @@
 //#define DEBUGLORA
 
 
-#define RFM95      0
-#define LORAE5     1
+#define RFM95      0      // Make sure the board ROLE is MASTER
+#define LORAE5     1      // Make sure the board ROLE is SLAVE
 
 // 2 - select the target board, original one based on RFM95 or Seed LoRa E5 version
 #define HWTARGET   LORAE5

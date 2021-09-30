@@ -72,11 +72,12 @@ void gpsSetup() {
     delay(250);
     GPS.begin(9600);
     GPSSerial.listen();
+    delay(500);
   #else
     GPS.begin(9600);
+    delay(2500);
   #endif
-  
-  delay(500);
+
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);
   clearGpsPendingChar(100);
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);  // make sure

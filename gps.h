@@ -23,7 +23,7 @@
 #ifndef __GPS_H__
 #define __GPS_H__
 
-#define GPS_MAX_HDOP  150
+#define GPS_MAX_HDOP  200
 #define GPS_MIN_SAT   3
 
 void gpsSetup();
