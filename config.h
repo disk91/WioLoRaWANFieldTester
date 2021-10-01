@@ -56,6 +56,8 @@
 //#define WITH_SPLASH_TTN     1
 
 
+#define VERSION "v0.9"
+
 #ifdef DEBUG
   #define LOGLN(x)  Serial.println x
   #define LOG(x) Serial.print x

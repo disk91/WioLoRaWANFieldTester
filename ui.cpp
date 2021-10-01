@@ -79,8 +79,17 @@ void initScreen() {
   pinMode(WIO_5S_PRESS, INPUT_PULLUP); 
 }
 
+void displayTitle() {
+    char title[128];
+    tft.setTextColor(TFT_GRAY);
+    tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+    sprintf(title,"WioLoRaWanFieldTester %s",VERSION);
+    tft.drawString(title,(320-210)/2,120, GFXFF);  
+}
+
 void displaySplash() {
   // Totally useless so totally mandatory
+  tft.fillScreen(TFT_BLACK);
   #ifdef WITH_SPLASH 
     tft.drawRoundRect((320-200)/2,200,200,10,5,TFT_WHITE);
     tft.setTextColor(TFT_GRAY);

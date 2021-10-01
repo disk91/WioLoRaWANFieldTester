@@ -59,6 +59,7 @@ void setup() {
   #endif
   initState();
   initScreen();
+  displayTitle();
 
   // Make sure the LoraWan configuration has been made if not wait for the configuration
   boolean zero = true;
