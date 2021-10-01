@@ -72,7 +72,7 @@ void gpsSetup() {
     delay(250);
     GPS.begin(9600);
     GPSSerial.listen();
-    delay(500);
+    delay(1000);
   #else
     GPS.begin(9600);
     delay(2500);
