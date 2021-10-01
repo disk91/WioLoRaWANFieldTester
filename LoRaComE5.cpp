@@ -249,7 +249,7 @@ void loraSetup(void) {
   } else if ( loraConf.zone == ZONE_IN865 ) {
     sendATCommand("AT+DR=IN865","+DR: IN865","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
   } else if ( loraConf.zone == ZONE_AU915 ) {
-    sendATCommand("AT+DR=IN865","+DR: AU915","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);    
+    sendATCommand("AT+DR=AU915","+DR: AU915","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);    
   } else {
     LOGLN(("Invalid Zone selected"));
     return;
