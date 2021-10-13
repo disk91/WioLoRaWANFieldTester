@@ -24,6 +24,21 @@
 #include "ui.h"
 #include "LoRaCom.h"
 
+// init data to verify display
+#ifdef DEBUGDATA
+void initDebug() {
+ int i = 0;
+ 
+ state.rssi[i] = -120; state.snr[i] = -15 ; state.retry[i] = 1 ; state.seq[i] = i ; state.hs[i] = 2 ; state.bestRssi[i] = -80 ; state.worstRssi[i] = -130; state.minDistance[i] = 2500 ; state.maxDistance[i] = 15200;i++;
+ state.rssi[i] = 5; state.snr[i] = 15 ; state.retry[i] = 1 ; state.seq[i] = i ; state.hs[i] = NODATA ; state.bestRssi[i] = 0 ; state.worstRssi[i] = 0; state.minDistance[i] = 0 ; state.maxDistance[i] = 0;i++;
+ state.rssi[i] = NORSSI; state.snr[i] = NOSNR; state.retry[i] = LOSTFRAME ; state.seq[i] = i ; state.hs[i] = NODATA ; state.bestRssi[i] = 0 ; state.worstRssi[i] = 0; state.minDistance[i] = 0 ; state.maxDistance[i] = 0;i++;
+ state.rssi[i] = NORSSI; state.snr[i] = NOSNR; state.retry[i] = 1 ; state.seq[i] = i ; state.hs[i] = 1 ; state.bestRssi[i] = -110 ; state.worstRssi[i] = -110; state.minDistance[i] = 7000 ; state.maxDistance[i] = 7000;i++;
+ state.rssi[i] = -80; state.snr[i] = -2; state.retry[i] = 2 ; state.seq[i] = i ; state.hs[i] = 1 ; state.bestRssi[i] = -90 ; state.worstRssi[i] = -90; state.minDistance[i] = 30000 ; state.maxDistance[i] = 30000;i++;
+ state.elements = i;
+ state.writePtr = i;
+}
+#endif
+
 state_t state;
 void initState() {
   if ( ! readConfig() ) {
@@ -52,6 +67,10 @@ void initState() {
   state.batVoltage = 0;
   state.batPercent = 0;
   state.batUpdated = false;
+
+  #ifdef DEBUGDATA
+    initDebug();
+  #endif
 }
 
 void addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lost) {
@@ -62,8 +81,8 @@ void addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lo
       state.retry[state.writePtr] = retry;
       state.hs[state.writePtr] = NODATA;
   } else {
-      state.rssi[state.writePtr] = 0;
-      state.snr[state.writePtr] = 0;
+      state.rssi[state.writePtr] = NORSSI;
+      state.snr[state.writePtr] = NOSNR;
       state.retry[state.writePtr] = LOSTFRAME;
       state.hs[state.writePtr] = NODATA;
   }

@@ -18,6 +18,7 @@
  *  Author : Paul Pinault (disk91.com)
  */  
 #include <Arduino.h>
+#include <math.h>
 #include "config.h"
 #include "fonts.h"
 #include "testeur.h"
@@ -47,9 +48,11 @@ TFT_eSPI tft;
 #define HIST_X_BAR_OFFSET 50
 #define HIST_X_BAR_SPACE 2
 
-#define MAX_SNR 40
+#define MIN_SNR -20
+#define MAX_SNR 30
 #define MAX_RETRY 8
 #define MAX_HS 20
+#define MAX_DIST  64000
 
 #define SELECTED_NONE   0
 #define SELECTED_POWER  1
@@ -104,10 +107,11 @@ void displaySplash() {
         draw_splash_ttn(TTN_XCENTER, (240-85)/2, i);
       #endif
     }
-    delay(1500);
-    tft.fillScreen(TFT_BLACK);
   #endif
+}
 
+void clearScreen() {
+    tft.fillScreen(TFT_BLACK);  
 }
 
 void screenSetup() {
@@ -248,13 +252,19 @@ void refresUI() {
          ui.selected_display = DISPLAY_TXHS;
          forceRefresh = true;
          break;
-#ifdef WITH_GPS
       case DISPLAY_TXHS:
+         ui.previous_display = ui.selected_display;
+         ui.selected_display = DISPLAY_DISTANCE;
+         forceRefresh = true;
+         break;
+#ifdef WITH_GPS
+      case DISPLAY_DISTANCE:
          ui.previous_display = ui.selected_display;
          ui.selected_display = DISPLAY_GPS;
          forceRefresh = true;
          break;
 #endif        
+      
       default:
          break;   
     }  
@@ -265,10 +275,15 @@ void refresUI() {
 #ifdef WITH_GPS
       case DISPLAY_GPS:
          ui.previous_display = ui.selected_display;
+         ui.selected_display = DISPLAY_DISTANCE;
+         forceRefresh = true;
+         break;
+#endif       
+      case DISPLAY_DISTANCE:
+         ui.previous_display = ui.selected_display;
          ui.selected_display = DISPLAY_TXHS;
          forceRefresh = true;
          break;
-#endif        
       case DISPLAY_TXHS:
          ui.previous_display = ui.selected_display;
          ui.selected_display = DISPLAY_TXRSSI;
@@ -351,6 +366,9 @@ void refresUI() {
         break;
       case DISPLAY_TXHS:
         refreshTxHs();
+        break;
+      case DISPLAY_DISTANCE:
+        refreshDistance();
         break;
       case DISPLAY_GPS:
         refreshGpsDetails();
@@ -467,7 +485,7 @@ void refreshLastFrame() {
   tft.setTextColor(TFT_WHITE);
   char tmp[100];
   if ( idx != MAXBUFFER ) {
-     if ( state.retry[idx] != LOSTFRAME ) {
+     if ( state.retry[idx] != LOSTFRAME && state.rssi[idx] != NORSSI ) {
        sprintf(tmp,"%04d  %ddBm %ddBm %d rpt",state.seq[idx],state.rssi[idx],state.snr[idx], state.retry[idx]);
      } else {
        sprintf(tmp,"%04d  LOST",state.seq[idx]);
@@ -621,20 +639,22 @@ void refreshRssiHist() {
   for ( int i = 0 ; i < state.elements ; i++ ) {
      int idx = getIndexInBuffer(state.elements-(i+1));
      if ( idx != MAXBUFFER ) {
-        int rssi = state.rssi[idx];
-        uint16_t color = TFT_GREEN;
-        if ( rssi > 8 ) rssi = 8; // avoid drawing over the graph.
-        if ( rssi < -125 ) color = TFT_RED;
-        else if (rssi < -100 ) color = TFT_ORANGE;
-        else if (rssi < -80 ) color = TFT_DARKGREEN;
-        if ( rssi < 0 ) {
-          tft.fillRect(xOffset,HIST_Y_OFFSET+10,xSz,-rssi,color);
-        } else {
-          tft.fillRect(xOffset,HIST_Y_OFFSET+10-rssi,xSz,rssi,color);         
-        }
-     } else {
-        tft.drawLine(xOffset+1,HIST_Y_OFFSET+3,xOffset+xSz-2,HIST_Y_OFFSET-3,TFT_RED);
-        tft.drawLine(xOffset+1,HIST_Y_OFFSET-3,xOffset+xSz-2,HIST_Y_OFFSET+3,TFT_RED);        
+       if ( state.rssi[idx] != NORSSI ) {
+          int rssi = state.rssi[idx];
+          uint16_t color = TFT_GREEN;
+          if ( rssi > 8 ) rssi = 8; // avoid drawing over the graph.
+          if ( rssi < -125 ) color = TFT_RED;
+          else if (rssi < -100 ) color = TFT_ORANGE;
+          else if (rssi < -80 ) color = TFT_DARKGREEN;
+          if ( rssi < 0 ) {
+            tft.fillRect(xOffset,HIST_Y_OFFSET+10,xSz,-rssi,color);
+          } else {
+            tft.fillRect(xOffset,HIST_Y_OFFSET+10-rssi,xSz,rssi,color);         
+          }
+       } else {
+          tft.drawLine(xOffset+1,HIST_Y_OFFSET+3+10,xOffset+xSz-2,HIST_Y_OFFSET-3+10,TFT_RED);
+          tft.drawLine(xOffset+1,HIST_Y_OFFSET-3+10,xOffset+xSz-2,HIST_Y_OFFSET+3+10,TFT_RED);        
+       }
      }
      xOffset -= xSz + HIST_X_BAR_SPACE;
   }
@@ -663,35 +683,44 @@ void refreshSnrHist() {
   }
   // Redraw lines
   int yOffset = HIST_Y_OFFSET+HIST_Y_SIZE-10;
-  int yStep10 = ((HIST_Y_OFFSET+HIST_Y_SIZE-10) - ( HIST_Y_OFFSET - 5 )) / (MAX_SNR/10);  // step for 10 SNR
-  tft.drawLine(HIST_X_OFFSET+2,yOffset,HIST_X_SIZE-2,yOffset,TFT_GRAY);  
-  for ( int i = 10 ; i < MAX_SNR ; i+= 10 ) {
+  int yStep10 = ((HIST_Y_OFFSET+HIST_Y_SIZE-10) - ( HIST_Y_OFFSET - 5 )) / (( MAX_SNR - MIN_SNR )/10);  // step for 10 SNR
+  int value = MIN_SNR;
+  for ( int i = 0 ; i < (MAX_SNR-MIN_SNR) ; i+= 10, value+=10 ) {
     int y = yOffset-(yStep10*i)/10;
     if ( i % 10 == 0 ) {
       char sTmp[10];
-      sprintf(sTmp,"%d",i); 
+      sprintf(sTmp,"%d",value); 
       tft.setFreeFont(FF25);    
       tft.setTextColor(TFT_GRAY);
       tft.drawString(sTmp,HIST_X_OFFSET+5,y-15,GFXFF);
     }
-    tft.drawLine(HIST_X_OFFSET+2,y,HIST_X_SIZE-2,y,TFT_GRAY20);
+    int color = (value==0)?TFT_GRAY:TFT_GRAY20;
+    tft.drawLine(HIST_X_OFFSET+2,y,HIST_X_SIZE-2,y,color);
   }
   xOffset = HIST_X_OFFSET+HIST_X_SIZE-xSz-HIST_X_BAR_SPACE;
+  int yOffsetZero = yOffset-(-MIN_SNR*yStep10)/10;
   for ( int i = 0 ; i < state.elements ; i++ ) {
      int idx = getIndexInBuffer(state.elements-(i+1));
      if ( idx != MAXBUFFER ) {
-        int snr = state.snr[idx];
-        uint16_t color = TFT_GREEN;
-        if ( snr < 5 ) color = TFT_RED;
-        else if (snr < 10 ) color = TFT_ORANGE;
-        else if (snr < 20 ) color = TFT_DARKGREEN;
-        tft.fillRect(xOffset,yOffset-(snr*yStep10)/10,xSz,(snr*yStep10)/10,color);
-     } else {
-        tft.drawLine(xOffset+1,yOffset+3,xOffset+xSz-2,yOffset-3,TFT_RED);
-        tft.drawLine(xOffset+1,yOffset-3,xOffset+xSz-2,yOffset+3,TFT_RED);        
+        if ( state.snr[idx] != NOSNR ) {
+            int snr = state.snr[idx];
+            if ( snr < MIN_SNR ) snr = MIN_SNR;
+            if ( snr > MAX_SNR ) snr = MAX_SNR;
+            uint16_t color = TFT_GREEN;
+            if ( snr < -10 ) color = TFT_RED;
+            else if (snr < 0 ) color = TFT_ORANGE;
+            else if (snr < 5 ) color = TFT_DARKGREEN;   
+            if ( snr > 0 ) {
+               tft.fillRect(xOffset,yOffsetZero-(snr*yStep10)/10,xSz,(snr*yStep10)/10,color);
+            } else {
+               tft.fillRect(xOffset,yOffsetZero,xSz,-(snr*yStep10)/10,color);
+            }
+         } else {
+            tft.drawLine(xOffset+1,yOffsetZero+3,xOffset+xSz-2,yOffsetZero-3,TFT_RED);
+            tft.drawLine(xOffset+1,yOffsetZero-3,xOffset+xSz-2,yOffsetZero+3,TFT_RED);        
+         }
      }
      xOffset -= xSz + HIST_X_BAR_SPACE;
-     
   }
   
 }
@@ -791,8 +820,8 @@ void refreshTxRssi() {
   xOffset = HIST_X_OFFSET+HIST_X_SIZE-xSz-HIST_X_BAR_SPACE;
   for ( int i = 0 ; i < state.elements ; i++ ) {
      int idx = getIndexInBuffer(state.elements-(i+1));
-     if ( idx != MAXBUFFER && state.hs[idx] != NODATA ) {
-       if ( idx != MAXBUFFER ) {
+     if ( idx != MAXBUFFER ) {
+       if ( state.hs[idx] != NODATA ) {
           int minRssi = state.worstRssi[idx];
           int maxRssi = state.bestRssi[idx];
           uint16_t color = TFT_GREEN;
@@ -804,13 +833,13 @@ void refreshTxRssi() {
           else if (maxRssi < -80 ) color = TFT_DARKGREEN;
   
           if ( minRssi != maxRssi ) {
-            tft.fillRect(xOffset,(HIST_Y_OFFSET)+(-minRssi+10),xSz,(maxRssi-minRssi),color);
+            tft.fillRect(xOffset,(HIST_Y_OFFSET)+(-maxRssi+10),xSz,(maxRssi-minRssi),color);
           } else {
             tft.fillRect(xOffset,(HIST_Y_OFFSET)+(-minRssi+10)-1,xSz,2,color);
           }
        } else {
-          tft.drawLine(xOffset+1,HIST_Y_OFFSET+3,xOffset+xSz-2,HIST_Y_OFFSET-3,TFT_RED);
-          tft.drawLine(xOffset+1,HIST_Y_OFFSET-3,xOffset+xSz-2,HIST_Y_OFFSET+3,TFT_RED);        
+          tft.drawLine(xOffset+1,HIST_Y_OFFSET+3+10,xOffset+xSz-2,HIST_Y_OFFSET-3+10,TFT_RED);
+          tft.drawLine(xOffset+1,HIST_Y_OFFSET-3+10,xOffset+xSz-2,HIST_Y_OFFSET+3+10,TFT_RED);        
        }
      }
      xOffset -= xSz + HIST_X_BAR_SPACE;
@@ -860,8 +889,8 @@ void refreshTxHs() {
   xOffset = HIST_X_OFFSET+HIST_X_SIZE-xSz-HIST_X_BAR_SPACE;
   for ( int i = 0 ; i < state.elements ; i++ ) {
      int idx = getIndexInBuffer(state.elements-(i+1));
-     if ( idx != MAXBUFFER && state.hs[idx] != NODATA ) {
-       if ( idx != MAXBUFFER && state.retry[idx] != LOSTFRAME ) {
+     if ( idx != MAXBUFFER ) {
+       if ( state.hs[idx] != NODATA ) {
           int hs = state.hs[idx];
           if ( hs == 0 ) {
             tft.drawLine(xOffset+1,yOffset+3,xOffset+xSz-2,yOffset-3,TFT_GREEN);
@@ -881,6 +910,78 @@ void refreshTxHs() {
      xOffset -= xSz + HIST_X_BAR_SPACE;
   } 
 }
+
+
+void refreshDistance() {
+   // No need to refresh everytime
+  if ( ui.previous_display != ui.selected_display ) {
+    tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET-18,HIST_X_TXTSIZE,18,TFT_BLACK);
+    tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,TFT_BLACK);
+    tft.setFreeFont(FF25);    
+    tft.setTextColor(TFT_WHITE);
+    tft.drawString("Distance",HIST_X_OFFSET,HIST_Y_OFFSET-18,GFXFF);
+    tft.drawRoundRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,R_SIZE,TFT_WHITE);
+    ui.previous_display = ui.selected_display;
+  }
+
+  // clean the bar
+  int xSz = (HIST_X_SIZE - (HIST_X_OFFSET+HIST_X_BAR_OFFSET + MAXBUFFER*HIST_X_BAR_SPACE)) / MAXBUFFER;
+  int xOffset = HIST_X_OFFSET+HIST_X_SIZE-xSz-HIST_X_BAR_SPACE;
+  for ( int i = 0 ; i < MAXBUFFER ; i++ ) {
+     tft.fillRect(xOffset,HIST_Y_OFFSET+2,xSz,HIST_Y_SIZE-4,TFT_BLACK);
+     xOffset -= xSz + HIST_X_BAR_SPACE;
+  }
+  // Redraw lines
+  int yOffset = HIST_Y_OFFSET+HIST_Y_SIZE-1;
+  int lastY = yOffset+21;
+  char sTmp[10];
+  for ( uint32_t i = 5000 ; i < MAX_DIST ; i+= 5000 ) {
+    int y = yOffset-(log((((i/500) * 2 * (i+5000)) / MAX_DIST))*26);
+    tft.drawLine(HIST_X_OFFSET+50,y,HIST_X_SIZE-2,y,TFT_GRAY20);
+    if ( lastY - y > 20 ) {
+      sprintf(sTmp,"%dkm",i/1000); 
+      tft.setFreeFont(FS9);    
+      tft.setTextColor(TFT_GRAY);
+      tft.drawString(sTmp,HIST_X_OFFSET+5,y-15,GFXFF);
+      lastY = y;      
+    }   
+  }
+  xOffset = HIST_X_OFFSET+HIST_X_SIZE-xSz-HIST_X_BAR_SPACE;
+  for ( int i = 0 ; i < state.elements ; i++ ) {
+     int idx = getIndexInBuffer(state.elements-(i+1));
+     if ( idx != MAXBUFFER ) {
+       if ( state.hs[idx] != NODATA ) {
+          uint16_t minDistance = state.minDistance[idx];
+          uint16_t maxDistance = state.maxDistance[idx];
+          int miny, maxy;
+          if ( minDistance >= 5000 ) {
+             miny = yOffset-(log((((minDistance/500) * 2 * (minDistance+5000)) / MAX_DIST))*26);
+          } else {
+             // linear in the area
+             miny  = yOffset-(log((((5000/500) * 2 * (5000+5000)) / MAX_DIST))*26);
+             miny  = yOffset - ( minDistance * (yOffset-miny) ) / 5000; 
+          }
+          if ( maxDistance >= 5000 ) {
+             maxy = yOffset-(log((((maxDistance/500) * 2 * (maxDistance+5000)) / MAX_DIST))*26);
+          } else {
+             // linear in the area
+             maxy  = yOffset-(log((((5000/500) * 2 * (5000+5000)) / MAX_DIST))*26);
+             maxy  = yOffset - ( maxDistance * (yOffset-maxy) ) / 5000; 
+          }
+          if ( minDistance == maxDistance ) {
+             tft.fillRect(xOffset,maxy,xSz,1,TFT_GREEN); 
+          } else {
+             tft.fillRect(xOffset,maxy,xSz,(miny-maxy),TFT_GREEN); 
+          }         
+       } else {
+          tft.drawLine(xOffset+1,yOffset+3-5,xOffset+xSz-2,yOffset-3-5,TFT_RED);
+          tft.drawLine(xOffset+1,yOffset-3-5,xOffset+xSz-2,yOffset+3-5,TFT_RED);        
+       }
+     }
+     xOffset -= xSz + HIST_X_BAR_SPACE;
+  } 
+}
+
 
 /**
  * Refresh the GPS state indicator

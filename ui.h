@@ -36,7 +36,8 @@
 #define DISPLAY_RETRY_HIST 3
 #define DISPLAY_TXRSSI     4
 #define DISPLAY_TXHS       5
-#define DISPLAY_GPS        6
+#define DISPLAY_DISTANCE   6
+#define DISPLAY_GPS        7
 
 
 #ifdef WITH_SPLASH_HELIUM
@@ -71,6 +72,7 @@ void configPending();
 void initScreen();
 void displaySplash();
 void displayTitle();
+void clearScreen();
 void screenSetup();
 void refresUI();
 
@@ -88,6 +90,7 @@ void refreshTxHs();
 void refreshGpsDetails();
 void refreshGps();
 bool refreshLiPo();
+void refreshDistance();
 void draw_splash_helium(int xOffset, int yOffset, int density);
 void draw_splash_ttn(int xOffset, int yOffset, int density);
 bool manageConfigScreen(bool interactive, bool firstRun);

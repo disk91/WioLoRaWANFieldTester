@@ -242,6 +242,13 @@ void loraSetup(void) {
     sendATCommand("AT+LW=JDC,OFF","+LW: JDC, OFF","+LW: ERR","",DEFAULT_TIMEOUT,false,NULL); // manually managed to avoid conflicts  
   } else if ( loraConf.zone == ZONE_US915 ) {
     sendATCommand("AT+DR=US915","+DR: US915","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    // unvalidate the subband other than 2
+    for ( int i=0 ; i < 72 ; i++ ) {
+      if ( i < 8 || i > 15 ) {
+        sprintf(_cmd,"AT+CH=%d,OFF",i);
+        sendATCommand(_cmd,"+CH: CH","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);  
+      }
+    }
   } else if ( loraConf.zone == ZONE_AS923 ) {
     sendATCommand("AT+DR=AS923","+DR: AS923","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
   } else if ( loraConf.zone == ZONE_KR920 ) {
@@ -249,7 +256,14 @@ void loraSetup(void) {
   } else if ( loraConf.zone == ZONE_IN865 ) {
     sendATCommand("AT+DR=IN865","+DR: IN865","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
   } else if ( loraConf.zone == ZONE_AU915 ) {
-    sendATCommand("AT+DR=AU915","+DR: AU915","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);    
+    sendATCommand("AT+DR=AU915","+DR: AU915","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);  
+    // unvalidate the subband other than 2
+    for ( int i=0 ; i < 72 ; i++ ) {
+      if ( i < 8 || i > 15 ) {
+        sprintf(_cmd,"AT+CH=%d,OFF",i);
+        sendATCommand(_cmd,"+CH: CH","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);  
+      }
+    }
   } else {
     LOGLN(("Invalid Zone selected"));
     return;
@@ -413,7 +427,7 @@ bool processTx(void) {
       loraContext.estimatedDCMs = interFrameDutyCycleEstimate(loraContext.lastDr)*retries;
     } else {
       //Serial.printf("Add Data for seq(%d) rssi(%d) snr(%d) [Lost]\r\n",loraContext.currentSeqId,(int16_t)0, (int16_t)0);
-      addInBuffer(0, 0, loraContext.lastRetry, loraContext.currentSeqId, true);
+      addInBuffer(0, 0, 0, loraContext.currentSeqId, true);
       state.hasRefreshed = true;
       state.cState = JOINED;
     }
@@ -457,6 +471,12 @@ bool processTx(void) {
              state.hs[idx]         = downlink[5];
              if ( state.hs[idx] > 20 ) state.hs[idx] = 20;
              if ( state.hs[idx] < 0 ) state.hs[idx] = 0;
+
+             // Fix the lost frame status ... 
+             // if we got a response it was finally not lost
+             if ( state.retry[idx] == LOSTFRAME ) {
+                state.retry[idx] = loraContext.lastRetry;
+             }
              state.hasRefreshed = true;
            }
         }

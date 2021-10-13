@@ -24,7 +24,7 @@
 //#define DEBUG
 //#define DEBUGGPS
 //#define DEBUGLORA
-
+//#define DEBUGDATA
 
 #define RFM95      0      // Make sure the board ROLE is MASTER
 #define LORAE5     1      // Make sure the board ROLE is SLAVE
@@ -56,7 +56,7 @@
 //#define WITH_SPLASH_TTN     1
 
 
-#define VERSION "v0.9"
+#define VERSION "v1.0a"
 
 #ifdef DEBUG
   #define LOGLN(x)  Serial.println x

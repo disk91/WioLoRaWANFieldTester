@@ -86,6 +86,7 @@ void setup() {
   gpsSetup();
   displaySplash();
   loraSetup();
+  clearScreen();
 
   screenSetup();
   analogReference(AR_INTERNAL2V23);

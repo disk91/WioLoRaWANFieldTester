@@ -24,6 +24,8 @@
 #define SLOWERSF    255
 #define LOSTFRAME   255
 #define NODATA      255
+#define NORSSI      255
+#define NOSNR       255
 
 #define MAXBUFFER    32
 
