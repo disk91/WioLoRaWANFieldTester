@@ -965,8 +965,8 @@ void refreshDistance() {
              maxy = yOffset-(log((((maxDistance/500) * 2 * (maxDistance+5000)) / MAX_DIST))*26);
           } else {
              // linear in the area
-             maxy  = yOffset-(log((((5000/500) * 2 * (5000+5000)) / MAX_DIST))*26);
-             maxy  = yOffset - ( maxDistance * (yOffset-maxy) ) / 5000; 
+             maxy  = yOffset - (log((((5000/500) * 2 * (5000+5000)) / MAX_DIST))*26);
+             maxy  = yOffset - ( maxDistance * (yOffset-maxy) ) / 5000 - 2; 
           }
           if ( minDistance == maxDistance ) {
              tft.fillRect(xOffset,maxy,xSz,1,TFT_GREEN); 
