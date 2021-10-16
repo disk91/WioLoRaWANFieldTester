@@ -130,9 +130,9 @@ uint32_t nextPossibleSendMs() {
   #endif
   #ifdef CFG_us915
     // Set a minimum time to US915_DUTYCYCLE_MS milli-seconds
-    int32_t ms = US915_DUTYCYCLE_MS - (osticks2ms(os_getTime()) - lastSend); 
+    int32_t ms = NONDCZONE_DUTYCYCLE_MS - (osticks2ms(os_getTime()) - lastSend); 
     if ( ms > 0 ) return ms;
-    else lastSend = osticks2ms(os_getTime()) - US915_DUTYCYCLE_MS;
+    else lastSend = osticks2ms(os_getTime()) - NONDCZONE_DUTYCYCLE_MS;
   #endif
   return 0;
 }
@@ -152,8 +152,10 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
 
     _dr_configured_t dr;
     switch ( _dr ) {
+      #ifndef CFG_us915
       case 12 : dr = DR_SF12; break;
       case 11 : dr = DR_SF11; break;
+      #endif
       case 10 : dr = DR_SF10; break;
       case 9 : dr = DR_SF9; break;
       case 8 : dr = DR_SF8; break;

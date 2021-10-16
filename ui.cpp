@@ -430,8 +430,10 @@ bool refreshLiPo() {
           // green status
           tft.fillRoundRect(xOffset,yOffset,50,10,5,TFT_GREEN);  
         } else if ( state.batVoltage > 3500 ) {
+          tft.fillRect(xOffset,yOffset,50 ,10,TFT_BLACK);
           tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_ORANGE);  
         } else {
+          tft.fillRect(xOffset,yOffset,50 ,10,TFT_BLACK);
           tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_RED);  
         }      
       }
