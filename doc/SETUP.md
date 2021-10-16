@@ -5,11 +5,9 @@ Once you have your WioTerminal and your FieldTester add-on board, you need to pr
 ## Install Firmware on the WioTerminal
 
 - You can directly upload the following binaries:
-  * [EU868 with GPS enable](../binaries/WioLoRaWANFieldTester_EU868_GPS.uf2)
-  * [EU868 with GPS disable](../binaries/WioLoRaWANFieldTester_EU868_NOGPS.uf2)
-  * [US915 with GPS enable](../binaries/WioLoRaWANFieldTester_US915_GPS.uf2)
-  * [US915 with GPS disable](../binaries/WioLoRaWANFieldTester_US915_NOGPS.uf2)
-  * [All Zone LoRa E5 Chassis](../binaries/WioLoRaWANFieldTester_LoRaE5.uf2)
+  * [EU868 Zone RFM95+GPS](../binaries/WioLoRaWANFieldTester_RFM95_EU868_GPS.uf2)
+  * [US915 Zone RFM95+GPS](../binaries/WioLoRaWANFieldTester_RFM95_US915_GPS.uf2)
+  * [All Zone LoRa E5 Chassis](../binaries/WioLoRaWANFieldTester_LoRaE5_ALLZONE.uf2)
 
 - Once downloaded
   * Switch the Wio Terminal ON with the lateral button
