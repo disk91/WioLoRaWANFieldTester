@@ -30,6 +30,9 @@ void gpsSetup();
 void gpsLoop();
 uint64_t gpsEncodePosition48b();
 bool gpsQualityIsGoodEnough();
+#ifdef DEBUGGPS
+char * gpsLastNMEA();
+#endif
 
 typedef struct {
   bool      isReady;        // when false, no need to process these informations
@@ -45,6 +48,7 @@ typedef struct {
   int32_t   latitude;       // 1 / 10_000_000
   int16_t   altitude;       // in meters
   uint8_t   sats;           // Number of sats used
+  char *    lastNMEA;       // Last NMEA String received
   
 } gpsData_t;
 

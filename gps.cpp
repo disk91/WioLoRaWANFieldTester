@@ -64,6 +64,12 @@ void clearGpsPendingChar(uint32_t timeout) {
   }
 }
 
+#ifdef DEBUGGPS
+char * gpsLastNMEA() { 
+  return GPS.lastNMEA();
+};
+#endif
+
 void gpsSetup() {
   #if HWTARGET == LORAE5
     #if _SS_MAX_RX_BUFF < 128
@@ -104,9 +110,14 @@ void gpsLoop() {
   
   //Serial.print(c);
   if (GPS.newNMEAreceived()) {
-    // DEBUG -- Serial.print(GPS.lastNMEA());
+    // Since this function change internal library var,
+    // avoid multiple call, just once and use results later
+    gps.lastNMEA = GPS.lastNMEA();
+    #ifdef DEBUGGPS
+    Serial.print(gps.lastNMEA);
+    #endif
     gps.rxStuff = true;
-    if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
+    if (!GPS.parse(gps.lastNMEA)) // this also sets the newNMEAreceived() flag to false
       return; // we can fail to parse a sentence in which case we should just wait for another
   }
 
