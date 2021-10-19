@@ -338,10 +338,20 @@ void refresUI() {
      ui.lastGpsUpdateTime = gps.updateTime;
      refreshGpsDetails();
   }
+  #ifdef DEBUGGPS
+  if ( ui.selected_display == DISPLAY_GPS && !gps.isReady && gps.rxStuff ) {
+     refreshGpsDetails();    
+  }
+  #else
   if ( ui.selected_display == DISPLAY_GPS && !gps.isReady && gps.updateTime == ui.lastGpsUpdateTime ) {
      // clear display when GPS signal lost
      ui.lastGpsUpdateTime = gps.updateTime+1;
      refreshGpsDetails();    
+  }
+  #endif
+
+  if ( gps.rxStuff ) {
+    gps.rxStuff=false;
   }
   #endif
 
@@ -458,6 +468,12 @@ void refreshMode() {
   switch ( ui.selected_mode ) {
     case MODE_MANUAL:
       tft.drawString("Manual",xOffset+5,yOffset+3, GFXFF);  
+      break;
+    case MODE_AUTO_1H:
+      tft.drawString("Auto 1h",xOffset+5,yOffset+3, GFXFF);  
+      break;
+    case MODE_AUTO_15MIN:
+      tft.drawString("Auto 15m",xOffset+5,yOffset+3, GFXFF);  
       break;
     case MODE_AUTO_5MIN:
       tft.drawString("Auto 5m",xOffset+5,yOffset+3, GFXFF);  
@@ -1001,7 +1017,6 @@ void refreshGps() {
      if ( gps.rxStuff ) {
        tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_BLACK);   
        delay(50);   
-       gps.rxStuff=false;
      }
      tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_RED);
   }
@@ -1027,49 +1042,82 @@ void refreshGpsDetails() {
     tft.drawRoundRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,R_SIZE,TFT_WHITE);
     ui.previous_display = ui.selected_display;
   }
-  tft.fillRect(TXT_ALL_VALUE_OFF_X,TXT_TIME_OFF_Y-2,200,120,TFT_BLACK);
+  #ifdef DEBUGGPS
+    tft.fillRect(HIST_X_OFFSET+2,HIST_Y_OFFSET+2,HIST_X_SIZE-4,HIST_Y_SIZE-4,TFT_BLACK);
+  #else
+    tft.fillRect(TXT_ALL_VALUE_OFF_X,TXT_TIME_OFF_Y-2,200,120,TFT_BLACK);
+  #endif
 
   char sTmp[64];
+  uint8_t   hour, minute, second;
+  uint16_t  hdop;     
+  int32_t   longitude;
+  int32_t   latitude;
+  int16_t   altitude;
+  uint8_t   sats;
+  #ifdef DEBUGGPS
+  bool isDebug = true;
+  #else
+  bool isDebug = false;
+  #endif
+
   tft.setFreeFont(FM9);    
   tft.setTextColor(TFT_GRAY);
 
-  if ( gps.isReady ) {
-
-    sprintf(sTmp,"Time:      %02d:%02d:%02d", gps.hour, gps.minute, gps.second); 
+  if (isDebug && !gps.isReady) {
+    sprintf(sTmp,"Uptime %d s", millis()/1000); 
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_TIME_OFF_Y,GFXFF);
-  
-    sprintf(sTmp,"Latitude:  %f", gps.latitude/10000000.0);
-    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_LAT_OFF_Y,GFXFF);
-  
-    sprintf(sTmp,"Longitude: %f", gps.longitude/10000000.0);
-    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_LNG_OFF_Y,GFXFF);
-  
-    sprintf(sTmp,"Altitude:  %d", gps.altitude);
-    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_ALT_OFF_Y,GFXFF);
 
-    if ( gpsQualityIsGoodEnough() ) {
-        tft.setTextColor(TFT_GRAY);
-    } else {
-        tft.setTextColor(TFT_ORANGE);
-    }
-    sprintf(sTmp,"Hdop:      %d.%d Sats: %d", gps.hdop/100,gps.hdop-100*(gps.hdop/100), gps.sats);
-    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_QUA_OFF_Y,GFXFF);
+    sprintf(sTmp,"GPS not ready (fixing)");
+    tft.drawString(sTmp,TXT_ALL_OFF_X+28,TXT_LAT_OFF_Y,GFXFF);
+
+    // Display NMEA String
+    if (gps.lastNMEA && *gps.lastNMEA) {
+      uint8_t nmea_len = strlen(gps.lastNMEA);
+      uint8_t y_offset = TXT_LNG_OFF_Y;
+      uint8_t index = 0;
+      // Display each char of last NMEA String
+      for (int i=0; i<=nmea_len; i++) {
+        sTmp[index] = gps.lastNMEA[i];
+        // end of line or string?
+        if (index++ >= 27 || i==nmea_len) {
+          sTmp[index] = 0x00; // End of String
+          tft.drawString(sTmp,TXT_ALL_OFF_X, y_offset,GFXFF);
+          y_offset+=25; // Next display Line
+          index=0;      // New Line to display
+        } 
+      }
+    } 
 
   } else {
 
-    sprintf(sTmp,"Time:      %02d:%02d:%02d", 0, 0, 0); 
+    if ( gps.isReady ) {
+      hour = gps.hour;
+      minute = gps.minute;
+      second= gps.second;
+      hdop = gps.hdop;
+      longitude = gps.longitude;
+      latitude = gps.latitude;
+      altitude = gps.altitude;
+      sats = gps.sats;;
+    }
+
+    sprintf(sTmp,"Time:      %02d:%02d:%02d", hour, minute, second); 
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_TIME_OFF_Y,GFXFF);
-  
-    sprintf(sTmp,"Latitude:  %f", 0.0);
+
+    sprintf(sTmp,"Latitude:  %f", latitude/10000000.0);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_LAT_OFF_Y,GFXFF);
-  
-    sprintf(sTmp,"Longitude: %f", 0.0);
+
+    sprintf(sTmp,"Longitude: %f", longitude/10000000.0);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_LNG_OFF_Y,GFXFF);
-  
-    sprintf(sTmp,"Altitude:  %d", 0);
+
+    sprintf(sTmp,"Altitude:  %d", altitude);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_ALT_OFF_Y,GFXFF);
-  
-    sprintf(sTmp,"Hdop:      %d.%d Sats: %d", 0,0, 0);
+
+    if ( gps.isReady && !gpsQualityIsGoodEnough() ) {
+      tft.setTextColor(TFT_ORANGE);
+    }
+    sprintf(sTmp,"Hdop:      %d.%d Sats: %d", gps.hdop/100,gps.hdop-100*(gps.hdop/100), gps.sats);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_QUA_OFF_Y,GFXFF);
 
   }

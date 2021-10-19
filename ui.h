@@ -24,11 +24,13 @@
 #define __UI_H
 
 #define MODE_MANUAL       0     // manual message (default)
-#define MODE_AUTO_5MIN    1     // every 5 minutes (consider DC)
-#define MODE_AUTO_1MIN    2     // every 1 minutes (consider DC)
-#define MODE_MAX_RATE     3     // every time is is possible after DC
+#define MODE_AUTO_1H      1     // every  1 hours   (consider DC)
+#define MODE_AUTO_15MIN   2     // every 15 minutes (consider DC)
+#define MODE_AUTO_5MIN    3     // every  5 minutes (consider DC)
+#define MODE_AUTO_1MIN    4     // every  1 minutes (consider DC)
+#define MODE_MAX_RATE     5     // every time is is possible after DC
 
-#define MODE_MAX          3
+#define MODE_MAX          5
 
 #define DISPLAY_UNKNONW    0
 #define DISPLAY_RSSI_HIST  1
