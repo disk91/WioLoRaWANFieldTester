@@ -469,6 +469,12 @@ void refreshMode() {
     case MODE_MANUAL:
       tft.drawString("Manual",xOffset+5,yOffset+3, GFXFF);  
       break;
+    case MODE_AUTO_1H:
+      tft.drawString("Auto 1h",xOffset+5,yOffset+3, GFXFF);  
+      break;
+    case MODE_AUTO_15MIN:
+      tft.drawString("Auto 15m",xOffset+5,yOffset+3, GFXFF);  
+      break;
     case MODE_AUTO_5MIN:
       tft.drawString("Auto 5m",xOffset+5,yOffset+3, GFXFF);  
       break;

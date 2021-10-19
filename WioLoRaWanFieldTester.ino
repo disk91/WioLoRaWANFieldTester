@@ -132,6 +132,12 @@ void loop(void) {
         ui.hasClick = false;
       }
       break;
+    case MODE_AUTO_1H:
+      if ( cTime >= ( 60 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
+      break;
+    case MODE_AUTO_15MIN:
+      if ( cTime >= ( 15 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
+      break;
     case MODE_AUTO_5MIN:
       if ( cTime >= ( 5 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
       break;
