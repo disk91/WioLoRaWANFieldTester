@@ -26,6 +26,7 @@ gpsData_t gps;
 #ifndef WITH_GPS
 
 void gpsSetup() {
+  gps.hasbeenReady = false;
   gps.isReady = false;
 }
 
@@ -99,6 +100,7 @@ void gpsSetup() {
   clearGpsPendingChar(100);
   
   delay(500);
+  gps.hasbeenReady = false;
   gps.isReady = false;
   gps.rxStuff = false;
 }
@@ -129,6 +131,7 @@ void gpsLoop() {
       gps.hdop = (uint16_t)(GPS.HDOP*100.0);
       if ( GPS.satellites >= 2 ) {
           gps.isReady = true;
+          gps.hasbeenReady = true;
           gps.updateTime = cTime;
           gps.hour = GPS.hour;
           gps.minute = GPS.minute;

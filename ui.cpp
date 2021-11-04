@@ -1049,22 +1049,11 @@ void refreshGpsDetails() {
   #endif
 
   char sTmp[64];
-  uint8_t   hour, minute, second;
-  uint16_t  hdop;     
-  int32_t   longitude;
-  int32_t   latitude;
-  int16_t   altitude;
-  uint8_t   sats;
-  #ifdef DEBUGGPS
-  bool isDebug = true;
-  #else
-  bool isDebug = false;
-  #endif
-
   tft.setFreeFont(FM9);    
   tft.setTextColor(TFT_GRAY);
 
-  if (isDebug && !gps.isReady) {
+  #ifdef DEBUGGPS
+  if ( !gps.isReady) {
     sprintf(sTmp,"Uptime %d s", millis()/1000); 
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_TIME_OFF_Y,GFXFF);
 
@@ -1088,30 +1077,29 @@ void refreshGpsDetails() {
         } 
       }
     } 
-
   } else {
-
-    if ( gps.isReady ) {
-      hour = gps.hour;
-      minute = gps.minute;
-      second= gps.second;
-      hdop = gps.hdop;
-      longitude = gps.longitude;
-      latitude = gps.latitude;
-      altitude = gps.altitude;
-      sats = gps.sats;;
-    }
-
-    sprintf(sTmp,"Time:      %02d:%02d:%02d", hour, minute, second); 
+  #endif
+    if ( !gps.hasbeenReady ) {
+      // make sure we reset the values
+      gps.hour = 0;
+      gps.minute = 0;
+      gps.second= 0;
+      gps.hdop = 0;
+      gps.longitude = 0;
+      gps.latitude = 0;
+      gps.altitude = 0;
+      gps.sats = 0;
+    } 
+    sprintf(sTmp,"Time:      %02d:%02d:%02d", gps.hour, gps.minute, gps.second); 
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_TIME_OFF_Y,GFXFF);
 
-    sprintf(sTmp,"Latitude:  %f", latitude/10000000.0);
+    sprintf(sTmp,"Latitude:  %f", gps.latitude/10000000.0);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_LAT_OFF_Y,GFXFF);
 
-    sprintf(sTmp,"Longitude: %f", longitude/10000000.0);
+    sprintf(sTmp,"Longitude: %f", gps.longitude/10000000.0);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_LNG_OFF_Y,GFXFF);
 
-    sprintf(sTmp,"Altitude:  %d", altitude);
+    sprintf(sTmp,"Altitude:  %d", gps.altitude);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_ALT_OFF_Y,GFXFF);
 
     if ( gps.isReady && !gpsQualityIsGoodEnough() ) {
@@ -1119,8 +1107,9 @@ void refreshGpsDetails() {
     }
     sprintf(sTmp,"Hdop:      %d.%d Sats: %d", gps.hdop/100,gps.hdop-100*(gps.hdop/100), gps.sats);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_QUA_OFF_Y,GFXFF);
-
+  #ifdef DEBUGGPS
   }
+  #endif
 }
 
 /** ********************************************************************
