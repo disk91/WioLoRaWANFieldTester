@@ -723,7 +723,7 @@ void refreshSnrHist() {
         if ( state.snr[idx] != NOSNR ) {
             int snr = state.snr[idx];
             if ( snr < MIN_SNR ) snr = MIN_SNR;
-            if ( snr > MAX_SNR ) snr = MAX_SNR;
+            if ( snr > MAX_SNR - 5 ) snr = MAX_SNR -5; // we had some overflowing, @TODO investigate later
             uint16_t color = TFT_GREEN;
             if ( snr < -10 ) color = TFT_RED;
             else if (snr < 0 ) color = TFT_ORANGE;
