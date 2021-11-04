@@ -388,7 +388,7 @@ bool processLoRaConfig(void) {
   static uint8_t confStatus=__LCONF_STATE_NONE;
   static uint8_t pos;
   static uint8_t confirmed;
-  static char sZone[6];
+  static char sZone[8];
   bool updated = false;
   #if HWTARGET == RFM95
    // hardcoded
@@ -513,7 +513,7 @@ bool processLoRaConfig(void) {
             {
                sZone[pos] = c;  
                pos++;      
-               if ( pos == 5 ) {
+               if ( pos == 5  && sZone[0] != 'A' ) {
                   // We should have the zone
                   sZone[5] = '\0';
                   if ( strcmp(sZone,"EU868") == 0 ) {
@@ -525,12 +525,6 @@ bool processLoRaConfig(void) {
                   } else if ( strcmp(sZone,"US915") == 0 ) {
                     loraConf.zone = ZONE_US915;
                     SERIALCONFIG.println("ZONE: US915");
-                    SERIALCONFIG.println("OK");
-                    confStatus |= __LCONF_STATE_ZONE;
-                    updated = true;
-                  } else if ( strcmp(sZone,"AS923") == 0 ) {
-                    loraConf.zone = ZONE_AS923;
-                    SERIALCONFIG.println("ZONE: AS923");
                     SERIALCONFIG.println("OK");
                     confStatus |= __LCONF_STATE_ZONE;
                     updated = true;
@@ -556,6 +550,34 @@ bool processLoRaConfig(void) {
                     SERIALCONFIG.println("KO");
                   }
                   state = __LCONF_STATE_NONE;
+               } else if ( pos == 7 && sZone[0] == 'A' ) {
+                  // We should have the zone
+                  sZone[7] = '\0';
+                  if ( strcmp(sZone,"AS923_1") == 0 ) {
+                    loraConf.zone = ZONE_AS923_1;
+                    SERIALCONFIG.println("ZONE: AS923_1");
+                    SERIALCONFIG.println("OK");
+                    confStatus |= __LCONF_STATE_ZONE;
+                    updated = true;
+                  } else if ( strcmp(sZone,"AS923_2") == 0 ) {
+                    loraConf.zone = ZONE_AS923_2;
+                    SERIALCONFIG.println("ZONE: AS923_2");
+                    SERIALCONFIG.println("OK");
+                    confStatus |= __LCONF_STATE_ZONE;
+                    updated = true;
+                  } else if ( strcmp(sZone,"AS923_3") == 0 ) {
+                    loraConf.zone = ZONE_AS923_3;
+                    SERIALCONFIG.println("ZONE: AS923_3");
+                    SERIALCONFIG.println("OK");
+                    confStatus |= __LCONF_STATE_ZONE;
+                    updated = true;
+                  } else if ( strcmp(sZone,"AS923_4") == 0 ) {
+                    loraConf.zone = ZONE_AS923_4;
+                    SERIALCONFIG.println("ZONE: AS923_4");
+                    SERIALCONFIG.println("OK");
+                    confStatus |= __LCONF_STATE_ZONE;
+                    updated = true;
+                  }
                }
             }
             #else

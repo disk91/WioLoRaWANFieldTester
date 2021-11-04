@@ -42,10 +42,13 @@ bool processLoRaConfig(void);
 #define ZONE_UNDEFINED  0
 #define ZONE_EU868      1
 #define ZONE_US915      2
-#define ZONE_AS923      3
-#define ZONE_KR920      4
-#define ZONE_IN865      5
-#define ZONE_AU915      6
+#define ZONE_AS923_1    3
+#define ZONE_AS923_2    4
+#define ZONE_AS923_3    5
+#define ZONE_AS923_4    6
+#define ZONE_KR920      7
+#define ZONE_IN865      8
+#define ZONE_AU915      9
 #define ZONE_MAX        ZONE_AU915
 #define ZONE_MIN        ZONE_EU868
 

@@ -1278,8 +1278,17 @@ bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t a
     case ZONE_US915:
         sprintf(sZone,"US915");
         break;
-    case ZONE_AS923:
-        sprintf(sZone,"AS923");
+    case ZONE_AS923_1:
+        sprintf(sZone,"AS923_1");
+        break;
+    case ZONE_AS923_2:
+        sprintf(sZone,"AS923_2");
+        break;
+    case ZONE_AS923_3:
+        sprintf(sZone,"AS923_3");
+        break;
+    case ZONE_AS923_4:
+        sprintf(sZone,"AS923_4");
         break;
     case ZONE_KR920:    
         sprintf(sZone,"KR920");
@@ -1395,7 +1404,7 @@ void highlightOneElement(uint8_t selectedItem, uint8_t selectedColumn, bool disp
     case CONF_ITEM_ZONE:
       x = TXT_ALL_VALUE_OFF_X;
       y = TXT_ZONE_OFF_Y-2;
-      tft.drawRoundRect(x,y,60,18,4,color);
+      tft.drawRoundRect(x,y,80,18,4,color);
       break;
     case CONF_ITEM_DEVEUI:
       x = 3+TXT_ALL_VALUE_OFF_X+selectedColumn*11;

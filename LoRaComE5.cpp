@@ -249,8 +249,53 @@ void loraSetup(void) {
         sendATCommand(_cmd,"+CH: CH","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);  
       }
     }
-  } else if ( loraConf.zone == ZONE_AS923 ) {
+  } else if ( loraConf.zone == ZONE_AS923_1 ) {
+    /*  According to https://github.com/helium/router
+        923.6 MHz
+        923.8 MHz
+        924.0 MHz
+        924.2 MHz
+        924.4 MHz
+    */
     sendATCommand("AT+DR=AS923","+DR: AS923","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=0,923.2,0,5","+CH: 0,9232","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=1,923.4,0,5","+CH: 1,9234","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=2,923.6,0,5","+CH: 2,9236","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=3,923.8,0,5","+CH: 3,9238","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=4,924.0,0,5","+CH: 4,9240","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=5,924.2,0,5","+CH: 5,9242","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=6,924.4,0,5","+CH: 6,9244","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+RXWIN2=923.2,DR2","+RXWIN2: 9232","+RXWIN2: ERR","",DEFAULT_TIMEOUT,false,NULL);
+  } else if ( loraConf.zone == ZONE_AS923_2 ) {
+    sendATCommand("AT+DR=AS923","+DR: AS923","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=0,921.4,0,5","+CH: 0,9214","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=1,921.6,0,5","+CH: 1,9216","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=2,921.8,0,5","+CH: 2,9218","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=3,922.0,0,5","+CH: 3,9220","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=4,922.2,0,5","+CH: 4,9222","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=5,922.4,0,5","+CH: 5,9224","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=6,922.6,0,5","+CH: 6,9226","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+RXWIN2=921.4,DR2","+RXWIN2: 9214","+RXWIN2: ERR","",DEFAULT_TIMEOUT,false,NULL);
+  } else if ( loraConf.zone == ZONE_AS923_3 ) {
+    sendATCommand("AT+DR=AS923","+DR: AS923","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=0,916.6,0,5","+CH: 0,9166","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=1,916.8,0,5","+CH: 1,9168","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=2,917.0,0,5","+CH: 2,9170","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=3,917.2,0,5","+CH: 3,9172","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=4,917.4,0,5","+CH: 4,9174","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=5,917.6,0,5","+CH: 5,9176","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=6,917.8,0,5","+CH: 6,9178","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+RXWIN2=916.6,DR2","+RXWIN2: 9166","+RXWIN2: ERR","",DEFAULT_TIMEOUT,false,NULL);
+  } else if ( loraConf.zone == ZONE_AS923_4 ) {
+    sendATCommand("AT+DR=AS923","+DR: AS923","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=0,917.3,0,5","+CH: 0,9173","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=1,917.5,0,5","+CH: 1,9175","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=2,917.7,0,5","+CH: 2,9177","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=3,917.9,0,5","+CH: 3,9179","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=4,918.1,0,5","+CH: 4,9181","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=5,918.3,0,5","+CH: 5,9183","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+CH=6,918.5,0,5","+CH: 6,9185","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    sendATCommand("AT+RXWIN2=917.3,DR2","+RXWIN2: 9173","+RXWIN2: ERR","",DEFAULT_TIMEOUT,false,NULL);
   } else if ( loraConf.zone == ZONE_KR920 ) {
     sendATCommand("AT+DR=KR920","+DR: KR920","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
   } else if ( loraConf.zone == ZONE_IN865 ) {
@@ -505,7 +550,9 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
   if ( loraContext.lastDr != _dr ) {
     // set dr ( for real dr is not dr but SF)
     boolean retDr = true;
-    if ( loraConf.zone == ZONE_EU868 || loraConf.zone == ZONE_AS923 || loraConf.zone == ZONE_KR920 || loraConf.zone == ZONE_IN865 || loraConf.zone == ZONE_AU915 ) {
+    if ( loraConf.zone == ZONE_EU868 
+      || loraConf.zone == ZONE_AS923_1 || loraConf.zone == ZONE_AS923_2 || loraConf.zone == ZONE_AS923_3 || loraConf.zone == ZONE_AS923_4
+      || loraConf.zone == ZONE_KR920 || loraConf.zone == ZONE_IN865 || loraConf.zone == ZONE_AU915 ) {
       // DR0 - SF12 / DR5 - SF7
       switch (_dr) {
         case 7:
