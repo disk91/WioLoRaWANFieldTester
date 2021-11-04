@@ -1090,6 +1090,10 @@ void refreshGpsDetails() {
       gps.altitude = 0;
       gps.sats = 0;
     } 
+    if ( ! gps.isReady ) {
+      tft.setTextColor(TFT_RED);
+    }
+    
     sprintf(sTmp,"Time:      %02d:%02d:%02d", gps.hour, gps.minute, gps.second); 
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_TIME_OFF_Y,GFXFF);
 
