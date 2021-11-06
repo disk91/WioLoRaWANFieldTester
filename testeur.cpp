@@ -124,11 +124,18 @@ uint8_t getLastIndexWritten() {
 
 void tst_setPower(int8_t pwr) {
   if ( pwr < 2 ) pwr = 2;
-  if ( loraConf.zone == ZONE_EU868 
-    || loraConf.zone == ZONE_AS923_1 || loraConf.zone == ZONE_AS923_2 ||  loraConf.zone == ZONE_AS923_3 ||  loraConf.zone == ZONE_AS923_4 
-    || loraConf.zone == ZONE_KR920 ) {
+  if ( loraConf.zone == ZONE_EU868 || loraConf.zone == ZONE_KR920 ) {
     if ( pwr > 16 ) pwr = 16;
+    #if HWTARGET == RFM95
     pwr &= 0xFE;
+    #endif
+  } else if ( loraConf.zone == ZONE_AS923_1 || loraConf.zone == ZONE_AS923_2 ||  loraConf.zone == ZONE_AS923_3 ||  loraConf.zone == ZONE_AS923_4 ) {
+    if ( pwr == MAXPOWER ) {
+      // just to make sure on init we are limiting to 16dBm as some coutry in AS923 have this limit
+      // need to get the detail for each subzone definition.
+      pwr = 16;
+    }
+    if ( pwr > 22 ) pwr = 22;      
   } else if ( loraConf.zone == ZONE_US915 || loraConf.zone == ZONE_AU915 || loraConf.zone == ZONE_IN865 ) {
     #if HWTARGET == LORAE5
       if ( pwr > 22 ) pwr = 22;
