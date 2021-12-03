@@ -84,10 +84,13 @@ void initScreen() {
 
 void displayTitle() {
     char title[128];
+    uint8_t model = HWTARGET;
     tft.setTextColor(TFT_GRAY);
     tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
-    sprintf(title,"WioLoRaWanFieldTester %s",VERSION);
-    tft.drawString(title,(320-210)/2,120, GFXFF);  
+    sprintf(title,"Wio LoRaWan Field Tester");
+    tft.drawString(title,(320-200)/2, 80, GFXFF);  
+    sprintf(title,"Version %s (%s)", VERSION, model==LORAE5 ? "LoRaE5" : "RFM95");
+    tft.drawString(title,(320-180)/2, 140, GFXFF);  
 }
 
 void displaySplash() {
