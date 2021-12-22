@@ -1030,8 +1030,9 @@ void refreshGps() {
 #define TXT_LNG_OFF_Y       (HIST_Y_OFFSET+60)
 #define TXT_ALT_OFF_Y       (HIST_Y_OFFSET+85)
 #define TXT_QUA_OFF_Y       (HIST_Y_OFFSET+110)
+#define TXT_BAT_OFF_Y       (HIST_Y_OFFSET+135)
 #define TXT_ALL_OFF_X       (HIST_X_OFFSET+5)
-#define TXT_ALL_VALUE_OFF_X (HIST_X_OFFSET+5+85)
+#define TXT_ALL_VALUE_OFF_X (HIST_X_OFFSET+21+85)
 void refreshGpsDetails() {
   if ( ui.previous_display != ui.selected_display ) {
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET-18,HIST_X_TXTSIZE,18,TFT_BLACK);
@@ -1042,11 +1043,8 @@ void refreshGpsDetails() {
     tft.drawRoundRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,R_SIZE,TFT_WHITE);
     ui.previous_display = ui.selected_display;
   }
-  #ifdef DEBUGGPS
-    tft.fillRect(HIST_X_OFFSET+2,HIST_Y_OFFSET+2,HIST_X_SIZE-4,HIST_Y_SIZE-4,TFT_BLACK);
-  #else
-    tft.fillRect(TXT_ALL_VALUE_OFF_X,TXT_TIME_OFF_Y-2,200,120,TFT_BLACK);
-  #endif
+  // Clear the whole area, all is displayed back
+  tft.fillRect(HIST_X_OFFSET+2,HIST_Y_OFFSET+2,HIST_X_SIZE-4,HIST_Y_SIZE-4,TFT_BLACK);
 
   char sTmp[64];
   tft.setFreeFont(FM9);    
@@ -1077,6 +1075,8 @@ void refreshGpsDetails() {
         } 
       }
     } 
+    sprintf(sTmp,"Battery:   %d mV (%d%%)",state.batVoltage, state.batPercent);
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_BAT_OFF_Y,GFXFF);
   } else {
   #endif
     if ( !gps.hasbeenReady ) {
@@ -1111,6 +1111,9 @@ void refreshGpsDetails() {
     }
     sprintf(sTmp,"Hdop:      %d.%d Sats: %d", gps.hdop/100,gps.hdop-100*(gps.hdop/100), gps.sats);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_QUA_OFF_Y,GFXFF);
+
+    sprintf(sTmp,"Battery:   %d mV (%d%%)",state.batVoltage, state.batPercent);
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_BAT_OFF_Y,GFXFF);
   #ifdef DEBUGGPS
   }
   #endif

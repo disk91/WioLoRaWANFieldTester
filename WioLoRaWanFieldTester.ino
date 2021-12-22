@@ -44,6 +44,33 @@ static uint8_t emptyFrame[] = {
   0x00
 };
 
+// Try to get battery percent depending on voltage 
+// Ok that's empiric mapping but better than nothing :-)
+// Used 0.5C curve
+// https://forum.pycom.io/topic/6585/read_battery_voltage-voltage-value-to-battery-level/3
+uint8_t batteryPercent(uint16_t volt) {
+  uint8_t percent = 0;
+  if (volt >= 4180 ) {
+    percent = 100;
+  } else if ( volt >= 4100 ) { percent = 95;
+  } else if ( volt >= 4000 ) { percent = 90;
+  } else if ( volt >= 3950 ) { percent = 85;
+  } else if ( volt >= 3900 ) { percent = 80;
+  } else if ( volt >= 3850 ) { percent = 70;
+  } else if ( volt >= 3800 ) { percent = 60;
+  } else if ( volt >= 3750 ) { percent = 50;
+  } else if ( volt >= 3725 ) { percent = 40;
+  } else if ( volt >= 3700 ) { percent = 30;
+  } else if ( volt >= 3650 ) { percent = 20;
+  } else if ( volt >= 3600 ) { percent = 10;
+  } else if ( volt >= 3400 ) { percent = 5;
+  } else if ( volt >= 3200 ) { percent = 2;
+  } else {
+    percent = 1;
+  }
+  return percent;
+}
+
 void setup() {
 
   #if defined SERIALCONFIG || defined DEBUG 
@@ -116,6 +143,7 @@ void loop(void) {
         uint32_t v = analogRead(LIPO_ADC);
         v = 2*( 3300 * v ) / 1024;  // should be 2230 ...
         state.batVoltage = v;
+        state.batPercent = batteryPercent(state.batVoltage);
       #elif HWTARGET == LORAE5
         if ( state.batOk ) {
           unsigned int soc = lipo.soc();  // Read state-of-charge (%)
