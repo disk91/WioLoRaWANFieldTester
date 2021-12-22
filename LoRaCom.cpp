@@ -546,6 +546,12 @@ bool processLoRaConfig(void) {
                     SERIALCONFIG.println("OK");
                     confStatus |= __LCONF_STATE_ZONE;
                     updated = true;
+                  } else if ( strcmp(sZone,"LATER") == 0 ) {
+                    loraConf.zone = ZONE_LATER;
+                    SERIALCONFIG.println("ZONE: LATER");
+                    SERIALCONFIG.println("OK");
+                    confStatus |= __LCONF_STATE_ZONE;
+                    updated = true;
                   } else {
                     SERIALCONFIG.println("KO");
                   }

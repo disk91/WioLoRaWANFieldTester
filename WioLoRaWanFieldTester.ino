@@ -71,7 +71,7 @@ void setup() {
   if ( zero ) {
     //configPending();
     while (true) {
-      if ( manageConfigScreen(true, first || hasChange ) ){
+      if ( manageConfigScreen(true, first || hasChange, false ) ){
         NVIC_SystemReset();
       }
       first = false;
@@ -79,9 +79,17 @@ void setup() {
     }
   } else if ( digitalRead(WIO_5S_PRESS) == LOW ) {
     while ( digitalRead(WIO_5S_PRESS) == LOW );
-    manageConfigScreen(false,true);
+    manageConfigScreen(false,true, false);
     NVIC_SystemReset();
   }
+
+  #if HWTARGET == LORAE5
+  if ( loraConf.zone == ZONE_LATER ) {
+    loraConf.zone = ZONE_UNDEFINED;
+    manageConfigScreen(false,true,true);
+    NVIC_SystemReset();
+  }
+  #endif
 
   gpsSetup();
   displaySplash();

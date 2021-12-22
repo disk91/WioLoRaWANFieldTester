@@ -227,7 +227,14 @@ void loraSetup(void) {
   loraContext.currentSeqId = 1;
   loraContext.downlinkPending = false;
      
-  sendATCommand("AT","+AT: OK","","",DEFAULT_TIMEOUT,false, NULL);
+  if ( ! sendATCommand("AT","+AT: OK","","",DEFAULT_TIMEOUT,false, NULL) ) {
+    // retry
+    if ( ! sendATCommand("AT","+AT: OK","","",DEFAULT_TIMEOUT,false, NULL) ) {
+      // error message
+      LoRaMissing();
+      while(1);
+    }
+  }
   sendATCommand("AT+UART=TIMEOUT,0","+UART: TIMEOUT","","",DEFAULT_TIMEOUT,false, NULL);
 
   // Setup region

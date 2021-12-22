@@ -1123,31 +1123,31 @@ void refreshGpsDetails() {
 // Return true when the configuration is valid
 static uint8_t _currentItem = CONF_ITEM_ZONE;
 static uint8_t _currentColumn = 0;
-bool manageConfigScreen(bool interactive, bool firstRun) {
+bool manageConfigScreen(bool interactive, bool firstRun, bool onlyZone) {
   uint8_t change = 0;
   bool keyGet = false;
   if ( firstRun ) {
-    displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NONE,true);
+    displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NONE,true,onlyZone);
   }
   do {
     if (digitalRead(WIO_5S_RIGHT) == LOW) {
-       if ( displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NEXTCOL,false) ) {
+       if ( displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NEXTCOL,false,onlyZone) ) {
          _currentColumn++;
        }
        keyGet = true;
     } else if (digitalRead(WIO_5S_LEFT) == LOW) {
-       if ( displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_PREVCOL,false) ) {
+       if ( displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_PREVCOL,false,onlyZone) ) {
          _currentColumn--;
        }
        keyGet = true;
     } else if (digitalRead(WIO_5S_UP) == LOW) {
-       if ( displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_PREVITEM,false) ) {
+       if ( displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_PREVITEM,false,onlyZone) ) {
          _currentItem--;
          _currentColumn = 0;
        }
        keyGet = true;
     } else if (digitalRead(WIO_5S_DOWN) == LOW) {
-       if ( displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NEXTITEM,false) ) {
+       if ( displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NEXTITEM,false,onlyZone) ) {
          _currentItem++;
          _currentColumn = 0;
        }
@@ -1222,7 +1222,7 @@ bool manageConfigScreen(bool interactive, bool firstRun) {
           }          
           break;
       }
-      displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NONE,false);
+      displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NONE,false,onlyZone);
       change = 0;
     }
     if ( keyGet ) delay(200);
@@ -1240,7 +1240,7 @@ void highlightOneElement(uint8_t selectedItem, uint8_t selectedColumn, bool disp
 #define TXT_ALL_VALUE_OFF_X (HIST_X_OFFSET+5+85)
 
 // return true when action executed
-bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t action, bool refreshAll) {
+bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t action, bool refreshAll, bool onlyZone) {
   
   // No need to refresh everytime
   if ( refreshAll ) {
@@ -1292,42 +1292,46 @@ bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t a
     case ZONE_AU915:
         sprintf(sZone,"AU915");
         break;
+    case ZONE_LATER:
+        sprintf(sZone,"NA");
+        break;
   }
   sprintf(sTmp,"Zone:   %s", sZone); 
   tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_ZONE_OFF_Y,GFXFF);
 
-  sprintf(sTmp,"DevEUI: %02X%02X%02X%02X%02X%02X%02X%02X",
-    loraConf.deveui[0],loraConf.deveui[1],
-    loraConf.deveui[2],loraConf.deveui[3],
-    loraConf.deveui[4],loraConf.deveui[5],
-    loraConf.deveui[6],loraConf.deveui[7]
-  ); 
-  tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_DEVEUI_OFF_Y,GFXFF);
+  if ( !onlyZone ) {
+    sprintf(sTmp,"DevEUI: %02X%02X%02X%02X%02X%02X%02X%02X",
+      loraConf.deveui[0],loraConf.deveui[1],
+      loraConf.deveui[2],loraConf.deveui[3],
+      loraConf.deveui[4],loraConf.deveui[5],
+      loraConf.deveui[6],loraConf.deveui[7]
+    ); 
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_DEVEUI_OFF_Y,GFXFF);
+    
+    sprintf(sTmp,"AppEUI: %02X%02X%02X%02X%02X%02X%02X%02X",
+      loraConf.appeui[0],loraConf.appeui[1],
+      loraConf.appeui[2],loraConf.appeui[3],
+      loraConf.appeui[4],loraConf.appeui[5],
+      loraConf.appeui[6],loraConf.appeui[7]
+    ); 
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPEUI_OFF_Y,GFXFF);
   
-  sprintf(sTmp,"AppEUI: %02X%02X%02X%02X%02X%02X%02X%02X",
-    loraConf.appeui[0],loraConf.appeui[1],
-    loraConf.appeui[2],loraConf.appeui[3],
-    loraConf.appeui[4],loraConf.appeui[5],
-    loraConf.appeui[6],loraConf.appeui[7]
-  ); 
-  tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPEUI_OFF_Y,GFXFF);
-
-  sprintf(sTmp,"AppKEY: %02X%02X%02X%02X%02X%02X%02X%02X",
-    loraConf.appkey[0],loraConf.appkey[1],
-    loraConf.appkey[2],loraConf.appkey[3],
-    loraConf.appkey[4],loraConf.appkey[5],
-    loraConf.appkey[6],loraConf.appkey[7]
-  ); 
-  tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPKEY_OFF_Y,GFXFF);
-
-  sprintf(sTmp,"        %02X%02X%02X%02X%02X%02X%02X%02X",
-    loraConf.appkey[8],loraConf.appkey[9],
-    loraConf.appkey[10],loraConf.appkey[11],
-    loraConf.appkey[12],loraConf.appkey[13],
-    loraConf.appkey[14],loraConf.appkey[15]
-  ); 
-  tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPKEY_OFF_Y2,GFXFF);
-
+    sprintf(sTmp,"AppKEY: %02X%02X%02X%02X%02X%02X%02X%02X",
+      loraConf.appkey[0],loraConf.appkey[1],
+      loraConf.appkey[2],loraConf.appkey[3],
+      loraConf.appkey[4],loraConf.appkey[5],
+      loraConf.appkey[6],loraConf.appkey[7]
+    ); 
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPKEY_OFF_Y,GFXFF);
+  
+    sprintf(sTmp,"        %02X%02X%02X%02X%02X%02X%02X%02X",
+      loraConf.appkey[8],loraConf.appkey[9],
+      loraConf.appkey[10],loraConf.appkey[11],
+      loraConf.appkey[12],loraConf.appkey[13],
+      loraConf.appkey[14],loraConf.appkey[15]
+    ); 
+    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPKEY_OFF_Y2,GFXFF);  
+  }
   // Previous Item & column
   uint8_t prevCol = selectedColumn;
   uint8_t prevItem = selectedItem;
@@ -1335,6 +1339,7 @@ bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t a
   // Clean previous
   switch ( action ) {
     case CONF_ACTION_NEXTITEM:
+          if ( onlyZone ) return false;
           if ( selectedItem < CONF_ITEM_LAST) {
             selectedItem++;
             selectedColumn=0;
@@ -1342,6 +1347,7 @@ bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t a
           else return false;
           break;
     case CONF_ACTION_PREVITEM:
+          if ( onlyZone ) return false;
           if ( selectedItem > CONF_ITEM_FIRST) {
             selectedItem--;
             selectedColumn=0;
@@ -1421,4 +1427,13 @@ void highlightOneElement(uint8_t selectedItem, uint8_t selectedColumn, bool disp
       break;
   }
   
+}
+
+// Missing LoRA Board
+void LoRaMissing() {
+        
+      tft.fillRect(0,120-20,320,40,TFT_RED);
+      tft.setTextColor(TFT_WHITE);
+      tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+      tft.drawString("LoRa board is missing",75,112, GFXFF);  
 }
