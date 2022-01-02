@@ -420,19 +420,20 @@ bool extractHexStr(const char * src, uint8_t * dst, uint8_t * sz) {
 }
 
 // estimate DutyCycle duration for a single transmission in ms of pause
-uint32_t interFrameDutyCycleEstimate(uint8_t _dr) {
+uint32_t interFrameDutyCycleEstimate(uint8_t _dr, uint8_t retries) {
    if ( loraConf.zone == ZONE_EU868 ) {
       // EU868
       // 1% based on SF and data size (10 Bytes)
       // @TODO also consider ack
       // @TODO make this more generic considering payload size
+      if ( retries == 0 ) retries = 1;
       switch (_dr) {
-          case 7:  return 6200; 
-          case 8:  return 11300; 
-          case 9:  return 20600; 
-          case 10: return 37100; 
-          case 11: return 82300; 
-          case 12: return 148300;
+          case 7:  return retries*6200; 
+          case 8:  return retries*11300; 
+          case 9:  return retries*20600; 
+          case 10: return retries*37100; 
+          case 11: return retries*82300; 
+          case 12: return retries*148300;
           default:
                LOGLN(("Invalid SF"));
                return 200000;
@@ -440,6 +441,22 @@ uint32_t interFrameDutyCycleEstimate(uint8_t _dr) {
    } else {
       // No Duty Cycle zones, set a minimum time
       return NONDCZONE_DUTYCYCLE_MS;
+   }
+}
+
+
+// estimate Tx duration with AT interface
+uint32_t txDurationEstimate(uint8_t _dr) {
+   switch (_dr) {
+     case 7:  return 1500; 
+     case 8:  return 1600; 
+     case 9:  return 1800; 
+     case 10: return 2000; 
+     case 11: return 2500; 
+     case 12: return 3000;
+     default:
+          LOGLN(("Invalid SF"));
+          return 2000;
    }
 }
 
@@ -467,7 +484,7 @@ bool processTx(void) {
   } else if (startsWith(loraContext.bufResponse,"+CMSGHEX: Done")) {
     loraContext.elapsedTime = millis() - loraContext.startTime;
     if ( loraContext.hasAcked ) {
-      uint8_t retries = loraContext.elapsedTime / 3000; // really approximative approach
+      uint8_t retries = loraContext.elapsedTime / txDurationEstimate(loraContext.lastDr); // really approximative approach
       //Serial.printf("Add Data for seq(%d) rssi(%d) snr(%d) \r\n",loraContext.currentSeqId,(int16_t)loraContext.lastRssi, (int16_t)loraContext.lastSnr);
       addInBuffer((int16_t)loraContext.lastRssi, (int16_t)loraContext.lastSnr, retries, loraContext.currentSeqId, false);
       state.hasRefreshed = true;
@@ -476,7 +493,7 @@ bool processTx(void) {
       } else {
           state.cState = JOINED;              
       }
-      loraContext.estimatedDCMs = interFrameDutyCycleEstimate(loraContext.lastDr)*retries;
+      loraContext.estimatedDCMs = interFrameDutyCycleEstimate(loraContext.lastDr, retries);
     } else {
       //Serial.printf("Add Data for seq(%d) rssi(%d) snr(%d) [Lost]\r\n",loraContext.currentSeqId,(int16_t)0, (int16_t)0);
       addInBuffer(0, 0, 0, loraContext.currentSeqId, true);
@@ -644,7 +661,7 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
       case 9:  loraContext.estimatedDCMs = 26700; break;
       case 10: loraContext.estimatedDCMs = 49400; break;
       case 11: loraContext.estimatedDCMs = 106900; break;
-      case 12: loraContext.estimatedDCMs = 197400;break;
+      case 12: loraContext.estimatedDCMs = 197400; break;
       default:
            LOGLN(("Invalid SF"));
            return;
@@ -654,7 +671,7 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
     state.cState = JOINING;
   } else {
       
-    loraContext.estimatedDCMs  = interFrameDutyCycleEstimate(_dr);
+    loraContext.estimatedDCMs  = interFrameDutyCycleEstimate(_dr,1);
       
     if (acked) {
       sprintf(_cmd,"AT+CMSGHEX=");
@@ -670,7 +687,11 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
     loraContext.hasAcked = false;
     loraContext.downlinkPending = false;
     state.cState = IN_TX;
-    sendATCommand(_cmd,"+CMSGHEX: Done","","",SEND_TIMEOUT_BASE*(retries+1),true,processTx);     
+    if (acked) {
+       sendATCommand(_cmd,"+CMSGHEX: Done","","",SEND_TIMEOUT_BASE*(retries+1),true,processTx);     
+    } else {
+       sendATCommand(_cmd,"+MSGHEX: Done","","",SEND_TIMEOUT_BASE,true,processTx);           
+    }
   }
   
 }
@@ -747,6 +768,31 @@ uint32_t nextPossibleSendMs(){
   
 }
 
+
+bool quickSetup() {
+  SERIALE5.begin(9600);
+  while(!SERIALE5);
+  loraContext.runningCommand = false;
+  if ( ! sendATCommand("AT","+AT: OK","","",DEFAULT_TIMEOUT,false, NULL) ) {
+    // retry
+    if ( ! sendATCommand("AT","+AT: OK","","",DEFAULT_TIMEOUT,false, NULL) ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool storeOneByte(uint8_t adr, uint8_t v) {
+    char _cmd[128];
+    sprintf(_cmd,"AT+EEPROM=%02X,%02X", adr, v);
+    return sendATCommand(_cmd,"+EEPROM: ","","",DEFAULT_TIMEOUT,false,NULL);     
+}
+
+bool readOneByte(uint8_t adr, uint8_t * v) {
+    char _cmd[128];
+    sprintf(_cmd,"AT+EEPROM=%02X",adr);
+    return sendATCommand(_cmd,"+EEPROM: ","","",DEFAULT_TIMEOUT,false,NULL);     
+}
 
 
 #endif

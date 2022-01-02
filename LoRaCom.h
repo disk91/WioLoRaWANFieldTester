@@ -39,6 +39,12 @@ boolean canLoRaSend();
 uint32_t nextPossibleSendMs();
 bool processLoRaConfig(void);
 
+#if HWTARGET == LORAE5
+bool storeOneByte(uint8_t adr, uint8_t v);
+bool readOneByte(uint8_t adr, uint8_t * v);
+bool quickSetup();
+#endif
+
 #define ZONE_UNDEFINED  0
 #define ZONE_EU868      1
 #define ZONE_US915      2

@@ -49,7 +49,7 @@ void initState() {
     // Config initial setup
     tst_setPower(MAXPOWER);  
     tst_setSf(SLOWERSF);      
-    tst_setRetry(1);
+    tst_setRetry(0);
     ui.selected_display = DISPLAY_RSSI_HIST;    
     ui.selected_mode = MODE_MANUAL;
     memcpy(loraConf.deveui, _DEVEUI, 8);
@@ -125,6 +125,9 @@ uint8_t getLastIndexWritten() {
 void tst_setPower(int8_t pwr) {
   if ( pwr < 2 ) pwr = 2;
   if ( loraConf.zone == ZONE_EU868 || loraConf.zone == ZONE_KR920 ) {
+    if ( pwr == MAXPOWER ) {
+      pwr = 14;
+    }
     if ( pwr > 16 ) pwr = 16;
     #if HWTARGET == RFM95
     pwr &= 0xFE;

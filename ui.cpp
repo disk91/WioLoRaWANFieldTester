@@ -88,9 +88,9 @@ void displayTitle() {
     tft.setTextColor(TFT_GRAY);
     tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
     sprintf(title,"Wio LoRaWan Field Tester");
-    tft.drawString(title,(320-200)/2, 80, GFXFF);  
+    tft.drawString(title,(320-200)/2, 95, GFXFF);  
     sprintf(title,"Version %s (%s)", VERSION, model==LORAE5 ? "LoRaE5" : "RFM95");
-    tft.drawString(title,(320-180)/2, 140, GFXFF);  
+    tft.drawString(title,(320-180)/2, 125, GFXFF);  
 }
 
 void displaySplash() {
@@ -1186,6 +1186,10 @@ bool manageConfigScreen(bool interactive, bool firstRun, bool onlyZone) {
           tst_setSf(state.cSf);
           // assuming the conf is valid
           storeConfig();
+
+          // also backup
+          storeConfigToBackup();
+          
           return true;
       } else {
         return false;

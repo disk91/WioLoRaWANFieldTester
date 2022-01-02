@@ -4,7 +4,7 @@
 
 The WioLoRaWanFieldTester provides different features, all-in-one:
 - Field Tester - it allows to monitor the LoRaWan / LongFi network performance from the field. That way you can verify the coverage and know the different Gateways / Hotspots covering a given place. It helps to find the best places to deploy new Gateways / Hotspots, compare different places to optimize the network deployement.
-- Mapper - it automatically transfer the positions to the network mappers to create a map of coverage. This map is really important to understand where it is posible to use the network. It is a key point for giving trust on the network and motivate the service providers to use it.
+- Mapper - it automatically transfer the positions to the network mappers - [helium](https://mappers.helium.com) and [coveragemap](https://coveragemap.net/) - to create a map of coverage. This map is really important to understand where it is posible to use the network. It is a key point for giving trust on the network and motivate the service providers to use it.
 - Tracker - it can be connected to tracking services like [cargo](https://cargo.helium.com) to track cars, people, assets in real time.
 
 For doing this, the terminal is connecting to the network and sending messages on regular basis. The onboarded GPS is getting the device position in real time. This message is acknoleged by the network to retreive the information requested for field testing.
@@ -42,7 +42,7 @@ Here you can see a schema of the different communications between these componen
 	The backend server computes a response to the device with the number of hotspots having received the message and the signal lower and higher limits. These data will be pushed back to the device through a downlink communication. The device will later display these information in the different screens.
 
 (5b) The device position is pushed to the mapper services.
-	When the position quality is good enough (hdop quality is under 2.0 and satellites in view over 5), the backend server is pushing these informations to the associated mapper automatically. This helps to construct community coverage map
+	When the position quality is good enough (hdop quality is under 2.0 and satellites in view over 5), the backend server is pushing these informations to the associated mapper automatically. This helps to construct community coverage map. Helium mapper and Coveragemap service are transparently connected.
 
 (6) The device now looks for pending downlinks by quering through a new uplink communication. 
 	When the device is max rate mode, this step (6) is integrated to the next step (1). In the other mode, the step (6) is following the step (5).

@@ -130,13 +130,14 @@ void setup() {
 
 void loop(void) {
 
-  static long cTime = 0;
-  static long batUpdateTime = 0;
+  static unsigned long cTime = 0;
+  static unsigned long batUpdateTime = 0;
+  unsigned long sTime;
+  bool fireMessage;
 
-  long sTime = millis();
-  bool fireMessage = false;
-
-
+  sTime = millis();
+  fireMessage = false;
+  
   #ifdef WITH_LIPO
     if ( batUpdateTime > 1000 ) {
       #if HWTARGET == RFM95
@@ -162,6 +163,7 @@ void loop(void) {
     
   refresUI();
   switch ( ui.selected_mode ) {
+    default:
     case MODE_MANUAL:
       if ( ui.hasClick && canLoRaSend() ) { 
         fireMessage = true;
@@ -185,31 +187,30 @@ void loop(void) {
       break;
   }
   if ( state.cState == EMPTY_DWNLINK && canLoRaSend() ) {
-    // clean the downlink queue
-    // send messages on port2 : the backend will not proceed port 2.
-    do_send(2, emptyFrame, sizeof(emptyFrame),getCurrentSf(), state.cPwr,true, state.cRetry); 
+      // clean the downlink queue
+      // send messages on port2 : the backend will not proceed port 2.
+      do_send(2, emptyFrame, sizeof(emptyFrame),getCurrentSf(), state.cPwr,true, state.cRetry); 
   } else if ( fireMessage ) {
-    // send a new test message on port 1, backend will create a downlink with information about network side reception
-    cTime = 0;
-    // Fill the frame
-    if ( gps.isReady && gpsQualityIsGoodEnough() ) {
-      uint64_t pos = gpsEncodePosition48b();
-      myFrame[0] = (pos >> 40) & 0xFF;
-      myFrame[1] = (pos >> 32) & 0xFF;
-      myFrame[2] = (pos >> 24) & 0xFF;
-      myFrame[3] = (pos >> 16) & 0xFF;
-      myFrame[4] = (pos >>  8) & 0xFF;
-      myFrame[5] = (pos      ) & 0xFF;
-      myFrame[6] = ((gps.altitude+1000) >> 8) & 0xFF;
-      myFrame[7] = ((gps.altitude+1000)     ) & 0xFF;
-      myFrame[8] = (uint8_t)gps.hdop / 10;
-      myFrame[9] = gps.sats;
-    } else {
-      bzero(myFrame, sizeof(myFrame));
-    }
-    do_send(1, myFrame, sizeof(myFrame),getCurrentSf(), state.cPwr,true, state.cRetry); 
+      // send a new test message on port 1, backend will create a downlink with information about network side reception
+      cTime = 0;
+      // Fill the frame
+      if ( gps.isReady && gpsQualityIsGoodEnough() ) {
+        uint64_t pos = gpsEncodePosition48b();
+        myFrame[0] = (pos >> 40) & 0xFF;
+        myFrame[1] = (pos >> 32) & 0xFF;
+        myFrame[2] = (pos >> 24) & 0xFF;
+        myFrame[3] = (pos >> 16) & 0xFF;
+        myFrame[4] = (pos >>  8) & 0xFF;
+        myFrame[5] = (pos      ) & 0xFF;
+        myFrame[6] = ((gps.altitude+1000) >> 8) & 0xFF;
+        myFrame[7] = ((gps.altitude+1000)     ) & 0xFF;
+        myFrame[8] = (uint8_t)gps.hdop / 10;
+        myFrame[9] = gps.sats;
+      } else {
+        bzero(myFrame, sizeof(myFrame));
+      }
+      do_send(1, myFrame, sizeof(myFrame),getCurrentSf(), state.cPwr,true, state.cRetry); 
   }
-  
   loraLoop();
   gpsLoop();
   
