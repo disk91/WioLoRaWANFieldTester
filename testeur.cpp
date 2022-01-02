@@ -47,6 +47,7 @@ void initState() {
     uint8_t  _APPKEY[16] = __APPKEY;
 
     // Config initial setup
+    loraConf.zone = __ZONE;
     tst_setPower(MAXPOWER);  
     tst_setSf(SLOWERSF);      
     tst_setRetry(0);
@@ -55,7 +56,6 @@ void initState() {
     memcpy(loraConf.deveui, _DEVEUI, 8);
     memcpy(loraConf.appeui, _APPEUI, 8);
     memcpy(loraConf.appkey, _APPKEY,16);
-    loraConf.zone = __ZONE;
     storeConfig();
   }
   state.cState = NOT_JOINED;
