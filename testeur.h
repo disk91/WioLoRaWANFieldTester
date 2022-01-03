@@ -46,6 +46,8 @@ typedef struct s_state {
   uint8_t   cSf;      // Current SF
   uint8_t   cRetry;   // Current Number of retry
   e_state   cState;   // Current State (Joined / NotJoined)
+  boolean   cnfBack;  // Configuration has been backup
+  boolean   hidKey;   // Hide Key field in setup
   
   int16_t   rssi[MAXBUFFER];   // Rssi history
   int16_t   snr[MAXBUFFER];    // Snr history

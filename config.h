@@ -56,7 +56,7 @@
 //#define WITH_SPLASH_TTN     1
 
 
-#define VERSION "v1.3a"
+#define VERSION "v1.3"
 
 #ifdef DEBUG
   #define LOGLN(x)  Serial.println x
@@ -85,5 +85,8 @@
 
 bool readConfig();
 void storeConfig();
+bool storeConfigToBackup();
+bool readConfigFromBackup();
+void clearBackup();
 
 #endif // __CONFIG_H

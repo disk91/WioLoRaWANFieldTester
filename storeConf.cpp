@@ -23,7 +23,10 @@
 #include "LoRaCom.h"
 
 #define MAGIC 0xD154
-#define VERSION 0x02
+#define VERSION 0x03
+
+#define FLAG_BACKUPED 0x01
+#define FLAG_HIDE_KEY 0x02
 
 typedef struct {
   uint16_t  magic;
@@ -39,6 +42,7 @@ typedef struct {
   uint8_t   appeui[8];   // App EUI
   uint8_t   appkey[16];  // App KEY
   uint8_t   zone;        // Zone EU868... cf loracom.h ZONE_XXX
+  uint8_t   flag;        // to store some flags
 } Config;
 
 
@@ -64,6 +68,8 @@ bool readConfig() {
     state.cPwr = c.cPwr;
     state.cSf = c.cSf;
     state.cRetry = c.cRetry;
+    state.cnfBack = ((c.flag & FLAG_BACKUPED ) > 0);
+    state.hidKey = ((c.flag & FLAG_HIDE_KEY ) > 0);
     ui.selected_display = c.selected_display;
     ui.selected_mode = c.selected_mode;
     memcpy(loraConf.deveui, c.deveui, 8);
@@ -86,6 +92,10 @@ void storeConfig() {
   c.selected_display = ui.selected_display;
   c.selected_mode = ui.selected_mode;
   c.zone = loraConf.zone;
+  c.flag = 0;
+  if ( state.cnfBack ) c.flag |= FLAG_BACKUPED;
+  if ( state.hidKey ) c.flag |= FLAG_HIDE_KEY;
+
   memcpy(c.deveui, loraConf.deveui, 8);
   memcpy(c.appeui, loraConf.appeui, 8);
   memcpy(c.appkey, loraConf.appkey,16);
@@ -99,15 +109,37 @@ void storeConfig() {
   // Use the LoRae5 internal storage to save the config and support firmware update
   bool readConfigFromBackup() {
   
-    uint8_t v;
+    Config c;
+    uint8_t * t = (uint8_t *) &c;
+
+    if ( ! quickSetup() ) return false;
+
     for ( int k = 0 ; k < sizeof(Config); k++) {
-       readOneByte(k, &v);
+       readOneByte(k, t);
+       t++;
     }
-  
-    
+
+    uint8_t csum = computeCSum(&c);
+    if ( c.magic == MAGIC && c.version == VERSION && c.csum == csum ) {
+      state.cPwr = c.cPwr;
+      state.cSf = c.cSf;
+      state.cRetry = c.cRetry;
+      state.cnfBack = ((c.flag & FLAG_BACKUPED ) > 0);
+      state.hidKey = ((c.flag & FLAG_HIDE_KEY ) > 0);
+      ui.selected_display = c.selected_display;
+      ui.selected_mode = c.selected_mode;
+      memcpy(loraConf.deveui, c.deveui, 8);
+      memcpy(loraConf.appeui, c.appeui, 8);
+      memcpy(loraConf.appkey, c.appkey,16);
+      loraConf.zone = c.zone;
+    } else {
+      return false;
+    }
+    return true;
+      
   }
   
-  void storeConfigToBackup( ) {
+  bool storeConfigToBackup( ) {
 
     Config c;
     c.magic = MAGIC;
@@ -115,6 +147,8 @@ void storeConfig() {
     c.cPwr = state.cPwr;
     c.cSf = state.cSf;
     c.cRetry = state.cRetry;
+    c.flag = FLAG_BACKUPED;
+    if ( state.hidKey ) c.flag |= FLAG_HIDE_KEY;
     c.selected_display = ui.selected_display;
     c.selected_mode = ui.selected_mode;
     c.zone = loraConf.zone;
@@ -123,13 +157,27 @@ void storeConfig() {
     memcpy(c.appkey, loraConf.appkey,16);
     c.csum = computeCSum(&c);
 
-    if ( quickSetup() ) {
-      uint8_t * t = (uint8_t *) &c;
-      for ( int k = 0 ; k < sizeof(Config); k++) {
-         storeOneByte(k,*t);
-         t++;
-      }
+    uint8_t * t = (uint8_t *) &c;
+    bool ret = true;
+    for ( int k = 0 ; k < sizeof(Config); k++) {
+       if ( ! storeOneByte(k,*t) ) {
+         ret = false;
+         break;
+       }
+       t++;
     }
+    if ( ret ) {
+      state.cnfBack = true;
+    }
+    return ret;
+    
+  }
+
+  void clearBackup() {
+
+     for ( int k = 0 ; k < sizeof(Config); k++) {
+        storeOneByte(k,0);
+     }
   
   }
 
@@ -139,8 +187,12 @@ void storeConfig() {
     return false;
   }
   
-  void storeConfigFromBackup() {
+  bool storeConfigFromBackup() {
   
+  }
+
+  void clearBackup() {
+    
   }
 
 #endif

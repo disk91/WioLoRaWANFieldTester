@@ -1185,11 +1185,11 @@ bool manageConfigScreen(bool interactive, bool firstRun, bool onlyZone) {
           tst_setPower(state.cPwr);
           tst_setSf(state.cSf);
           // assuming the conf is valid
+          state.cnfBack = false;
+          if ( loraConf.zone == ZONE_LATER ) {
+            state.hidKey = true;
+          }
           storeConfig();
-
-          // also backup
-          storeConfigToBackup();
-          
           return true;
       } else {
         return false;
@@ -1325,22 +1325,30 @@ bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t a
       loraConf.appeui[6],loraConf.appeui[7]
     ); 
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPEUI_OFF_Y,GFXFF);
-  
-    sprintf(sTmp,"AppKEY: %02X%02X%02X%02X%02X%02X%02X%02X",
-      loraConf.appkey[0],loraConf.appkey[1],
-      loraConf.appkey[2],loraConf.appkey[3],
-      loraConf.appkey[4],loraConf.appkey[5],
-      loraConf.appkey[6],loraConf.appkey[7]
-    ); 
-    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPKEY_OFF_Y,GFXFF);
-  
-    sprintf(sTmp,"        %02X%02X%02X%02X%02X%02X%02X%02X",
-      loraConf.appkey[8],loraConf.appkey[9],
-      loraConf.appkey[10],loraConf.appkey[11],
-      loraConf.appkey[12],loraConf.appkey[13],
-      loraConf.appkey[14],loraConf.appkey[15]
-    ); 
-    tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPKEY_OFF_Y2,GFXFF);  
+
+    if ( !state.hidKey ) {
+      sprintf(sTmp,"AppKEY: %02X%02X%02X%02X%02X%02X%02X%02X",
+        loraConf.appkey[0],loraConf.appkey[1],
+        loraConf.appkey[2],loraConf.appkey[3],
+        loraConf.appkey[4],loraConf.appkey[5],
+        loraConf.appkey[6],loraConf.appkey[7]
+      ); 
+      tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPKEY_OFF_Y,GFXFF);
+    
+      sprintf(sTmp,"        %02X%02X%02X%02X%02X%02X%02X%02X",
+        loraConf.appkey[8],loraConf.appkey[9],
+        loraConf.appkey[10],loraConf.appkey[11],
+        loraConf.appkey[12],loraConf.appkey[13],
+        loraConf.appkey[14],loraConf.appkey[15]
+      ); 
+      tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPKEY_OFF_Y2,GFXFF);  
+    } else {
+      sprintf(sTmp,"AppKEY: XXXXXXXXXXXXXXXX"); 
+      tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPKEY_OFF_Y,GFXFF);
+    
+      sprintf(sTmp,"        XXXXXXXXXXXXXXXX"); 
+      tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_APPKEY_OFF_Y2,GFXFF);  
+    }
   }
   // Previous Item & column
   uint8_t prevCol = selectedColumn;

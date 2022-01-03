@@ -96,7 +96,11 @@ void setup() {
   bool first = true;
   bool hasChange = false;
   if ( zero ) {
-    //configPending();
+    // try to restore backup
+    if ( readConfigFromBackup() ) {
+       storeConfig();
+       NVIC_SystemReset();
+    }
     while (true) {
       if ( manageConfigScreen(true, first || hasChange, false ) ){
         NVIC_SystemReset();
@@ -121,8 +125,17 @@ void setup() {
   gpsSetup();
   displaySplash();
   loraSetup();
-  clearScreen();
+  // at this point configuration is ready
+  if ( ! state.cnfBack ) {
+     // backup config
+     if ( storeConfigToBackup() ) {
+        storeConfig(); // update backup status
+     }
+  }
 
+//  clearBackup();
+
+  clearScreen();
   screenSetup();
   analogReference(AR_INTERNAL2V23);
 }

@@ -56,6 +56,10 @@ void initState() {
     memcpy(loraConf.deveui, _DEVEUI, 8);
     memcpy(loraConf.appeui, _APPEUI, 8);
     memcpy(loraConf.appkey, _APPKEY,16);
+
+    state.cnfBack = false;
+    state.hidKey = false;
+
     storeConfig();
   }
   state.cState = NOT_JOINED;
@@ -67,6 +71,7 @@ void initState() {
   state.batVoltage = 0;
   state.batPercent = 0;
   state.batUpdated = false;
+
 
   #ifdef DEBUGDATA
     initDebug();
@@ -147,6 +152,8 @@ void tst_setPower(int8_t pwr) {
     #else
       #error "Invalid Target"
     #endif
+  } else if ( loraConf.zone == ZONE_LATER || loraConf.zone == ZONE_UNDEFINED ) {
+    pwr = MAXPOWER;
   } else {
     LOGLN(("Zone not supported for power limit"));
     if ( pwr > 16 ) pwr = 16;
@@ -163,6 +170,8 @@ void tst_setSf(uint8_t sf) {
       if ( sf > 12 ) sf = 12;
   } else if ( loraConf.zone == ZONE_US915 ) {
     if ( sf > 10 ) sf = 10;
+  } else if ( loraConf.zone == ZONE_LATER || loraConf.zone == ZONE_UNDEFINED ) {
+    sf = SLOWERSF;
   } else {
     LOGLN(("Zone not supported for SF limit"));
     if ( sf > 10 ) sf = 10;

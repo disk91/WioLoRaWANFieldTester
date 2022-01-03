@@ -20,6 +20,7 @@
 #include <Arduino.h>
 #include "config.h"
 #include "LoRaCom.h"
+#include "testeur.h"
 #if HWTARGET == RFM95
 
 #include <lmic.h>
@@ -384,7 +385,7 @@ uint8_t __charToHex(uint8_t c) {
 
 // return true when config has been partially changed 
 bool processLoRaConfig(void) {
-  static uint8_t state=__LCONF_STATE_NONE;
+  static uint8_t __state=__LCONF_STATE_NONE;
   static uint8_t confStatus=__LCONF_STATE_NONE;
   static uint8_t pos;
   static uint8_t confirmed;
@@ -401,19 +402,19 @@ bool processLoRaConfig(void) {
   #endif
   while ( SERIALCONFIG.available() ) {
     uint8_t c = SERIALCONFIG.read();
-    if ( state == __LCONF_STATE_NONE ) {
+    if ( __state == __LCONF_STATE_NONE ) {
       switch (c) {
         case 'D' : // device EUI
-                   state = __LCONF_STATE_DEVEUI;
+                   __state = __LCONF_STATE_DEVEUI;
                    break;
         case 'A' : // App EUI
-                   state = __LCONF_STATE_APPEUI;
+                   __state = __LCONF_STATE_APPEUI;
                    break;
         case 'K' : // App KEY
-                   state = __LCONF_STATE_APPKEY;
+                   __state = __LCONF_STATE_APPKEY;
                    break;
         case 'Z' : // Zone
-                   state = __LCONF_STATE_ZONE;
+                   __state = __LCONF_STATE_ZONE;
                    break;
         case '\n': // forget
         case '\r': 
@@ -431,11 +432,11 @@ bool processLoRaConfig(void) {
           pos = 0;
         } else {
           SERIALCONFIG.println("KO");
-          state = __LCONF_STATE_NONE;
+          __state = __LCONF_STATE_NONE;
         }
       } else {
         // Now we are processing the Hex Values
-        switch (state) {
+        switch (__state) {
           case __LCONF_STATE_DEVEUI: {
             uint8_t v = __charToHex(c);
             if ( v == 0xFF ) goto invalid;
@@ -455,7 +456,7 @@ bool processLoRaConfig(void) {
               SERIALCONFIG.println();
               SERIALCONFIG.println("OK");
               confStatus |= __LCONF_STATE_DEVEUI;
-              state = __LCONF_STATE_NONE;
+              __state = __LCONF_STATE_NONE;
               updated = true;
             }
           }
@@ -479,7 +480,7 @@ bool processLoRaConfig(void) {
               SERIALCONFIG.println();
               SERIALCONFIG.println("OK");
               confStatus |= __LCONF_STATE_APPEUI;
-              state = __LCONF_STATE_NONE;
+              __state = __LCONF_STATE_NONE;
               updated = true;
             }
           }
@@ -503,7 +504,7 @@ bool processLoRaConfig(void) {
               SERIALCONFIG.println();
               SERIALCONFIG.println("OK");
               confStatus |= __LCONF_STATE_APPKEY;
-              state = __LCONF_STATE_NONE;
+              __state = __LCONF_STATE_NONE;
               updated = true;
             }
           }
@@ -555,7 +556,7 @@ bool processLoRaConfig(void) {
                   } else {
                     SERIALCONFIG.println("KO");
                   }
-                  state = __LCONF_STATE_NONE;
+                  __state = __LCONF_STATE_NONE;
                } else if ( pos == 7 && sZone[0] == 'A' ) {
                   // We should have the zone
                   sZone[7] = '\0';
@@ -588,7 +589,7 @@ bool processLoRaConfig(void) {
             }
             #else
               SERIALCONFIG.println("KO");
-              state = __LCONF_STATE_NONE;
+              __state = __LCONF_STATE_NONE;
             #endif
           break;
         }
@@ -597,6 +598,12 @@ bool processLoRaConfig(void) {
   }
   // Terminate setting when everything is ok
   if ( confStatus == __LCONF_STATE_ALL_DONE ) {
+    // assuming the conf is valid
+    state.cnfBack = false;
+    if ( loraConf.zone == ZONE_LATER ) {
+       state.hidKey = true;
+    }
+
     // Save & reboot
     storeConfig();
     SERIALCONFIG.println("LoRaWan configuration OK");
@@ -605,6 +612,6 @@ bool processLoRaConfig(void) {
   return updated;
 invalid:
      SERIALCONFIG.println("KO");
-     state = __LCONF_STATE_NONE;
+     __state = __LCONF_STATE_NONE;
      return false;
 }

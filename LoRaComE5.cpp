@@ -55,6 +55,7 @@ typedef struct {
   uint8_t currentSeqId; // simplified
   float lastRssi;
   float lastSnr;
+  uint8_t tmpInt8;
 } loraE5_t;
 loraE5_t loraContext;
 
@@ -788,10 +789,31 @@ bool storeOneByte(uint8_t adr, uint8_t v) {
     return sendATCommand(_cmd,"+EEPROM: ","","",DEFAULT_TIMEOUT,false,NULL);     
 }
 
+
+bool processRead(void) {
+  if ( startsWith(loraContext.bufResponse,"+EEPROM: **, **") ) {
+     int s = indexOf(loraContext.bufResponse,"PROM: ");
+     if ( s > 0 ) {
+        uint8_t values[1];
+        uint8_t sz = 1;
+        if ( extractHexStr(&loraContext.bufResponse[s+4], values,&sz) ) {
+          loraContext.tmpInt8 = values[0];
+          return true;
+        }
+     }
+   }
+   return false;
+}
+
+
 bool readOneByte(uint8_t adr, uint8_t * v) {
     char _cmd[128];
     sprintf(_cmd,"AT+EEPROM=%02X",adr);
-    return sendATCommand(_cmd,"+EEPROM: ","","",DEFAULT_TIMEOUT,false,NULL);     
+    if ( sendATCommand(_cmd,"+EEPROM: ","","",DEFAULT_TIMEOUT,false,processRead) ) {
+      *v = loraContext.tmpInt8;
+      return true;          
+    }
+    return false;
 }
 
 
