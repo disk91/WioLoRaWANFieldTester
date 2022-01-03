@@ -47,9 +47,13 @@ To get a better understanding on how WioLoRaWANFieldTester works, [read this pag
 - Serial port LoRaWan setup configuration
 - End-user setup screen
 - Setup with Cargo (helium tracking platform)
+- Ready for industrial production with credential commissining
+- Support firmware upgrade w/o credential loss (LoRa-E5 only)
 
 ### Comming soon features
 - sdcard data storage
+- stop reporting on movement stop
+- low power management for longer autonomy
 
 ## Get your own device
 
