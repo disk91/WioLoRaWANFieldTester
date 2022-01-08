@@ -88,6 +88,14 @@ void setup() {
   initScreen();
   displayTitle();
 
+  // Specific build to clear the LoRa E5 memory storing the LoRa configuration
+  // that allows firwmare update.
+  #if defined JUSTCLEAN && HWTARGET == LORAE5 
+    quickSetup();
+    clearBackup();
+    while(1);
+  #endif
+
   // Make sure the LoraWan configuration has been made if not wait for the configuration
   boolean zero = true;
   for ( int i = 0 ; i < 8 ; i++ ) {
@@ -133,7 +141,6 @@ void setup() {
      }
   }
 
-//  clearBackup();
 
   clearScreen();
   screenSetup();

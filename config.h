@@ -54,6 +54,7 @@
 #define WITH_SPLASH         1
 #define WITH_SPLASH_HELIUM  1   
 //#define WITH_SPLASH_TTN     1
+//#define JUSTCLEAN
 
 
 #define VERSION "v1.4a"
