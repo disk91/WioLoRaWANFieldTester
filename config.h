@@ -82,7 +82,7 @@
 
 #define SERIALCONFIG  Serial
 
-#define NONDCZONE_DUTYCYCLE_MS 5000    // Fair use and preserve DCs in MS
+#define NONDCZONE_DUTYCYCLE_MS 25000    // Fair use and preserve DCs in MS
 
 bool readConfig();
 void storeConfig();

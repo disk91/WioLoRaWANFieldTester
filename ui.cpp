@@ -88,9 +88,11 @@ void displayTitle() {
     tft.setTextColor(TFT_GRAY);
     tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
     sprintf(title,"Wio LoRaWan Field Tester");
-    tft.drawString(title,(320-200)/2, 95, GFXFF);  
+    tft.drawString(title,(320-200)/2, 85, GFXFF);  
     sprintf(title,"Version %s (%s)", VERSION, model==LORAE5 ? "LoRaE5" : "RFM95");
-    tft.drawString(title,(320-180)/2, 125, GFXFF);  
+    tft.drawString(title,(320-180)/2, 115, GFXFF);  
+    sprintf(title,"WIO_FT_%02X%02X%02X%02X%02X", loraConf.deveui[3],loraConf.deveui[4], loraConf.deveui[5], loraConf.deveui[6], loraConf.deveui[7]);
+    tft.drawString(title,(320-160)/2, 180, GFXFF);
 }
 
 void displaySplash() {
@@ -445,10 +447,12 @@ bool refreshLiPo() {
         } else if ( state.batVoltage > 3500 ) {
           tft.fillRect(xOffset,yOffset,50 ,10,TFT_BLACK);
           tft.fillRoundRect(xOffset,yOffset,30,10,5,TFT_ORANGE);  
-        } else {
+        } else if ( state.batVoltage > 0 ) {
           tft.fillRect(xOffset,yOffset,50 ,10,TFT_BLACK);
           tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_RED);  
-        }      
+        } else {
+          tft.fillRect(xOffset,yOffset,50 ,10,TFT_BLACK);
+        }
       }
       tft.drawRoundRect(xOffset,yOffset,50 ,10,5,TFT_WHITE);
       state.batUpdated = false;
