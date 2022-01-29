@@ -1101,7 +1101,7 @@ void refreshGpsDetails() {
       tft.setTextColor(TFT_RED);
     }
     
-    sprintf(sTmp,"Time:      %02d:%02d:%02d", gps.hour, gps.minute, gps.second); 
+    sprintf(sTmp,"Time:      %02d:%02d:%02d", gps.hour, gps.minute, gps.second);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_TIME_OFF_Y,GFXFF);
 
     sprintf(sTmp,"Latitude:  %f", gps.latitude/10000000.0);
@@ -1110,7 +1110,11 @@ void refreshGpsDetails() {
     sprintf(sTmp,"Longitude: %f", gps.longitude/10000000.0);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_LNG_OFF_Y,GFXFF);
 
-    sprintf(sTmp,"Altitude:  %d", gps.altitude);
+    #ifdef DEBUGGPS
+      sprintf(sTmp,"Altitude:  %04d Dist: %d", gps.altitude,gpsEstimateDistance());
+    #else
+      sprintf(sTmp,"Altitude:  %d m", gps.altitude);
+    #endif 
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_ALT_OFF_Y,GFXFF);
 
     if ( gps.isReady && !gpsQualityIsGoodEnough() ) {

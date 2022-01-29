@@ -115,9 +115,7 @@ void gpsLoop() {
     // Since this function change internal library var,
     // avoid multiple call, just once and use results later
     gps.lastNMEA = GPS.lastNMEA();
-    #ifdef DEBUGGPS
-    Serial.print(gps.lastNMEA);
-    #endif
+    LOGGPS((gps.lastNMEA));
     gps.rxStuff = true;
     if (!GPS.parse(gps.lastNMEA)) // this also sets the newNMEAreceived() flag to false
       return; // we can fail to parse a sentence in which case we should just wait for another
@@ -158,6 +156,28 @@ void gpsLoop() {
   }
   
 }
+
+void gpsBackupPosition() {
+  gps.backupLongitude = gps.longitude;
+  gps.backupLatitude = gps.latitude;
+}
+
+
+// really low quality distance estimator
+// return a result in meter
+int gpsEstimateDistance() {
+
+  int32_t dLon = gps.backupLongitude - gps.longitude;
+  int32_t dLat = gps.backupLatitude - gps.latitude;
+  if (dLon < 0) dLon = -dLon;
+  if (dLat < 0) dLat = -dLat;
+  dLon += dLat; 
+  // we can estimate that a value of 100 = 1m
+  if ( dLon > 1000000 ) dLon = 1000000; // no need to be over 10km / preserve UI display in debug
+  return (dLon/100); 
+  
+}
+
 
 bool gpsQualityIsGoodEnough() {
 

@@ -463,6 +463,15 @@ uint32_t txDurationEstimate(uint8_t _dr) {
 
 // ---------------------------------------------------------------------
 // Manage transmission response asynchronously
+// exemple :
+// 12:23:29.618 -> AT+CMSGHEX=20591A02324505490C07
+// 12:23:29.721 -> +CMSGHEX: Start
+// 12:23:29.721 -> +CMSGHEX: Wait ACK
+// 12:23:33.559 -> +CMSGHEX: ACK Received
+// 12:23:33.592 -> +CMSGHEX: PORT: 2; RX: "3E9999010101"
+// 12:23:33.627 -> +CMSGHEX: RXWIN1, RSSI -84, SNR 6.0
+// 12:23:33.627 -> +CMSGHEX: Done
+
 bool processTx(void) {
   if ( startsWith(loraContext.bufResponse,"+CMSGHEX: RXWIN*, RSSI") ) {
      int s = indexOf(loraContext.bufResponse,"RSSI ");
@@ -524,6 +533,7 @@ bool processTx(void) {
         if ( sz == 6 && port == 2 ) {
            int downlinkSeqId = downlink[0];
            //Serial.printf("Rx downlink for frame %d\r\n",downlinkSeqId);
+           // We search the previous one ... so it exists
            int idx = getIndexBySeq(downlinkSeqId);
            if ( idx != MAXBUFFER ) {
              state.worstRssi[idx]  = downlink[1];

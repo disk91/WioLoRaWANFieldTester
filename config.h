@@ -57,7 +57,7 @@
 //#define JUSTCLEAN
 
 
-#define VERSION "v1.4a"
+#define VERSION "v1.4"
 
 #ifdef DEBUG
   #define LOGLN(x)  Serial.println x
@@ -79,6 +79,15 @@
   #define LOGLORAF(x)
 #endif
 
+#ifdef DEBUGGPS
+  #define LOGGPSLN(x) Serial.println x
+  #define LOGGPS(x) Serial.print x
+  #define LOGGPSF(x) Serial.printf x
+#else
+  #define LOGGPSLN(x) 
+  #define LOGGPS(x)
+  #define LOGGPSF(x)
+#endif
 
 #define SERIALCONFIG  Serial
 

@@ -87,7 +87,7 @@ void setup() {
   initState();
   initScreen();
   displayTitle();
-
+  
   // Specific build to clear the LoRa E5 memory storing the LoRa configuration
   // that allows firwmare update.
   #if defined JUSTCLEAN && HWTARGET == LORAE5 
@@ -145,6 +145,7 @@ void setup() {
   clearScreen();
   screenSetup();
   analogReference(AR_INTERNAL2V23);
+
 }
 
 
@@ -203,7 +204,23 @@ void loop(void) {
       if ( cTime >= ( 1 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
       break;
     case MODE_MAX_RATE:
-      if ( canLoRaSend() ) fireMessage = true;
+      #ifdef WITH_GPS
+        // join on start
+        if ( ( state.cState == NOT_JOINED || state.cState == JOIN_FAILED ) && canLoRaSend() ) fireMessage = true;
+        
+        // in case no GPS, we switch to 60s minimum
+        // for indoor test, manual mode can be use
+        if ( ! gps.isReady || ! gpsQualityIsGoodEnough() ) {
+           if ( cTime >= ( 1 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
+        } else {
+           // check distance with the previous sent position
+           // under 50 meters we send messages on every minutes.
+           if ( gpsEstimateDistance() > 50 && canLoRaSend() ) fireMessage = true;
+           else if ( cTime >= ( 1 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
+        }
+      #else
+        if ( canLoRaSend() ) fireMessage = true;
+      #endif
       break;
   }
   if ( state.cState == EMPTY_DWNLINK && canLoRaSend() ) {
@@ -214,21 +231,26 @@ void loop(void) {
       // send a new test message on port 1, backend will create a downlink with information about network side reception
       cTime = 0;
       // Fill the frame
-      if ( gps.isReady && gpsQualityIsGoodEnough() ) {
-        uint64_t pos = gpsEncodePosition48b();
-        myFrame[0] = (pos >> 40) & 0xFF;
-        myFrame[1] = (pos >> 32) & 0xFF;
-        myFrame[2] = (pos >> 24) & 0xFF;
-        myFrame[3] = (pos >> 16) & 0xFF;
-        myFrame[4] = (pos >>  8) & 0xFF;
-        myFrame[5] = (pos      ) & 0xFF;
-        myFrame[6] = ((gps.altitude+1000) >> 8) & 0xFF;
-        myFrame[7] = ((gps.altitude+1000)     ) & 0xFF;
-        myFrame[8] = (uint8_t)gps.hdop / 10;
-        myFrame[9] = gps.sats;
-      } else {
+      #ifdef WITH_GPS
+        if ( gps.isReady && gpsQualityIsGoodEnough() ) {
+          gpsBackupPosition();
+          uint64_t pos = gpsEncodePosition48b();
+          myFrame[0] = (pos >> 40) & 0xFF;
+          myFrame[1] = (pos >> 32) & 0xFF;
+          myFrame[2] = (pos >> 24) & 0xFF;
+          myFrame[3] = (pos >> 16) & 0xFF;
+          myFrame[4] = (pos >>  8) & 0xFF;
+          myFrame[5] = (pos      ) & 0xFF;
+          myFrame[6] = ((gps.altitude+1000) >> 8) & 0xFF;
+          myFrame[7] = ((gps.altitude+1000)     ) & 0xFF;
+          myFrame[8] = (uint8_t)gps.hdop / 10;
+          myFrame[9] = gps.sats;
+        } else {
+          bzero(myFrame, sizeof(myFrame));
+        }
+      #else
         bzero(myFrame, sizeof(myFrame));
-      }
+      #endif
       do_send(1, myFrame, sizeof(myFrame),getCurrentSf(), state.cPwr,true, state.cRetry); 
   }
   loraLoop();
@@ -240,4 +262,5 @@ void loop(void) {
   if ( duration < 0 ) duration = 10;
   cTime += duration;
   batUpdateTime += duration;
+
 }

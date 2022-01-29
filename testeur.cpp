@@ -28,12 +28,13 @@
 #ifdef DEBUGDATA
 void initDebug() {
  int i = 0;
- 
- state.rssi[i] = -120; state.snr[i] = -15 ; state.retry[i] = 1 ; state.seq[i] = i ; state.hs[i] = 2 ; state.bestRssi[i] = -80 ; state.worstRssi[i] = -130; state.minDistance[i] = 2500 ; state.maxDistance[i] = 15200;i++;
- state.rssi[i] = 5; state.snr[i] = 15 ; state.retry[i] = 1 ; state.seq[i] = i ; state.hs[i] = NODATA ; state.bestRssi[i] = 0 ; state.worstRssi[i] = 0; state.minDistance[i] = 0 ; state.maxDistance[i] = 0;i++;
- state.rssi[i] = NORSSI; state.snr[i] = NOSNR; state.retry[i] = LOSTFRAME ; state.seq[i] = i ; state.hs[i] = NODATA ; state.bestRssi[i] = 0 ; state.worstRssi[i] = 0; state.minDistance[i] = 0 ; state.maxDistance[i] = 0;i++;
- state.rssi[i] = NORSSI; state.snr[i] = NOSNR; state.retry[i] = 1 ; state.seq[i] = i ; state.hs[i] = 1 ; state.bestRssi[i] = -110 ; state.worstRssi[i] = -110; state.minDistance[i] = 7000 ; state.maxDistance[i] = 7000;i++;
- state.rssi[i] = -80; state.snr[i] = -2; state.retry[i] = 2 ; state.seq[i] = i ; state.hs[i] = 1 ; state.bestRssi[i] = -90 ; state.worstRssi[i] = -90; state.minDistance[i] = 30000 ; state.maxDistance[i] = 30000;i++;
+ for ( int k = 0 ; k < 6 ; k++) { // 30 on 32
+   state.rssi[i] = -120; state.snr[i] = -15 ; state.retry[i] = 1 ; state.seq[i] = 100+(6*k)+i ; state.hs[i] = 2 ; state.bestRssi[i] = -80 ; state.worstRssi[i] = -130; state.minDistance[i] = 2500 ; state.maxDistance[i] = 15200;i++;
+   state.rssi[i] = 5; state.snr[i] = 15 ; state.retry[i] = 1 ; state.seq[i] = 100+(6*k)+i ; state.hs[i] = NODATA ; state.bestRssi[i] = 0 ; state.worstRssi[i] = 0; state.minDistance[i] = 0 ; state.maxDistance[i] = 0;i++;
+   state.rssi[i] = NORSSI; state.snr[i] = NOSNR; state.retry[i] = LOSTFRAME ; state.seq[i] = 100+(6*k)+i ; state.hs[i] = NODATA ; state.bestRssi[i] = 0 ; state.worstRssi[i] = 0; state.minDistance[i] = 0 ; state.maxDistance[i] = 0;i++;
+   state.rssi[i] = NORSSI; state.snr[i] = NOSNR; state.retry[i] = 1 ; state.seq[i] = 100+(6*k)+i ; state.hs[i] = 1 ; state.bestRssi[i] = -110 ; state.worstRssi[i] = -110; state.minDistance[i] = 7000 ; state.maxDistance[i] = 7000;i++;
+   state.rssi[i] = -80; state.snr[i] = -2; state.retry[i] = 2 ; state.seq[i] = 100+(6*k)+i ; state.hs[i] = 1 ; state.bestRssi[i] = -90 ; state.worstRssi[i] = -90; state.minDistance[i] = 30000 ; state.maxDistance[i] = 30000;i++;
+ }
  state.elements = i;
  state.writePtr = i;
 }
@@ -84,24 +85,29 @@ void addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lo
       state.rssi[state.writePtr] = rssi;
       state.snr[state.writePtr] = snr;
       state.retry[state.writePtr] = retry;
-      state.hs[state.writePtr] = NODATA;
   } else {
       state.rssi[state.writePtr] = NORSSI;
       state.snr[state.writePtr] = NOSNR;
       state.retry[state.writePtr] = LOSTFRAME;
-      state.hs[state.writePtr] = NODATA;
   }
+  state.hs[state.writePtr] = NODATA;
+  state.worstRssi[state.writePtr] = NORSSI;
+  state.bestRssi[state.writePtr] = NORSSI;
+  state.minDistance[state.writePtr] = NODATA;
+  state.maxDistance[state.writePtr] = NODATA;
+
   state.writePtr = (state.writePtr+1) & (MAXBUFFER-1);
-  if ( state.writePtr == state.readPtr ) {
+  if ( state.elements == MAXBUFFER ) {
     state.readPtr = (state.readPtr+1) & (MAXBUFFER-1);  
+  } else {
+    state.elements++;
   }
-  if (state.elements < MAXBUFFER) state.elements++;
 }
 
 uint8_t getIndexInBuffer(int i) {
   int t = state.readPtr;
+  if ( i > state.elements ) return MAXBUFFER;
   for ( int k = 0 ; k < i ; k++ ) {
-    if ( t == state.writePtr ) return MAXBUFFER;
     t = (t+1) & (MAXBUFFER-1);
   }
   return t;
@@ -109,7 +115,7 @@ uint8_t getIndexInBuffer(int i) {
 
 uint8_t getIndexBySeq(int seq) {
   int idx = state.readPtr;
-  while ( idx != state.writePtr && state.seq[idx] != seq ) {
+  while ( idx < state.elements && state.seq[idx] != seq ) {
     idx = ( idx + 1 ) & (MAXBUFFER-1);
   }
   if ( state.seq[idx] == seq ) return idx;
@@ -117,12 +123,8 @@ uint8_t getIndexBySeq(int seq) {
 }
 
 uint8_t getLastIndexWritten() {
-  if ( state.writePtr == 0 ) {
-    if ( state.readPtr == 0 ) {
-      return MAXBUFFER;
-    }
-    return MAXBUFFER-1;
-  }
+  if ( state.elements == 0 ) return MAXBUFFER;
+  if ( state.writePtr == 0 ) return MAXBUFFER-1;
   return state.writePtr-1;
 }
 
