@@ -49,10 +49,10 @@ To get a better understanding on how WioLoRaWANFieldTester works, [read this pag
 - Setup with Cargo (helium tracking platform)
 - Ready for industrial production with credential commissining
 - Support firmware upgrade w/o credential loss (LoRa-E5 only)
+- Reduce uplink messages when device is not moving / out of coverage
 
 ### Comming soon features
 - sdcard data storage
-- stop reporting on movement stop
 - low power management for longer autonomy
 
 ## Get your own device
@@ -69,6 +69,12 @@ Read and follow the steps in [WioLoRaWANFieldTester configuration documentation]
 ## Use it
 
 Read the [User Guide documentation](doc/UserGuide.md)
+
+## Troubleshooting
+
+### GPS never fixing (even outdoor)
+
+Some of the LoRa-E5 chassis have an incorrect default UART speed at 115200. To reset it to the normal value, flash the firmware [Gps_Reset_To_9600bps](binaries/Gps_Reset_To_9600bps.uf2). Then you wait for about 1 minute and then reflash the latest version. This should fix it.
 
 ## Contribute to developement
 
