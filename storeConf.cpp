@@ -185,6 +185,8 @@ void storeConfig() {
 #else
 
   bool readConfigFromBackup() {
+    state.cPwr = 16;
+    state.cSf = 7;
     return false;
   }
   
