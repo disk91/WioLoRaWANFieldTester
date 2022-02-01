@@ -107,7 +107,6 @@ void storeConfig() {
 
 #if HWTARGET == LORAE5
 
-  #error "******"
   // Use the LoRae5 internal storage to save the config and support firmware update
   bool readConfigFromBackup() {
   
