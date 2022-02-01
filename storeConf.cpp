@@ -18,6 +18,7 @@
  *  Author : Paul Pinault (disk91.com)
  */ 
 #include <FlashStorage.h>
+#include "config.h"
 #include "testeur.h"
 #include "ui.h"
 #include "LoRaCom.h"
@@ -106,6 +107,7 @@ void storeConfig() {
 
 #if HWTARGET == LORAE5
 
+  #error "******"
   // Use the LoRae5 internal storage to save the config and support firmware update
   bool readConfigFromBackup() {
   
@@ -187,7 +189,7 @@ void storeConfig() {
     return false;
   }
   
-  bool storeConfigFromBackup() {
+  bool storeConfigToBackup() {
   
   }
 
