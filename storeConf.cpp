@@ -18,6 +18,7 @@
  *  Author : Paul Pinault (disk91.com)
  */ 
 #include <FlashStorage.h>
+#include <lmic.h>
 #include "config.h"
 #include "testeur.h"
 #include "ui.h"
