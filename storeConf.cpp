@@ -18,6 +18,8 @@
  *  Author : Paul Pinault (disk91.com)
  */ 
 #include <FlashStorage.h>
+#include <lmic.h>
+#include "config.h"
 #include "testeur.h"
 #include "ui.h"
 #include "LoRaCom.h"
@@ -184,10 +186,12 @@ void storeConfig() {
 #else
 
   bool readConfigFromBackup() {
+    state.cPwr = 16;
+    state.cSf = DR_SF7;
     return false;
   }
   
-  bool storeConfigFromBackup() {
+  bool storeConfigToBackup() {
   
   }
 
