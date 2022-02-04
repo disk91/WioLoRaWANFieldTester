@@ -56,8 +56,8 @@
 typedef struct s_ui {
   uint8_t selected_menu;    // What menu zone is selected for settings
   uint8_t selected_mode;    // What mode do we want ? manual / auto
-  e_state displayed_state;  // showning LoRaWan join state
-  uint8_t transmit_v;       // Can transmit due to dity cycle - count down ?
+  e_state displayed_state;  // showing LoRaWan join state
+  uint8_t transmit_v;       // Can transmit due to duty cycle - count down ?
 
   uint8_t lastWrId;
   uint8_t selected_display; // What graph we want to display

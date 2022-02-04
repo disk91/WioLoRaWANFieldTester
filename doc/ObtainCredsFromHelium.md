@@ -1,8 +1,8 @@
 # Obtain your device credential from [Helium console](https://console.helium.com)
 
-You have previously created a device in the helium console. Now we need to setup the device with the created credentials. These credentials will be used in the next step and transfered to the device.
+You have previously created a device in the helium console. Now we need to setup the device with the created credentials. These credentials will be used in the next step and transferred to the device.
 
-## Acces the device credentials (Quick install)
+## Access the device credentials (Quick install)
 
 From the [console dashboard](https://console.helium.com), access the device page and search for your device. Click on its name to get the details.
 
@@ -18,9 +18,9 @@ Once you are on the device page, you can access the device credentials. For the 
 Go back to [installation page](SETUP.md) to continue the configuration
 
 
-## Access the device credentials (For developpers)
+## Access the device credentials (For developers)
 
-This is only for developper, quick install do not requires to care about this part.
+This is only for developer, quick install do not requires to care about this part.
 Developers can prefer to force certain credentials instead of re-configuring the device after each firmware upload. In this case, the file key.h can be modified to contain the device credentials.
 
 To get these credential, access the device detail page the same way as previously.
