@@ -45,6 +45,16 @@
   #define RFM95_DIO_0     3
   #define RFM95_DIO_1     2
   #define LIPO_ADC        A4
+
+  // Offset to add when calculating battery percent remaining (in mv) 
+  // Sometimes R/R divider may not accurate and battery voltage can be
+  // shifted, so percent calculation may be wrong, this offset is added
+  // on each calculation to fix it, best way to know this one if to fully
+  // charge battery should be 4.2V, and read on GPS screen battery voltage
+  // to view difference, in my case reading was 3950mV so added 250mV offset
+  // it's empiric of course, not best but better than nothing
+  // #define LIPO_OFFSET_MV 250 
+
 // 3 - select possible options
   #define WITH_GPS
   #define WITH_LIPO

@@ -64,7 +64,7 @@ ui_t ui;
 void configPending() {
   tft.fillRect(0,120-20,320,40,TFT_WHITE);
   tft.setTextColor(TFT_BLACK);
-  tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+  tft.setFreeFont(FS9);     // Select the original small TomThumb font
   tft.drawString("SETUP CREDENTIALS",70,112, GFXFF);   
 }
 
@@ -86,7 +86,7 @@ void displayTitle() {
     char title[128];
     uint8_t model = HWTARGET;
     tft.setTextColor(TFT_GRAY);
-    tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+    tft.setFreeFont(FS9);     // Select the original small TomThumb font
     sprintf(title,"Wio LoRaWan Field Tester");
     tft.drawString(title,(320-200)/2, 85, GFXFF);  
     sprintf(title,"Version %s (%s)", VERSION, model==LORAE5 ? "LoRaE5" : "RFM95");
@@ -101,7 +101,7 @@ void displaySplash() {
   #ifdef WITH_SPLASH 
     tft.drawRoundRect((320-200)/2,200,200,10,5,TFT_WHITE);
     tft.setTextColor(TFT_GRAY);
-    tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+    tft.setFreeFont(FS9);     // Select the original small TomThumb font
     tft.drawString("disk91.com",(320-90)/2,215, GFXFF);  
     for ( int i = 10 ; i < 100 ; i+=4 ) {
       tft.fillRoundRect((320-200)/2+2,202,((204*i)/100),6,3,TFT_WHITE);
@@ -397,7 +397,7 @@ void refresUI() {
     storeConfig();
   }
 
-  // avoid re-entreing
+  // avoid re-entering
   if ( hasAction ) delay(300); 
 }
 
@@ -415,7 +415,7 @@ bool refreshLiPo() {
       ui.alertMode = true;
       tft.fillRect(0,120-20,320,40,TFT_RED);
       tft.setTextColor(TFT_WHITE);
-      tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+      tft.setFreeFont(FS9);     // Select the original small TomThumb font
       tft.drawString("SWITCH LiPo IN CHARGE MODE",25,112, GFXFF);  
     }
     return false;
@@ -471,7 +471,7 @@ void refreshMode() {
   int yOffset = Y_OFFSET;
   tft.fillRoundRect(xOffset,yOffset,X_SIZE-5,Y_SIZE,R_SIZE,TFT_WHITE);   
   tft.setTextColor(TFT_BLACK);
-  tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+  tft.setFreeFont(FS9);     // Select the original small TomThumb font
   switch ( ui.selected_mode ) {
     case MODE_MANUAL:
       tft.drawString("Manual",xOffset+5,yOffset+3, GFXFF);  
@@ -573,7 +573,7 @@ void refreshState() {
         if ( ui.displayed_state == JOIN_FAILED || ui.displayed_state == NOT_JOINED || ui.displayed_state == JOINING ) {
           tft.fillRoundRect(xOffset+40,yOffset,35,Y_SIZE,R_SIZE,TFT_RED);
           tft.setTextColor(TFT_WHITE);
-          tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+          tft.setFreeFont(FS9);     // Select the original small TomThumb font
           tft.drawString("NA",xOffset+43,yOffset+3, GFXFF);  
         } else {
           if ( ui.displayed_state == IN_TX ) {
@@ -585,7 +585,7 @@ void refreshState() {
       } else {
         tft.fillRoundRect(xOffset+40,yOffset,35,Y_SIZE,R_SIZE,TFT_RED);
         tft.setTextColor(TFT_WHITE);
-        tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+        tft.setFreeFont(FS9);     // Select the original small TomThumb font
         char sWait[10];
         sprintf(sWait,"%02d",ui.transmit_v); 
         tft.drawString(sWait,xOffset+48,yOffset+3, GFXFF);           
@@ -599,7 +599,7 @@ void refreshPower() {
   uint16_t color = (ui.selected_menu == SELECTED_POWER)?TFT_WHITE:TFT_GRAY;
   tft.fillRoundRect(X_OFFSET,Y_OFFSET,X_SIZE-BOX_SPACING,Y_SIZE,R_SIZE,color);
   tft.setTextColor(TFT_BLACK);
-  tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+  tft.setFreeFont(FS9);     // Select the original small TomThumb font
   char sPower[10];
   sprintf(sPower,"+%02d dBm",state.cPwr); 
   tft.drawString(sPower,X_OFFSET+5,Y_OFFSET+3, GFXFF);
@@ -610,7 +610,7 @@ void refreshSf() {
   uint16_t color = (ui.selected_menu == SELECTED_SF)?TFT_WHITE:TFT_GRAY;
   tft.fillRoundRect(xOffset,Y_OFFSET,X_SIZE-BOX_SPACING,Y_SIZE,R_SIZE,color);
   tft.setTextColor(TFT_BLACK);
-  tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+  tft.setFreeFont(FS9);     // Select the original small TomThumb font
   char sSf[10];
   sprintf(sSf,"SF   %02d",state.cSf); 
   tft.drawString(sSf,xOffset+5,Y_OFFSET+3, GFXFF);
@@ -621,7 +621,7 @@ void refreshRetry() {
   uint16_t color = (ui.selected_menu == SELECTED_RETRY)?TFT_WHITE:TFT_GRAY;
   tft.fillRoundRect(xOffset,Y_OFFSET,X_SIZE-BOX_SPACING,Y_SIZE,R_SIZE,color);
   tft.setTextColor(TFT_BLACK);
-  tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+  tft.setFreeFont(FS9);     // Select the original small TomThumb font
   char sRetry[10];
   sprintf(sRetry,"Retry  %01d",state.cRetry); 
   tft.drawString(sRetry,xOffset+5,Y_OFFSET+3, GFXFF);
@@ -630,7 +630,7 @@ void refreshRetry() {
 
 void refreshRssiHist() {
 
-  // No need to refresh everytime
+  // No need to refresh every time
   if ( ui.previous_display != ui.selected_display ) {
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET-18,HIST_X_TXTSIZE,18,TFT_BLACK);
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,TFT_BLACK);
@@ -688,7 +688,7 @@ void refreshRssiHist() {
   
 void refreshSnrHist() {
 
-  // No need to refresh everytime
+  // No need to refresh every time
   if ( ui.previous_display != ui.selected_display ) {
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET-18,HIST_X_TXTSIZE,18,TFT_BLACK);
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,TFT_BLACK);
@@ -752,7 +752,7 @@ void refreshSnrHist() {
 
 void refreshRetryHist() {
 
-  // No need to refresh everytime
+  // No need to refresh every time
   if ( ui.previous_display != ui.selected_display ) {
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET-18,HIST_X_TXTSIZE,18,TFT_BLACK);
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,TFT_BLACK);
@@ -812,7 +812,7 @@ void refreshRetryHist() {
 
 void refreshTxRssi() {
 
-  // No need to refresh everytime
+  // No need to refresh every time
   if ( ui.previous_display != ui.selected_display ) {
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET-18,HIST_X_TXTSIZE,18,TFT_BLACK);
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,TFT_BLACK);
@@ -873,7 +873,7 @@ void refreshTxRssi() {
 }
 
 void refreshTxHs() {
-   // No need to refresh everytime
+   // No need to refresh every time
   if ( ui.previous_display != ui.selected_display ) {
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET-18,HIST_X_TXTSIZE,18,TFT_BLACK);
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,TFT_BLACK);
@@ -938,7 +938,7 @@ void refreshTxHs() {
 
 
 void refreshDistance() {
-   // No need to refresh everytime
+   // No need to refresh every time
   if ( ui.previous_display != ui.selected_display ) {
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET-18,HIST_X_TXTSIZE,18,TFT_BLACK);
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,TFT_BLACK);
@@ -1260,7 +1260,7 @@ void highlightOneElement(uint8_t selectedItem, uint8_t selectedColumn, bool disp
 // return true when action executed
 bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t action, bool refreshAll, bool onlyZone) {
   
-  // No need to refresh everytime
+  // No need to refresh every time
   if ( refreshAll ) {
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET-18,HIST_X_TXTSIZE,18,TFT_BLACK);
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,TFT_BLACK);
@@ -1460,6 +1460,6 @@ void LoRaMissing() {
         
       tft.fillRect(0,120-20,320,40,TFT_RED);
       tft.setTextColor(TFT_WHITE);
-      tft.setFreeFont(FS9);     // Select the orginal small TomThumb font
+      tft.setFreeFont(FS9);     // Select the original small TomThumb font
       tft.drawString("LoRa board is missing",75,112, GFXFF);  
 }

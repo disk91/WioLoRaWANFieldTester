@@ -164,6 +164,9 @@ void loop(void) {
       #if HWTARGET == RFM95
         uint32_t v = analogRead(LIPO_ADC);
         v = 2*( 3300 * v ) / 1024;  // should be 2230 ...
+        #ifdef LIPO_OFFSET_MV
+          v += LIPO_OFFSET_MV;
+        #endif
         state.batVoltage = v;
         state.batPercent = batteryPercent(state.batVoltage);
       #elif HWTARGET == LORAE5

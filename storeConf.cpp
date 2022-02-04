@@ -18,6 +18,8 @@
  *  Author : Paul Pinault (disk91.com)
  */ 
 #include <FlashStorage.h>
+#include <lmic.h>
+#include "config.h"
 #include "testeur.h"
 #include "ui.h"
 #include "LoRaCom.h"
@@ -59,7 +61,7 @@ uint8_t computeCSum(Config * c) {
 
 
 // Load configuration from flash
-// return tru if loaded false if default must be set
+// return true if loaded false if default must be set
 bool readConfig() {
 
   Config c = my_flash_store.read();
@@ -184,10 +186,12 @@ void storeConfig() {
 #else
 
   bool readConfigFromBackup() {
+    state.cPwr = 16;
+    state.cSf = DR_SF7;
     return false;
   }
   
-  bool storeConfigFromBackup() {
+  bool storeConfigToBackup() {
   
   }
 

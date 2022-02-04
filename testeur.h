@@ -32,7 +32,7 @@
 enum e_state {
   NOT_JOINED    = 1,    // Not connected yet
   JOIN_FAILED   = 2,    // Connection failed
-  JOINING       = 3,    // Currenlty running the joining procedure
+  JOINING       = 3,    // Currently running the joining procedure
   JOINED        = 4,    // Joined, waiting for action
   IN_TX         = 5,    // Transmitting 
   IN_RPT        = 6,    // 1st transmission failed, running a repeat
@@ -63,7 +63,7 @@ typedef struct s_state {
 
   int       readPtr;          // circular buffer
   int       writePtr;
-  int       elements;         // numbre of data in buffer
+  int       elements;         // number of data in buffer
   boolean   hasRefreshed;     // Data has refreshed
 
   uint16_t  batVoltage;         // voltage in mV

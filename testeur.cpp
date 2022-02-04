@@ -141,7 +141,7 @@ void tst_setPower(int8_t pwr) {
     #endif
   } else if ( loraConf.zone == ZONE_AS923_1 || loraConf.zone == ZONE_AS923_2 ||  loraConf.zone == ZONE_AS923_3 ||  loraConf.zone == ZONE_AS923_4 ) {
     if ( pwr == MAXPOWER ) {
-      // just to make sure on init we are limiting to 16dBm as some coutry in AS923 have this limit
+      // just to make sure on init we are limiting to 16dBm as some country in AS923 have this limit
       // need to get the detail for each subzone definition.
       pwr = 16;
     }
