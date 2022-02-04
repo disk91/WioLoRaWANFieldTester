@@ -18,8 +18,10 @@
  *  Author : Paul Pinault (disk91.com)
  */ 
 #include <FlashStorage.h>
-#include <lmic.h>
 #include "config.h"
+#if HWTARGET == RFM95
+  #include <lmic.h>
+#endif
 #include "testeur.h"
 #include "ui.h"
 #include "LoRaCom.h"
@@ -186,8 +188,13 @@ void storeConfig() {
 #else
 
   bool readConfigFromBackup() {
-    state.cPwr = 16;
-    state.cSf = DR_SF7;
+    #if defined CFG_eu868
+      state.cPwr = 16;
+      state.cSf = DR_SF7;
+    #elif defined CFG_us915
+      state.cPwr = 20;
+      state.cSf = DR_SF10;
+    #endif
     return false;
   }
   
