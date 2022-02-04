@@ -11,16 +11,16 @@ Once you have your WioTerminal and your FieldTester add-on board, you need to pr
 
 - Once downloaded
   * Switch the Wio Terminal ON with the lateral button
-  * Switch to bootloader mode by puching down power button twice very quickly. Sequence is ON / RESET / ON / RESET / ON. This mount an Arduino drive on the computer.
+  * Switch to bootloader mode by pushing down power button twice very quickly. Sequence is ON / RESET / ON / RESET / ON. This mount an Arduino drive on the computer.
   * Drag and drop the selected firmware into that drive.
-  * Fimware is flashing, device is rebooting, you should see **"SETUP CREDENTIALS"** on the screen
+  * Firmware is flashing, device is rebooting, you should see **"SETUP CREDENTIALS"** on the screen
 
 ## Setup on Helium console
 
 If you want to use the device with Helium network, you need to declare it in the Helium console.
 - Follow the [Helium configuration](ConfigureHelium.md) page details
 
-## Additionnally you can setup Cargo (Optional)
+## Additionally you can setup Cargo (Optional)
 
 Cargo is a Tracking platform offered by Helium where you can connect your device and follow it on a map in real time. If you want to configure cargo with the WioLoRaWANFieldTester follow the [Cargo configuration](ConfigureCargo.md) 
 
@@ -47,7 +47,7 @@ Once done, if you need to verify or change this setup, restart the device pressi
 
 ### Configure your device with the credentials (Serial way)
 
-The device uses the Serial line (Wioterminal USB) to receives the LoRaWAN configuration. You need to execute a series of commands the WioLoRaWABFieldTester understand to do this setup.
+The device uses the Serial line (Wio Terminal USB) to receives the LoRaWAN configuration. You need to execute a series of commands the WioLoRaWABFieldTester understand to do this setup.
 
 For this, you need to use a serial tool or the command line. The tools I recommand are:
 - Windows : [Putty](https://www.putty.org/)
@@ -63,7 +63,7 @@ Now, we will have to pass the different credentials one by one:
 ```
 Z=<Zone> where zone can be EU868, US915, AS923, KR920, IN865, AU915
 ```
-As an exemple the line to enter in the Serial tool looks like
+As an example the line to enter in the Serial tool looks like
 ```
 Z=EU868
 ```
@@ -77,7 +77,7 @@ OK
 ```
 D=<DevEUI>
 ```
-As an exemple the line to enter in the Serial tool looks like
+As an example the line to enter in the Serial tool looks like
 ```
 D=DB6B416730000000
 ```
@@ -88,13 +88,13 @@ OK
 ```
 If you see nothing, check your serial settings, make sure WioTerminal is ON. If you see KO only it should be a mistyping, make sure you correctly type the line, please not that the use of Backspace is not authorized and generate errors.
 
-If you see OK, then KO on a second line it can be due to extra end-of-line caracters and this is not a problem. OK response indicates it has been correctly taken into account.
+If you see OK, then KO on a second line it can be due to extra end-of-line characters and this is not a problem. OK response indicates it has been correctly taken into account.
 
-* Get the AppEUI from the prevous step and insert it in the following line:
+* Get the AppEUI from the previous step and insert it in the following line:
 ```
 A=<AppEUI>
 ```
-As an exemple the line to enter in the Serial tool looks like
+As an example the line to enter in the Serial tool looks like
 ```
 A=7262F3850E000000
 ```
@@ -104,11 +104,11 @@ APPEUI:7262F3850E000000
 OK
 ```
 
-* Get the AppKEY from the prevous step and insert it in the following line:
+* Get the AppKEY from the previous step and insert it in the following line:
 ```
 K=<DevKEY>
 ```
-As an exemple the line to enter in the Serial tool looks like
+As an example the line to enter in the Serial tool looks like
 ```
 K=D2B1F00A451E34931900000000000000
 ```
@@ -131,7 +131,7 @@ The device now automatically starts to the main dashboard. You are **DONE !**
 You can use the command line for the setup instead of using a Serial tool. If you proceed the way above, **you do not need to execute this step**.
 
 * On Mac OS
-- identify your USB-Serial device (this is the one like above apearing when you plug the WioTerminal on USB)
+- identify your USB-Serial device (this is the one like above appearing when you plug the WioTerminal on USB)
 ```
 [~] ls /dev/tty.*
 /dev/tty.usbmodem123456

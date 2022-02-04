@@ -1,6 +1,6 @@
 # User Guide
 
-** This page will be updated soon with the last features addede recently**
+** This page will be updated soon with the last features added recently**
 
 <img src="../img/mainScreen.jpg" alt="LoRaWan tester" width="250"/> <img src="../img/Mainscreen-2.jpg" alt="LoRaWan tester" width="250"/>
 
@@ -10,18 +10,18 @@ When none of these parameters are selected, you can change the mode with the UP 
 - Manual : a frame is fired when pushing the 5 ways button. The downlink response is obtained by pooling.
 - Auto 5m : a frame is fired automatically every 5 minutes. The downlink response is obtained by pooling.
 - Auto 1m : a frame is fired automatically every 1 minute. The downlink response is obtained by pooling.
-- Max Rate : a frame is fired as soon as the device can regarding the eventual Duty Cycle. Downlink response will be received later on the flow and will onlu be monitored from the historical graph.
+- Max Rate : a frame is fired as soon as the device can regarding the eventual Duty Cycle. Downlink response will be received later on the flow and will only be monitored from the historical graph.
 
 The status is displayed on the screen and can be:
 - Disc - disconnected or not yet connected
 - Join - device is joining the network
 - Cnx - device has joined, ready to fire messages
-- Tx - transmisison in progress (orange when doing a retry)
+- Tx - transmission in progress (orange when doing a retry)
 - Dwn - communication in progress to retrieve the downlink containing the network side informations
 
-The Green / Red square on the righ is indicating the duty-cycle status when applicable. Green is ready to communicate, Red is duty-cycle with the count-down before being ready.
+The Green / Red square on the right is indicating the duty-cycle status when applicable. Green is ready to communicate, Red is duty-cycle with the count-down before being ready.
 
-The Red / Orange / Green circle on the left is indicating the GPS status (when activated). Red is not yet ready, Orange is position aquired but quality is poor to be reported. Green is good quality position ; it will be reported then.
+The Red / Orange / Green circle on the left is indicating the GPS status (when activated). Red is not yet ready, Orange is position acquired but quality is poor to be reported. Green is good quality position ; it will be reported then.
 
 The Green / Orange / Red bar on the left is indicating the battery level status (when activated)
 

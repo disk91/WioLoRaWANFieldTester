@@ -199,7 +199,7 @@ bool gpsQualityIsGoodEnough() {
  *                          XXXXXXXXXXXXXXXXXXXXXXX - 23b Longitude
  *
  *  division by 215 for longitude is to get 180*10M to fit in 2^23b
- *  substraction of 107 is 0.5 * 215 to round the value and not always be floored.
+ *  subtraction of 107 is 0.5 * 215 to round the value and not always be floored.
  */
 uint64_t gpsEncodePosition48b() {
 

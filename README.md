@@ -6,7 +6,7 @@
 
 When deploying a LoRaWAN network you want to know your gateway coverage and measure the radio performance in different places. When deploying Helium network you particularly want to know how many Hotspot around can be touched for a given position. Then you want to enrich the network mappers to know and share the real network coverage.
 
-There are some existing tools for such application but the cost is about $200. The idea of this project is to propose a simple tool you can build on your own with low cost hardware to fulfill this purpose.
+There are some existing tools for such application but the cost is about $200. The idea of this project is to propose a simple tool you can build on your own with low cost hardware to fulfil this purpose.
 
 The solution is based on low cost products, easy to find for about $50:
 - [Wio Terminal](https://wiki.seeedstudio.com/Wio-Terminal-Getting-Started/)
@@ -37,21 +37,21 @@ To get a better understanding on how WioLoRaWANFieldTester works, [read this pag
 - Manual / Automatic mode switch
 - Display last frame information
 - Network side RSSI / SNR / #of station
-- Your favorite network splash screen (select in config.h)
+- Your favourite network splash screen (select in config.h)
 - Screen shot and user guide
 - RFM95 Schematics
 - GPS position reporting with Helium mapper integration
 - LiPo charging mode detection
-- PCB availbale
+- PCB available
 - Enclosure available
 - Serial port LoRaWan setup configuration
 - End-user setup screen
 - Setup with Cargo (helium tracking platform)
-- Ready for industrial production with credential commissining
+- Ready for industrial production with credential commissioning
 - Support firmware upgrade w/o credential loss (LoRa-E5 only)
 - Reduce uplink messages when device is not moving / out of coverage
 
-### Comming soon features
+### Coming soon features
 - sdcard data storage
 - low power management for longer autonomy
 
@@ -76,7 +76,7 @@ Read the [User Guide documentation](doc/UserGuide.md)
 
 Some of the LoRa-E5 chassis have an incorrect default UART speed at 115200. To reset it to the normal value, flash the firmware [Gps_Reset_To_9600bps](binaries/Gps_Reset_To_9600bps.uf2). Then you wait for about 1 minute and then reflash the latest version. This should fix it.
 
-## Contribute to developement
+## Contribute to development
 
 Read the [developer documentation](doc/DEVELOPMENT.md)
 

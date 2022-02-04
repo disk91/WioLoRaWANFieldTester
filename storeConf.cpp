@@ -59,7 +59,7 @@ uint8_t computeCSum(Config * c) {
 
 
 // Load configuration from flash
-// return tru if loaded false if default must be set
+// return true if loaded false if default must be set
 bool readConfig() {
 
   Config c = my_flash_store.read();

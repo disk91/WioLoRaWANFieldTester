@@ -2,10 +2,10 @@
 
 ## Cargo integration
 
-[Cargo](https://cargo.helium.com/) is a tool from Helium to display real-time tracking device position on a map. This tool displays your position publically but is really easy to use. As is also displayed the coverage map as an extra layer, it is a usefull tool to find the hexagone not yet tested to complete the coverage map.
-In this tool, you will search your device by its name, the use of a uniq name will help you to find it.
+[Cargo](https://cargo.helium.com/) is a tool from Helium to display real-time tracking device position on a map. This tool displays your position publicly but is really easy to use. As is also displayed the coverage map as an extra layer, it is a useful tool to find the hexagon not yet tested to complete the coverage map.
+In this tool, you will search your device by its name, the use of a unique name will help you to find it.
 
-To make Cargo working with WioLoRaWANFieldTester, we need to create a decoding function to pass it the device coordinate in the righ format.
+To make Cargo working with WioLoRaWANFieldTester, we need to create a decoding function to pass it the device coordinate in the right format.
 
 ## Setup a decoding function
 
@@ -21,7 +21,7 @@ Then you can type the decoder function. This function will proceed the payload r
 
 <img src="../img/HNTv2_Cargo_decoder_function.png" alt="Helium create new decoder" width="500"/>
 
-Copy & Paste the follwoing JS content into the decoder textarea:
+Copy & Paste the following JS content into the decoder textarea:
 
 ```
 function Decoder(bytes, port) { 
@@ -72,7 +72,7 @@ You need to select the type of integration, here it is **Cargo**:
 
 <img src="../img/HNTv2_Create_Cargo_Integration.png" alt="Helium create new Cargo integration" width="500"/>
 
-Please read the warning about data privacy and accept it if you agrea on the terms:
+Please read the warning about data privacy and accept it if you agree on the terms:
 
 <img src="../img/HNTv2_Create_Cargo_Integration2.png" alt="Helium create new Cargo integration" width="500"/>
 

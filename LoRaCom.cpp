@@ -104,7 +104,7 @@ void loraSetup(void) {
     #elif defined CFG_us915
       LMIC_selectSubBand(1);
     #else
-    #error "Not Yet suported, please add the channels"
+    #error "Not Yet supported, please add the channels"
     #endif
 
     LMIC_setLinkCheckMode(0); 
@@ -273,7 +273,7 @@ void onEvent (ev_t ev) {
                     state.hasRefreshed = true;
                   }
                   if ( LMIC.moreData ) {
-                    // we should have pending data to retreive
+                    // we should have pending data to retrieve
                     // But in fact we never have moreData set
                     state.cState = EMPTY_DWNLINK;
                   }

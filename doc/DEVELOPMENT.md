@@ -2,16 +2,16 @@
 
 You can use WioLoRaWANFieldTester without a need to compile it by following the [Quick installation guide](SETUP.md). If you want to compile your proper version of it or if you want to contribute on the project by adding feature of fixing some bugs, here are the following steps.
 
-## Required environement
+## Required environment
 
 The installation details are available in the related [Wio LoRaWan Field tester on disk91.com](https://www.disk91.com/?p=5187) 
 
 ### Required software components
 * Arduino IDE
-* WioTerminal - [Toolsuite](Whttps://wiki.seeedstudio.com/Wio-Terminal-Getting-Started/)
+* WioTerminal - [Toolsuite](https://wiki.seeedstudio.com/Wio-Terminal-Getting-Started/)
 * GPS - Adafruit GPS library version 1.5.4
 
-:warning: Remove any local library `TFT_eSPI` from your Arduino library folder, if not, it will use the local one with wrong pins definition resulting in black screen on boot. This library is included with Seeed SAMD package installed thru Boards Manager.
+:warning: Remove any local library `TFT_eSPI` from your Arduino library folder, if not, it will use the local one with wrong pins definition resulting in black screen on boot. This library is included with Seeed SAMD package installed through Boards Manager.
 ```
 https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
 ```
@@ -38,7 +38,7 @@ LoRaWAN library needs to be setup for you local zone:
   Make sure the other defines are the same as above.
   ```C
   //
-  // Select your radio zone and coutry
+  // Select your radio zone and country
   //
   //#define CFG_eu868 1
   #define CFG_us915 1
@@ -59,7 +59,7 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
 ```C
    #define _SS_MAX_RX_BUFF 128 // RX buffer size
 ```
-- In `variant.cpp` (Libraries/Arduino15/packages/seeeduino/hardware/samd/1.8.2/library/Wire/Wire.cpp), add in  the follwoing lines (they are conflicting with Wire from the same package) ( `&& defined FALSE` ). This is to wait a fix from Seeed on their package.
+- In `variant.cpp` (Libraries/Arduino15/packages/seeeduino/hardware/samd/1.8.2/library/Wire/Wire.cpp), add in  the following lines (they are conflicting with Wire from the same package) ( `&& defined FALSE` ). This is to wait a fix from Seeed on their package.
 ```cpp 
 #if WIRE_INTERFACES_COUNT > 1
   TwoWire Wire1(&PERIPH_WIRE1, PIN_WIRE1_SDA, PIN_WIRE1_SCL);
@@ -102,7 +102,7 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
 
 ```
 
-- The `key.h file containes the LoRaWAN credential. When all set to 0, the device will expect a serial port configuration as seen in the setup. 
+- The `key.h file contains the LoRaWAN credential. When all set to 0, the device will expect a serial port configuration as seen in the setup.
 
 When developing it is more convenient to use a static configuration to avoid reconfiguring the device on every firmware update. For this, you can get the credential as defined in the [Access Helium device credential for developer](ObtainCredsFromHelium.md) section of the documentation.
 
@@ -139,7 +139,7 @@ The following Frame format are used:
 
 When the GPS position is invalid of GPS is disable, the frame is full of 0
 
-**donwlink response format on port 2:**
+**downlink response format on port 2:**
 | Byte          | Usage                          |
 |---------------|--------------------------------|
 | `0`           | Sequence ID % 255              |
