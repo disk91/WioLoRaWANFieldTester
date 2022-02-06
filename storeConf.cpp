@@ -31,6 +31,7 @@
 
 #define FLAG_BACKUPED 0x01
 #define FLAG_HIDE_KEY 0x02
+#define FLAG_GPS_OK   0x04
 
 typedef struct {
   uint16_t  magic;
@@ -74,6 +75,7 @@ bool readConfig() {
     state.cRetry = c.cRetry;
     state.cnfBack = ((c.flag & FLAG_BACKUPED ) > 0);
     state.hidKey = ((c.flag & FLAG_HIDE_KEY ) > 0);
+    state.gpsOk = ((c.flag & FLAG_GPS_OK ) > 0);
     ui.selected_display = c.selected_display;
     ui.selected_mode = c.selected_mode;
     memcpy(loraConf.deveui, c.deveui, 8);
@@ -99,6 +101,7 @@ void storeConfig() {
   c.flag = 0;
   if ( state.cnfBack ) c.flag |= FLAG_BACKUPED;
   if ( state.hidKey ) c.flag |= FLAG_HIDE_KEY;
+  if ( state.gpsOk ) c.flag |= FLAG_GPS_OK;
 
   memcpy(c.deveui, loraConf.deveui, 8);
   memcpy(c.appeui, loraConf.appeui, 8);
@@ -116,7 +119,7 @@ void storeConfig() {
     Config c;
     uint8_t * t = (uint8_t *) &c;
 
-    if ( ! quickSetup() ) return false;
+    if ( ! loraQuickSetup() ) return false;
 
     for ( int k = 0 ; k < sizeof(Config); k++) {
        readOneByte(k, t);
@@ -130,6 +133,7 @@ void storeConfig() {
       state.cRetry = c.cRetry;
       state.cnfBack = ((c.flag & FLAG_BACKUPED ) > 0);
       state.hidKey = ((c.flag & FLAG_HIDE_KEY ) > 0);
+      state.gpsOk = state.gpsOk || ((c.flag & FLAG_GPS_OK ) > 0);
       ui.selected_display = c.selected_display;
       ui.selected_mode = c.selected_mode;
       memcpy(loraConf.deveui, c.deveui, 8);
@@ -153,6 +157,7 @@ void storeConfig() {
     c.cRetry = state.cRetry;
     c.flag = FLAG_BACKUPED;
     if ( state.hidKey ) c.flag |= FLAG_HIDE_KEY;
+    if ( state.gpsOk ) c.flag |= FLAG_GPS_OK;
     c.selected_display = ui.selected_display;
     c.selected_mode = ui.selected_mode;
     c.zone = loraConf.zone;
@@ -188,13 +193,6 @@ void storeConfig() {
 #else
 
   bool readConfigFromBackup() {
-    #if defined CFG_eu868
-      state.cPwr = 16;
-      state.cSf = DR_SF7;
-    #elif defined CFG_us915
-      state.cPwr = 20;
-      state.cSf = DR_SF10;
-    #endif
     return false;
   }
   

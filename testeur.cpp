@@ -48,7 +48,15 @@ void initState() {
     uint8_t  _APPKEY[16] = __APPKEY;
 
     // Config initial setup
-    loraConf.zone = __ZONE;
+    #if HWTARGET == RFM95
+     #if defined CFG_eu868
+       loraConf.zone = ZONE_EU868;
+      #elif defined CFG_us915
+       loraConf.zone = ZONE_US915;
+      #endif
+    #else    
+      loraConf.zone = __ZONE;
+    #endif
     tst_setPower(MAXPOWER);  
     tst_setSf(SLOWERSF);      
     tst_setRetry(0);
@@ -60,7 +68,8 @@ void initState() {
 
     state.cnfBack = false;
     state.hidKey = false;
-
+    state.gpsOk = false;
+    
     storeConfig();
   }
   state.cState = NOT_JOINED;

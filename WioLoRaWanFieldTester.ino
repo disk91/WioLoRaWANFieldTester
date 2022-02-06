@@ -86,12 +86,18 @@ void setup() {
   #endif
   initState();
   initScreen();
+
+  // With some LoRa-E5 we have a problem with the GPS default serial speed
+  // So ate first we need to fix that
+  #if HWTARGET == LORAE5
+    processLoRaE5GpsFix();
+  #endif
   displayTitle();
   
   // Specific build to clear the LoRa E5 memory storing the LoRa configuration
   // that allows firwmare update.
   #if defined JUSTCLEAN && HWTARGET == LORAE5 
-    quickSetup();
+    loraQuickSetup();
     clearBackup();
     while(1);
   #endif

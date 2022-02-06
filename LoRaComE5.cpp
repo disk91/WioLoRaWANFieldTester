@@ -780,9 +780,10 @@ uint32_t nextPossibleSendMs(){
 }
 
 
-bool quickSetup() {
+bool loraQuickSetup() {
   SERIALE5.begin(9600);
-  while(!SERIALE5);
+  uint32_t start = millis();
+  while ( !SERIALE5 && (millis() - start) < 2000 );
   loraContext.runningCommand = false;
   if ( ! sendATCommand("AT","+AT: OK","","",DEFAULT_TIMEOUT,false, NULL) ) {
     // retry

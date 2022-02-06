@@ -106,8 +106,9 @@ void gpsSetup() {
 }
   
 
-void gpsLoop() {
-  
+boolean gpsLoop() {
+
+  bool recvNema = false; 
   char c = GPS.read();
   
   //Serial.print(c);
@@ -117,8 +118,11 @@ void gpsLoop() {
     gps.lastNMEA = GPS.lastNMEA();
     LOGGPS((gps.lastNMEA));
     gps.rxStuff = true;
-    if (!GPS.parse(gps.lastNMEA)) // this also sets the newNMEAreceived() flag to false
-      return; // we can fail to parse a sentence in which case we should just wait for another
+    if (!GPS.parse(gps.lastNMEA)) { // this also sets the newNMEAreceived() flag to false
+      return false; // we can fail to parse a sentence in which case we should just wait for another
+    } else {
+      recvNema = true;
+    }
   }
 
   // update the position information
@@ -138,15 +142,13 @@ void gpsLoop() {
           gps.longitude = GPS.longitude_fixed;
           gps.latitude = GPS.latitude_fixed;
           gps.sats = GPS.satellites;
-          #ifdef DEBUGGPS
-          Serial.printf("La: %d Lo: %d alt: %d sat: %d hdop: %d\n",
+          LOGGPSF(("La: %d Lo: %d alt: %d sat: %d hdop: %d\n",
              gps.latitude,
              gps.longitude,
              gps.altitude,
              gps.sats,
              gps.hdop
-          );
-          #endif
+          ));
       } else {
         gps.isReady = false;
       }    
@@ -154,7 +156,8 @@ void gpsLoop() {
   } else {
     gps.isReady = false;
   }
-  
+
+  return recvNema;
 }
 
 void gpsBackupPosition() {
@@ -241,5 +244,18 @@ uint64_t gpsEncodePosition48b() {
 
   return t;
 }
+
+
+void gpsQuickInit() {
+  GPS.begin(9600);
+  GPSSerial.listen();
+  delay(1200);
+}
+
+void gpsForceBaud115200() {
+  GPS.sendCommand("$PQBAUD,W,115200*43"); // This is to test on a working board
+}
+
+
 
 #endif

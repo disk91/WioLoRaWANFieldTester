@@ -27,11 +27,13 @@
 #define GPS_MIN_SAT   3
 
 void gpsSetup();
-void gpsLoop();
+boolean gpsLoop();
 uint64_t gpsEncodePosition48b();
 bool gpsQualityIsGoodEnough();
 void gpsBackupPosition();
 int gpsEstimateDistance();
+void gpsQuickInit();
+void gpsForceBaud115200();
 #ifdef DEBUGGPS
 char * gpsLastNMEA();
 #endif

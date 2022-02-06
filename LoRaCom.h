@@ -42,7 +42,7 @@ bool processLoRaConfig(void);
 #if HWTARGET == LORAE5
 bool storeOneByte(uint8_t adr, uint8_t v);
 bool readOneByte(uint8_t adr, uint8_t * v);
-bool quickSetup();
+bool loraQuickSetup();
 #endif
 
 #define ZONE_UNDEFINED  0

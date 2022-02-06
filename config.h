@@ -109,4 +109,8 @@ bool storeConfigToBackup();
 bool readConfigFromBackup();
 void clearBackup();
 
+#if HWTARGET == LORAE5
+  void processLoRaE5GpsFix();
+#endif
+
 #endif // __CONFIG_H

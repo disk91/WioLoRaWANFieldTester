@@ -71,6 +71,8 @@ typedef struct s_state {
   bool      batOk;            // battery detected
   bool      batUpdated;       // battery value has been updated
 
+  bool      gpsOk;            // true when the GPS has been verified and OK
+
 } state_t;
 
 extern state_t state;
