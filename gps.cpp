@@ -247,9 +247,14 @@ uint64_t gpsEncodePosition48b() {
 
 
 void gpsQuickInit() {
-  GPS.begin(9600);
-  GPSSerial.listen();
-  delay(1200);
+  #if HWTARGET == LORAE5
+    GPS.begin(9600);
+    GPSSerial.listen();
+    delay(1200);
+  #else
+    GPS.begin(9600);
+    delay(2500);
+  #endif  
 }
 
 void gpsForceBaud115200() {

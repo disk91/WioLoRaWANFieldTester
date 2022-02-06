@@ -159,6 +159,7 @@ void loop(void) {
 
   static unsigned long cTime = 0;
   static unsigned long batUpdateTime = 0;
+  static unsigned long noMovementCounter = 0;
   unsigned long sTime;
   bool fireMessage;
 
@@ -191,7 +192,7 @@ void loop(void) {
     }
   #endif
     
-  refresUI();
+  refresUI();  
   switch ( ui.selected_mode ) {
     default:
     case MODE_MANUAL:
@@ -208,9 +209,21 @@ void loop(void) {
       break;
     case MODE_AUTO_5MIN:
       if ( cTime >= ( 5 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
+      #ifdef WITH_GPS
+        if ( noMovementCounter >= MAXNONMOVEMENT_DURATION_MS ) {
+          ui.selected_mode = MODE_AUTO_15MIN;
+          refreshMode();
+        }
+      #endif
       break;
     case MODE_AUTO_1MIN:
       if ( cTime >= ( 1 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
+      #ifdef WITH_GPS
+        if ( noMovementCounter >= MAXNONMOVEMENT_DURATION_MS ) {
+          ui.selected_mode = MODE_AUTO_15MIN;
+          refreshMode();
+        }
+      #endif
       break;
     case MODE_MAX_RATE:
       #ifdef WITH_GPS
@@ -227,11 +240,16 @@ void loop(void) {
            if ( gpsEstimateDistance() > 50 && canLoRaSend() ) fireMessage = true;
            else if ( cTime >= ( 1 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
         }
+        if ( noMovementCounter >= MAXNONMOVEMENT_DURATION_MS ) {
+          ui.selected_mode = MODE_AUTO_15MIN;
+          refreshMode();
+        }
       #else
         if ( canLoRaSend() ) fireMessage = true;
       #endif
       break;
   }
+  
   if ( state.cState == EMPTY_DWNLINK && canLoRaSend() ) {
       // clean the downlink queue
       // send messages on port2 : the backend will not proceed port 2.
@@ -271,5 +289,15 @@ void loop(void) {
   if ( duration < 0 ) duration = 10;
   cTime += duration;
   batUpdateTime += duration;
+  
+  // Time duration without movement
+  if (  ! gps.isReady || ! gpsQualityIsGoodEnough() || gpsEstimateDistance() < 50 ) {
+    if ( noMovementCounter < MAXNONMOVEMENT_DURATION_MS ) {
+       noMovementCounter += duration; 
+    }
+  } else {
+    noMovementCounter = 0;
+  }
+
 
 }

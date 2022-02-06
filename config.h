@@ -67,7 +67,7 @@
 //#define JUSTCLEAN
 
 
-#define VERSION "v1.5a"
+#define VERSION "v1.5"
 
 #ifdef DEBUG
   #define LOGLN(x)  Serial.println x
@@ -101,7 +101,8 @@
 
 #define SERIALCONFIG  Serial
 
-#define NONDCZONE_DUTYCYCLE_MS 25000    // Fair use and preserve DCs in MS
+#define NONDCZONE_DUTYCYCLE_MS 25000                     // Fair use and preserve DCs in MS
+#define MAXNONMOVEMENT_DURATION_MS ( 30 * 60 * 1000 )    // Fair use - downgrade period when the position of the device is unchanged
 
 bool readConfig();
 void storeConfig();

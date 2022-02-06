@@ -24,6 +24,10 @@
 #include "ui.h"
 #include "LoRaCom.h"
 
+#if HWTARGET == RFM95
+  #include <lmic.h>
+#endif
+
 // init data to verify display
 #ifdef DEBUGDATA
 void initDebug() {
