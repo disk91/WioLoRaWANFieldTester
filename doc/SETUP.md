@@ -2,7 +2,7 @@
 
 Once you have your WioTerminal and your FieldTester add-on board, you need to proceed the following steps to be ready to use it:
 
-== If you are using a Seeed bundle, it is already setup, you don't need to do anything more ==
+`If you are using a Seeed bundle, it is already setup, you don't need to do anything more`
 
 ## Install Firmware on the WioTerminal
 
@@ -22,11 +22,11 @@ Once you have your WioTerminal and your FieldTester add-on board, you need to pr
 If you want to use the device with Helium network, you need to declare it in the Helium console.
 - Follow the [Helium configuration](ConfigureHelium.md) page details
 
-## Additionally you can setup Cargo (Optional) (only DiY version)
+## Additionally you can setup Cargo (Optional) (`only DiY version`)
 
 Cargo is a Tracking platform offered by Helium where you can connect your device and follow it on a map in real time. If you want to configure cargo with the WioLoRaWANFieldTester follow the [Cargo configuration](ConfigureCargo.md) 
 
-## Setup LoRaWan Credentials in the device (==only DiY version==)
+## Setup LoRaWan Credentials in the device (`only DiY version`)
 
 ### Access your device credentials (DevEUI AppEUI and AppKEY)
 
