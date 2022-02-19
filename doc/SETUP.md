@@ -2,12 +2,14 @@
 
 Once you have your WioTerminal and your FieldTester add-on board, you need to proceed the following steps to be ready to use it:
 
+== If you are using a Seeed bundle, it is already setup, you don't need to do anything more ==
+
 ## Install Firmware on the WioTerminal
 
 - You can directly upload the following binaries:
-  * [EU868 Zone RFM95+GPS](../binaries/WioLoRaWANFieldTester_RFM95_EU868_GPS.uf2)
-  * [US915 Zone RFM95+GPS](../binaries/WioLoRaWANFieldTester_RFM95_US915_GPS.uf2)
-  * [All Zone LoRa E5 Chassis](../binaries/WioLoRaWANFieldTester_LoRaE5_ALLZONE.uf2)
+  * [EU868 Zone RFM95+GPS (not Seeed)](../binaries/WioLoRaWANFieldTester_RFM95_EU868_GPS.uf2)
+  * [US915 Zone RFM95+GPS (not Seeed)](../binaries/WioLoRaWANFieldTester_RFM95_US915_GPS.uf2)
+  * [All Zone LoRa E5 Chassis (Seeed)](../binaries/WioLoRaWANFieldTester_LoRaE5_ALLZONE.uf2)
 
 - Once downloaded
   * Switch the Wio Terminal ON with the lateral button
@@ -15,16 +17,16 @@ Once you have your WioTerminal and your FieldTester add-on board, you need to pr
   * Drag and drop the selected firmware into that drive.
   * Firmware is flashing, device is rebooting, you should see **"SETUP CREDENTIALS"** on the screen
 
-## Setup on Helium console
+## Setup on Helium console (only DiY version)
 
 If you want to use the device with Helium network, you need to declare it in the Helium console.
 - Follow the [Helium configuration](ConfigureHelium.md) page details
 
-## Additionally you can setup Cargo (Optional)
+## Additionally you can setup Cargo (Optional) (only DiY version)
 
 Cargo is a Tracking platform offered by Helium where you can connect your device and follow it on a map in real time. If you want to configure cargo with the WioLoRaWANFieldTester follow the [Cargo configuration](ConfigureCargo.md) 
 
-## Setup LoRaWan Credentials in the device
+## Setup LoRaWan Credentials in the device (==only DiY version==)
 
 ### Access your device credentials (DevEUI AppEUI and AppKEY)
 
