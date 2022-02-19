@@ -17,7 +17,7 @@ Once you have your WioTerminal and your FieldTester add-on board, you need to pr
   * Drag and drop the selected firmware into that drive.
   * Firmware is flashing, device is rebooting, you should see **"SETUP CREDENTIALS"** on the screen
 
-## Setup on Helium console (only DiY version)
+## Setup on Helium console (`only DiY version`)
 
 If you want to use the device with Helium network, you need to declare it in the Helium console.
 - Follow the [Helium configuration](ConfigureHelium.md) page details
