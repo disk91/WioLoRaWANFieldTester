@@ -18,6 +18,10 @@ The solution also supports ready for use hardware:
 - [LoRaWan Chassis](https://www.seeedstudio.com/Wio-Terminal-Chassis-LoRa-E5-and-GNSS-p-5053.html)
 - [Battery Chassis](https://www.seeedstudio.com/Wio-Terminal-Chassis-Battery-650mAh-p-4756.html)
 
+`============================`
+`If you are using a Seeed bundle, it is already setup, you don't need to do anything more`
+`============================`
+
 ## How it works 
 
 To get a better understanding on how WioLoRaWANFieldTester works, [read this page](doc/HowItWorks.md).
