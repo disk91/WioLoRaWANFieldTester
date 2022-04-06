@@ -85,6 +85,12 @@ void gpsSetup() {
     delay(2500);
   #endif
 
+  // L76K GPS Module
+  GPS.sendCommand("$PCAS03,5,0,0,0,0,0,0,0,0,0,,,0,0*07");
+  clearGpsPendingChar(100);
+  GPS.sendCommand("$PCAS03,5,0,0,0,0,0,0,0,0,0,,,0,0*07");
+  clearGpsPendingChar(100);
+
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);
   clearGpsPendingChar(100);
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);  // make sure
