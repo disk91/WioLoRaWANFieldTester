@@ -67,7 +67,7 @@
 //#define JUSTCLEAN
 
 
-#define VERSION "v1.6"
+#define VERSION "v1.7a"
 
 #ifdef DEBUG
   #define LOGLN(x)  Serial.println x
