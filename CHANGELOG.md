@@ -1,3 +1,6 @@
+## Release 1.6
+- Add support for GPS L76K used in certain version of LoRa chassis (E5)
+
 ## Release 1.5
 - Fix RFM95 compilation & misc fix includes new binaries
 - Includes the GPS serial speed fix for some LoRa-E5 board wrongly configured
