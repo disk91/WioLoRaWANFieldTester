@@ -60,7 +60,10 @@ void clearGpsPendingChar(uint32_t timeout) {
   while ( GPS.available() || (millis() - start) < timeout ) {
     if ( GPS.available() ) {
       start = millis();
-      GPS.read();
+      char c = GPS.read();
+//#ifdef DEBUGGPS
+//      LOG((c));
+//#endif
     }
   }
 }
@@ -85,19 +88,30 @@ void gpsSetup() {
     delay(2500);
   #endif
 
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);
-  clearGpsPendingChar(100);
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);  // make sure
-  clearGpsPendingChar(100);
-  //GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ); // 1 Hz update rate
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_200_MILLIHERTZ); // 5s update rate
-  clearGpsPendingChar(100);
-  // Request no updates on antenna status, comment out to keep quiet
-  GPS.sendCommand(PGCMD_NOANTENNA);
-  clearGpsPendingChar(100);
-  // Request no update on GPTXT
-  GPS.sendCommand("$PQTXT,W,0,0*22");
-  clearGpsPendingChar(100);
+  if ( gpsIdentifyL76k() ) {
+    // Quectel L76K 
+    LOGLN(("L76K Found"));
+    GPS.sendCommand("$PCAS03,5,0,0,0,0,0,0,0,0,0,,,0,0*07");
+    clearGpsPendingChar(100);
+    GPS.sendCommand("$PCAS03,5,0,0,0,0,0,0,0,0,0,,,0,0*07");
+    clearGpsPendingChar(100);
+  } else {
+    // Quectel L86 & compatible
+    LOGLN(("L86 Found"));
+    GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);
+    clearGpsPendingChar(100);
+    GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);  // make sure
+    clearGpsPendingChar(100);
+    //GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ); // 1 Hz update rate
+    GPS.sendCommand(PMTK_SET_NMEA_UPDATE_200_MILLIHERTZ); // 5s update rate
+    clearGpsPendingChar(100);
+    // Request no updates on antenna status, comment out to keep quiet
+    GPS.sendCommand(PGCMD_NOANTENNA);
+    clearGpsPendingChar(100);
+    // Request no update on GPTXT
+    GPS.sendCommand("$PQTXT,W,0,0*22");
+    clearGpsPendingChar(100);
+  }
   
   delay(500);
   gps.hasbeenReady = false;
@@ -262,5 +276,34 @@ void gpsForceBaud115200() {
 }
 
 
+/* We send a reset command and look for a string like this
+ *  $GPTXT,01,01,02,MA=CASIC*27
+ *  $GPTXT,01,01,02,IC=AT6558R-5N-32-1C580901*13
+ */
+bool gpsIdentifyL76k() {
+  const char pattern[] = "AT6558R";
+  int  i=0;
+  
+  LOGLN(("Restart"));
+  GPS.sendCommand("$PCAS10,0*1C");
+  uint32_t start = millis();
+  while ( GPS.available() || (millis() - start) < 100 ) {
+    if ( GPS.available() ) {
+      start = millis();
+      char c = GPS.read();
+      if ( c == pattern[i] ) i++;
+      else i = 0;
+      if ( i == sizeof(pattern)-1 ) {
+        clearGpsPendingChar(100);
+        return true;
+      }      
+#ifdef DEBUGGPS
+      //LOG((c));
+#endif
+    }
+  }
+  LOGLN(("Done"));
+  return false; 
+}
 
 #endif

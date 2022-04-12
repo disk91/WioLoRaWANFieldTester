@@ -34,6 +34,7 @@ void gpsBackupPosition();
 int gpsEstimateDistance();
 void gpsQuickInit();
 void gpsForceBaud115200();
+bool gpsIdentifyL76k();
 #ifdef DEBUGGPS
 char * gpsLastNMEA();
 #endif
