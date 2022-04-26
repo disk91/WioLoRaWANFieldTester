@@ -38,6 +38,7 @@ void initDebug() {
    state.rssi[i] = NORSSI; state.snr[i] = NOSNR; state.retry[i] = LOSTFRAME ; state.seq[i] = 100+(6*k)+i ; state.hs[i] = NODATA ; state.bestRssi[i] = 0 ; state.worstRssi[i] = 0; state.minDistance[i] = 0 ; state.maxDistance[i] = 0;i++;
    state.rssi[i] = NORSSI; state.snr[i] = NOSNR; state.retry[i] = 1 ; state.seq[i] = 100+(6*k)+i ; state.hs[i] = 1 ; state.bestRssi[i] = -110 ; state.worstRssi[i] = -110; state.minDistance[i] = 7000 ; state.maxDistance[i] = 7000;i++;
    state.rssi[i] = -80; state.snr[i] = -2; state.retry[i] = 2 ; state.seq[i] = 100+(6*k)+i ; state.hs[i] = 1 ; state.bestRssi[i] = -90 ; state.worstRssi[i] = -90; state.minDistance[i] = 30000 ; state.maxDistance[i] = 30000;i++;
+   state.rssi[i] = 15; state.snr[i] = 20 ; state.retry[i] = 10 ; state.seq[i] = 100+(6*k)+i ; state.hs[i] = NODATA ; state.bestRssi[i] = 20 ; state.worstRssi[i] = 20; state.minDistance[i] = 0 ; state.maxDistance[i] = 0;i++;
  }
  state.elements = i;
  state.writePtr = i;
@@ -126,10 +127,12 @@ uint8_t getIndexInBuffer(int i) {
   return t;
 }
 
-uint8_t getIndexBySeq(int seq) {
+uint8_t getIndexBySeq(uint16_t seq) {
+  int k = 0;
   int idx = state.readPtr;
-  while ( idx < state.elements && state.seq[idx] != seq ) {
+  while ( idx < state.elements && state.seq[idx] != seq && k < MAXBUFFER ) {
     idx = ( idx + 1 ) & (MAXBUFFER-1);
+    k++;
   }
   if ( state.seq[idx] == seq ) return idx;
   else return MAXBUFFER;
