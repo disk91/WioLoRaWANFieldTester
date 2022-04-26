@@ -797,6 +797,7 @@ void refreshRetryHist() {
           uint16_t color = TFT_RED;
           if ( retry == 1 ) color = TFT_DARKGREEN;
           else if (retry == 2 ) color = TFT_ORANGE;
+          if ( retry >= MAX_RETRY ) retry = MAX_RETRY-1;
           tft.fillRect(xOffset,yOffset-(retry*yStep),xSz,(retry*yStep),color);
         }
      } else {
@@ -925,6 +926,7 @@ void refreshTxHs() {
             if ( hs == 1 ) color = TFT_RED;
             else if ( hs == 2 ) color = TFT_ORANGE;
             else if ( hs < 4 ) color = TFT_DARKGREEN;
+            if ( hs >= MAX_HS ) hs = MAX_HS -1;
             tft.fillRect(xOffset,yOffset-(hs*yStep),xSz,(hs*yStep),color);
           }
        } else {

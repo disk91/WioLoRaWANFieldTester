@@ -84,7 +84,7 @@ void tst_setRetry(uint8_t retry);
 void addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lost);
 uint8_t getIndexInBuffer(int i);
 uint8_t getLastIndexWritten();
-uint8_t getIndexBySeq(int seq);
+uint8_t getIndexBySeq(uint16_t seq);
 uint8_t getCurrentSf();
 
 #endif

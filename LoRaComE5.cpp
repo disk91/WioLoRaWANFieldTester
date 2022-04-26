@@ -531,7 +531,7 @@ bool processTx(void) {
        uint8_t sz = 32;
        if ( extractHexStr(&loraContext.bufResponse[s], downlink, &sz) ) {
         if ( sz == 6 && port == 2 ) {
-           int downlinkSeqId = downlink[0];
+           uint16_t downlinkSeqId = downlink[0];
            //Serial.printf("Rx downlink for frame %d\r\n",downlinkSeqId);
            // We search the previous one ... so it exists
            int idx = getIndexBySeq(downlinkSeqId);
