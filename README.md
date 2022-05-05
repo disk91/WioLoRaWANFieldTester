@@ -57,7 +57,8 @@ To get a better understanding on how WioLoRaWANFieldTester works, [read this pag
 - Support firmware upgrade w/o credential loss (LoRa-E5 only)
 - Reduce uplink messages when device is not moving / out of coverage
 
-### Coming soon features
+### Coming later features
+- manage US915 SF10 differently (donwlink size too large by default)
 - sdcard data storage
 - low power management for longer autonomy
 
@@ -77,6 +78,11 @@ Read and follow the steps in [WioLoRaWANFieldTester configuration documentation]
 Read the [User Guide documentation](doc/UserGuide.md)
 
 ## Troubleshooting
+
+### All frame "LOST" in US915 SF10
+
+The US915 SF10 is restricting the size of uplink and downlink. Uplink is adapted but donwlink frame is currently too large. The Uplink are correctly sent but the "LOST" status is indicated when the Downlink is not received. So "LOST" is always displayed. 
+Do not use SF10 in US915 if you want to get the uplink information. This will be fixed in a later version. Mapper and tracker features are working correclty even this.
 
 ### GPS never fixing (even outdoor)
 

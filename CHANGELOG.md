@@ -1,3 +1,6 @@
+## Release 1.7
+- Fix a bug that sometime infinite loop the device after a couple of hours
+
 ## Release 1.6
 - Add support for GPS L76K used in certain version of LoRa chassis (E5)
 
