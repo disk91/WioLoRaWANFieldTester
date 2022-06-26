@@ -121,11 +121,6 @@ void clearScreen() {
 
 void screenSetup() {
 
-  if ( ! readConfig() ) {
-    ui.selected_display = DISPLAY_RSSI_HIST;    
-    ui.selected_mode = MODE_MANUAL;
-  }
-
   ui.selected_menu = SELECTED_NONE;
   ui.displayed_state = UKN;
   ui.transmit_v = 255;

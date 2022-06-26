@@ -76,6 +76,10 @@ void initState() {
     state.gpsOk = false;
     
     storeConfig();
+  } else {
+    // restore the right parameter for the zone
+    tst_setPower(state.cPwr);
+    tst_setSf(state.cSf);
   }
   state.cState = NOT_JOINED;
 
