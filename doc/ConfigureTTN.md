@@ -16,13 +16,13 @@ Give it a name, select a date in the future, select the __Write downlink applica
 
 Once you have validate this, you reach the last page with the API key created. Copy the key into the clipboard and save it, we will need it in the coming step.
 
-<img src="../img/TTN_create_API_Key_end.png" style="width:400px">
+<img src="../img/TTN_Create_API_Key_end.png" style="width:400px">
 
 ## Add a integration type WebHook
 
 Now we are going to create an integration using a webhook with the backend on disk91.com. This backend is computing the information displayed on the Wio.
 
-<img src="../img/TTN_create_Webhook.png" style="width:400px">
+<img src="../img/TTN_Create_Webhook.png" style="width:400px">
 
 The base URL to be used is : `https://dev.disk91.com/fieldtester/ttn/v3`
 
