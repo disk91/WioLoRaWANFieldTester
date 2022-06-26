@@ -19,12 +19,18 @@ Once you have your WioTerminal and your FieldTester add-on board, you need to pr
 
 ## Setup on Helium console (`only DiY version`)
 
-If you want to use the device with Helium network, you need to declare it in the Helium console.
+If you want to use the device with Helium network, you need to declare it in the [Helium console](https://console.helium-iot.eu).
 - Follow the [Helium configuration](ConfigureHelium.md) page details
 
 ## Additionally you can setup Cargo (Optional) (`only DiY version`)
 
 Cargo is a Tracking platform offered by Helium where you can connect your device and follow it on a map in real time. If you want to configure cargo with the WioLoRaWANFieldTester follow the [Cargo configuration](ConfigureCargo.md) 
+
+## Setup on TTN console (for non Helium Users)
+
+If you want to use the device with TheThingsNetwork, you need to declare it in the [TTN console](https://console.cloud.thethings.network/). 
+- Follow the [TTN configuration](ConfigureTTN.md) page details.
+
 
 ## Setup LoRaWan Credentials in the device (`only DiY version`)
 
