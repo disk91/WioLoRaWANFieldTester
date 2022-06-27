@@ -27,14 +27,16 @@
 #define DEFAULT_TIMEOUT 2000
 #define PASSTHROUGH_TIMEOUT 15000
 #define JOIN_TIMEOUT 12000
-#define SEND_TIMEOUT_BASE 5000
+#define SEND_TIMEOUT_BASE 7000
 #define MAX_RESP_BUF_SZ  64
+#define MAX_DOWNLINK_BUF 32
 
 typedef struct {
   char bufOkResp[MAX_RESP_BUF_SZ];
   char bufErrResp[MAX_RESP_BUF_SZ];
   char bufEnding[MAX_RESP_BUF_SZ];
   char bufResponse[2*MAX_RESP_BUF_SZ];
+  uint8_t bufDownlink[MAX_DOWNLINK_BUF];
   bool withEndingCondition;
   uint16_t respIndex;
   bool runningCommand;
@@ -49,6 +51,7 @@ typedef struct {
   int8_t lastRetry;
   bool hasAcked;
   bool downlinkPending;
+  bool gotDownlink;
   uint32_t lastSendMs;
   uint32_t estimatedDCMs;
   bool (*lineProcessing)(void);
@@ -225,8 +228,9 @@ void loraSetup(void) {
   loraContext.lastDr = -1;
   loraContext.lastPower = -100;
   loraContext.lastRetry = -1;
-  loraContext.currentSeqId = 1;
+  loraContext.currentSeqId = 0xFF;  // next will be 0.
   loraContext.downlinkPending = false;
+  loraContext.gotDownlink = false;
      
   if ( ! sendATCommand("AT","+AT: OK","","",DEFAULT_TIMEOUT,false, NULL) ) {
     // retry
@@ -496,7 +500,36 @@ bool processTx(void) {
     if ( loraContext.hasAcked ) {
       uint8_t retries = loraContext.elapsedTime / txDurationEstimate(loraContext.lastDr); // really approximative approach
       //Serial.printf("Add Data for seq(%d) rssi(%d) snr(%d) \r\n",loraContext.currentSeqId,(int16_t)loraContext.lastRssi, (int16_t)loraContext.lastSnr);
+      LOGF(("Add Frame %d\r\n",loraContext.currentSeqId));
       addInBuffer((int16_t)loraContext.lastRssi, (int16_t)loraContext.lastSnr, retries, loraContext.currentSeqId, false);
+      if ( loraContext.gotDownlink ) {
+         uint16_t downlinkSeqId = loraContext.bufDownlink[0];
+         int idx = getIndexBySeq(downlinkSeqId);
+         LOGF(("Search Frame %d %d\r\n",downlinkSeqId, idx));
+         if ( idx != MAXBUFFER ) {
+            state.worstRssi[idx]  = loraContext.bufDownlink[1];
+            state.worstRssi[idx] -= 200;
+            if ( state.worstRssi[idx] > 5 ) state.worstRssi[idx] = 5;
+            if ( state.worstRssi[idx] < -145 ) state.worstRssi[idx] = -145;
+            state.bestRssi[idx]   = loraContext.bufDownlink[2];
+            state.bestRssi[idx]  -= 200;
+            if ( state.bestRssi[idx] > 5 ) state.bestRssi[idx] = 5;
+            if ( state.bestRssi[idx] < -145 ) state.bestRssi[idx] = -145;
+            state.minDistance[idx]  = loraContext.bufDownlink[3];
+            state.minDistance[idx] *= 250;
+            state.maxDistance[idx]  = loraContext.bufDownlink[4];
+            state.maxDistance[idx] *= 250;
+            state.hs[idx]         = loraContext.bufDownlink[5];
+            if ( state.hs[idx] > 20 ) state.hs[idx] = 20;
+            if ( state.hs[idx] < 0 ) state.hs[idx] = 0;
+
+            // Fix the lost frame status ... 
+            // if we got a response it was finally not lost
+            if ( state.retry[idx] == LOSTFRAME ) {
+               state.retry[idx] = loraContext.lastRetry;
+            }
+         }
+      }
       state.hasRefreshed = true;
       if ( ui.selected_mode != MODE_MAX_RATE && loraContext.downlinkPending ) {
           state.cState = EMPTY_DWNLINK; 
@@ -510,8 +543,6 @@ bool processTx(void) {
       state.hasRefreshed = true;
       state.cState = JOINED;
     }
-    // update the Duty cycle based on real retry estimate
-    loraContext.currentSeqId = (loraContext.currentSeqId + 1) & 0xFF ;
   } else if ( startsWith(loraContext.bufResponse,"+CMSGHEX: FPEND") ) {
     // downlink pending
     loraContext.downlinkPending = true;
@@ -527,39 +558,11 @@ bool processTx(void) {
     }
     s = indexOf(loraContext.bufResponse,"RX: \"");
     if ( s > 0 ) {
-       uint8_t downlink[32];
-       uint8_t sz = 32;
-       if ( extractHexStr(&loraContext.bufResponse[s], downlink, &sz) ) {
-        if ( sz == 6 && port == 2 ) {
-           uint16_t downlinkSeqId = downlink[0];
-           //Serial.printf("Rx downlink for frame %d\r\n",downlinkSeqId);
-           // We search the previous one ... so it exists
-           int idx = getIndexBySeq(downlinkSeqId);
-           if ( idx != MAXBUFFER ) {
-             state.worstRssi[idx]  = downlink[1];
-             state.worstRssi[idx] -= 200;
-             if ( state.worstRssi[idx] > 5 ) state.worstRssi[idx] = 5;
-             if ( state.worstRssi[idx] < -145 ) state.worstRssi[idx] = -145;
-             state.bestRssi[idx]   = downlink[2];
-             state.bestRssi[idx]  -= 200;
-             if ( state.bestRssi[idx] > 5 ) state.bestRssi[idx] = 5;
-             if ( state.bestRssi[idx] < -145 ) state.bestRssi[idx] = -145;
-             state.minDistance[idx]  = downlink[3];
-             state.minDistance[idx] *= 250;
-             state.maxDistance[idx]  = downlink[4];
-             state.maxDistance[idx] *= 250;
-             state.hs[idx]         = downlink[5];
-             if ( state.hs[idx] > 20 ) state.hs[idx] = 20;
-             if ( state.hs[idx] < 0 ) state.hs[idx] = 0;
-
-             // Fix the lost frame status ... 
-             // if we got a response it was finally not lost
-             if ( state.retry[idx] == LOSTFRAME ) {
-                state.retry[idx] = loraContext.lastRetry;
-             }
-             state.hasRefreshed = true;
-           }
-        }
+       uint8_t sz = MAX_DOWNLINK_BUF;
+       if ( extractHexStr(&loraContext.bufResponse[s], loraContext.bufDownlink, &sz) ) {
+          if ( sz == 6 && port == 2 ) {
+            loraContext.gotDownlink = true;
+          }
        }
     }
     
@@ -697,6 +700,8 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
     }
     loraContext.hasAcked = false;
     loraContext.downlinkPending = false;
+    loraContext.gotDownlink = false;
+    loraContext.currentSeqId = (loraContext.currentSeqId + 1) & 0xFF ;
     state.cState = IN_TX;
     if (acked) {
        sendATCommand(_cmd,"+CMSGHEX: Done","","",SEND_TIMEOUT_BASE*(retries+1),true,processTx);     
