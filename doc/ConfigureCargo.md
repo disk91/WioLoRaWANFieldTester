@@ -27,6 +27,8 @@ Copy & Paste the following JS content into the decoder textarea:
 function Decoder(bytes, port) { 
   var decoded = {};
   
+  if ( port != 1 ) return decoded;
+  
   var lonSign = (bytes[0]>>7) & 0x01 ? -1 : 1;
   var latSign = (bytes[0]>>6) & 0x01 ? -1 : 1;
   

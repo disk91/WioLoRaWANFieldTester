@@ -14,7 +14,7 @@ Give it a name, select a date in the future, select the __Write downlink applica
 
 <img src="../img/TTN_create_API_Key_1.png" style="width:400px">
 
-Once you have validate this, you reach the last page with the API key created. Copy the key into the clipboard and save it, we will need it in the coming step.
+Once you have validate this, you reach the last page with the API key created. Copy the key into the clipboard and save it, we will need it in the coming step. Don't forget to add the right to _write donwlink application traffic_ on it.
 
 <img src="../img/TTN_Create_API_Key_end.png" style="width:400px">
 

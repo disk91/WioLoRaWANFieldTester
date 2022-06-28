@@ -29,6 +29,15 @@
 
 #define MAXBUFFER    32
 
+#define DISCO_NONE    0
+#define DISCO_READY   1
+#define DISCO_WAIT    2
+#define DISCO_TX      3
+#define DISCO_END     4
+
+#define DISCO_TIME_MS 40000   // inter-frame time 35s
+#define DISCO_FRAMES  10      // number of frames
+
 enum e_state {
   NOT_JOINED    = 1,    // Not connected yet
   JOIN_FAILED   = 2,    // Connection failed
@@ -73,6 +82,12 @@ typedef struct s_state {
 
   bool      gpsOk;            // true when the GPS has been verified and OK
 
+  // Dicovery stuff
+  uint8_t   discoveryState;   // current state for discovery
+  uint32_t  lastSendMs;       // duration between two transmission
+  uint8_t   totalSent;        // number of transmission made   
+  uint64_t  startingPosition; // backup the initial position to repeate it.
+
 } state_t;
 
 extern state_t state;
@@ -87,4 +102,6 @@ uint8_t getLastIndexWritten();
 uint8_t getIndexBySeq(uint16_t seq);
 uint8_t getCurrentSf();
 
+void enterDisco();
+void leaveDisco();
 #endif

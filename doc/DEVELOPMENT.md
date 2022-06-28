@@ -10,6 +10,7 @@ The installation details are available in the related [Wio LoRaWan Field tester 
 * Arduino IDE
 * WioTerminal - [Toolsuite](https://wiki.seeedstudio.com/Wio-Terminal-Getting-Started/)
 * GPS - Adafruit GPS library version 1.5.4
+* QRcode - from Richard More
 
 :warning: Remove any local library `TFT_eSPI` from your Arduino library folder, if not, it will use the local one with wrong pins definition resulting in black screen on boot. This library is included with Seeed SAMD package installed through Boards Manager.
 ```

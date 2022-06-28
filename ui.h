@@ -40,6 +40,7 @@
 #define DISPLAY_TXHS       5
 #define DISPLAY_DISTANCE   6
 #define DISPLAY_GPS        7
+#define DISPLAY_DISCO      8
 
 
 #ifdef WITH_SPLASH_HELIUM
@@ -98,6 +99,7 @@ void draw_splash_ttn(int xOffset, int yOffset, int density);
 bool manageConfigScreen(bool interactive, bool firstRun, bool onlyZone);
 bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t action, bool refreshAll, bool onlyZone);
 void LoRaMissing();
+void refreshDisco();
 
 #define CONF_ACTION_NONE     0
 #define CONF_ACTION_MODIFY   1

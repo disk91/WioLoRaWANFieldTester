@@ -249,36 +249,80 @@ void loop(void) {
       #endif
       break;
   }
-  
-  if ( state.cState == EMPTY_DWNLINK && canLoRaSend() ) {
-      // clean the downlink queue
-      // send messages on port2 : the backend will not proceed port 2.
-      do_send(2, emptyFrame, sizeof(emptyFrame),getCurrentSf(), state.cPwr,true, state.cRetry); 
-  } else if ( fireMessage ) {
-      // send a new test message on port 1, backend will create a downlink with information about network side reception
-      cTime = 0;
-      // Fill the frame
-      #ifdef WITH_GPS
-        if ( gps.isReady && gpsQualityIsGoodEnough() ) {
-          gpsBackupPosition();
-          uint64_t pos = gpsEncodePosition48b();
-          myFrame[0] = (pos >> 40) & 0xFF;
-          myFrame[1] = (pos >> 32) & 0xFF;
-          myFrame[2] = (pos >> 24) & 0xFF;
-          myFrame[3] = (pos >> 16) & 0xFF;
-          myFrame[4] = (pos >>  8) & 0xFF;
-          myFrame[5] = (pos      ) & 0xFF;
-          myFrame[6] = ((gps.altitude+1000) >> 8) & 0xFF;
-          myFrame[7] = ((gps.altitude+1000)     ) & 0xFF;
-          myFrame[8] = (uint8_t)gps.hdop / 10;
-          myFrame[9] = gps.sats;
-        } else {
-          bzero(myFrame, sizeof(myFrame));
+
+  if ( ui.selected_display == DISPLAY_DISCO ) {
+    // send a SF10, max power message on every 30 seconds for 5 minutes
+    switch ( state.discoveryState ) {
+      case DISCO_READY:
+        // wait for start
+        //nothing to do
+        break;
+      case DISCO_WAIT:
+        // wait for the end of the duty cycle
+        if ( canLoRaSend() && gps.isReady && gpsQualityIsGoodEnough() ) {
+          state.startingPosition = gpsEncodePosition48b();
+          state.discoveryState = DISCO_TX;
+          state.lastSendMs = 0xFFFFFFFF;
+          state.totalSent = 0;
+          refreshDisco();
         }
-      #else
-        bzero(myFrame, sizeof(myFrame));
-      #endif
-      do_send(1, myFrame, sizeof(myFrame),getCurrentSf(), state.cPwr,true, state.cRetry); 
+        break;
+      case DISCO_TX:
+        // do transmit
+        if ( millis() < state.lastSendMs || ( millis() - state.lastSendMs ) > DISCO_TIME_MS ) {
+          state.lastSendMs = millis();
+          // we send a message
+          myFrame[0] = (state.startingPosition >> 40) & 0xFF;
+          myFrame[1] = (state.startingPosition >> 32) & 0xFF;
+          myFrame[2] = (state.startingPosition >> 24) & 0xFF;
+          myFrame[3] = (state.startingPosition >> 16) & 0xFF;
+          myFrame[4] = (state.startingPosition >>  8) & 0xFF;
+          myFrame[5] = (state.startingPosition      ) & 0xFF;
+          do_send(3, myFrame, 6, 10, state.cPwr, false, 0); // send frame SF10 (works everywhere, no ack, no retry on port 3)
+          state.totalSent++;
+          if ( state.totalSent >= DISCO_FRAMES ) {
+            // end
+            state.discoveryState = DISCO_END;
+          }
+          refreshDisco();
+        }
+        break;
+      case DISCO_END:
+        // print QR
+        // do nothing, wait for the end
+        break;
+    }
+  } else {
+    if ( state.cState == EMPTY_DWNLINK && canLoRaSend() ) {
+        // clean the downlink queue
+        // send messages on port2 : the backend will not proceed port 2.
+        do_send(2, emptyFrame, sizeof(emptyFrame),getCurrentSf(), state.cPwr,true, state.cRetry); 
+    } else if ( fireMessage ) {
+        // send a new test message on port 1, backend will create a downlink with information about network side reception
+        cTime = 0;
+        // Fill the frame
+        #ifdef WITH_GPS
+          if ( gps.isReady && gpsQualityIsGoodEnough() ) {
+            gpsBackupPosition();
+            uint64_t pos = gpsEncodePosition48b();
+            myFrame[0] = (pos >> 40) & 0xFF;
+            myFrame[1] = (pos >> 32) & 0xFF;
+            myFrame[2] = (pos >> 24) & 0xFF;
+            myFrame[3] = (pos >> 16) & 0xFF;
+            myFrame[4] = (pos >>  8) & 0xFF;
+            myFrame[5] = (pos      ) & 0xFF;
+            myFrame[6] = ((gps.altitude+1000) >> 8) & 0xFF;
+            myFrame[7] = ((gps.altitude+1000)     ) & 0xFF;
+            myFrame[8] = (uint8_t)gps.hdop / 10;
+            myFrame[9] = gps.sats;
+          } else {
+            bzero(myFrame, sizeof(myFrame));
+          }
+        #else
+          bzero(myFrame, sizeof(myFrame));
+        #endif
+        do_send(1, myFrame, sizeof(myFrame),getCurrentSf(), state.cPwr,true, state.cRetry); 
+    }
   }
   loraLoop();
   gpsLoop();

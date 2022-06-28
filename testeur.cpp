@@ -91,7 +91,7 @@ void initState() {
   state.batPercent = 0;
   state.batUpdated = false;
 
-
+  state.discoveryState = DISCO_NONE;
   #ifdef DEBUGDATA
     initDebug();
   #endif
@@ -211,4 +211,15 @@ void tst_setRetry(uint8_t retry) {
 
 uint8_t getCurrentSf() {
   return state.cSf;
+}
+
+// manage disco mode
+
+void enterDisco() {
+  state.discoveryState = DISCO_READY;
+}
+
+void leaveDisco() {
+  state.discoveryState = DISCO_NONE;
+  
 }
