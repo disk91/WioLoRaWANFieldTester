@@ -56,6 +56,8 @@ To get a better understanding on how WioLoRaWANFieldTester works, [read this pag
 - Ready for industrial production with credential commissioning
 - Support firmware upgrade w/o credential loss (LoRa-E5 only)
 - Reduce uplink messages when device is not moving / out of coverage
+- Discovery Mode - allow to see hotspot communications on a map (external website)
+- Works with TTN and Helium
 
 ### Coming later features
 - manage US915 SF10 differently (donwlink size too large by default)
@@ -83,6 +85,10 @@ Read the [User Guide documentation](doc/UserGuide.md)
 
 The US915 SF10 is restricting the size of uplink and downlink. Uplink is adapted but donwlink frame is currently too large. The Uplink are correctly sent but the "LOST" status is indicated when the Downlink is not received. So "LOST" is always displayed. 
 Do not use SF10 in US915 if you want to get the uplink information. This will be fixed in a later version. Mapper and tracker features are working correclty even this.
+
+### I can't change the factory setting
+
+The Seeed bundle comes with ready to use credentials. You don't need to setup your device. If you want to move your device out of the factory credential and move the device to your own console account or TTN, you can follow the [documentation here](https://github.com/disk91/WioLoRaWANFieldTester/issues/34). Once done, you won't be able to rollback to factory settings.
 
 ### GPS never fixing (even outdoor)
 

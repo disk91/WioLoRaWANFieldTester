@@ -45,3 +45,28 @@ All these information can be displays with an historical graph you select using 
 
 In the historical graph, a red cross is indicating a packet loss a green cross a 0 value.
 The TX Rssi graph is displaying a min-max bar, this is why you see just a line for a single hotspot response.
+
+
+### Discovery Mode
+
+The discovery mode send updlink message with no ack to get the maximum of hotspot capturing the information. The backend server is saving these information in a session that can be diplayed at the end of the discovery. On the final step a QR code gives the link to see the discovery results on your smartphone.
+
+To reach the Discovery Mode, push the directional button to the right, up to the last screen.
+
+<img src="../img/Disco_Welcome.jpg" alt="Discovery Welcome" width="250"/>
+
+To start a discovery session, it's better to be already connected to the network, you need to have a GPS coverage and duty-cycle needs to be ended. The Discovery mode duration is over 5 minutes, the progression bar is indicating it's working.
+
+<img src="../img/Disco_Wait.jpg" alt="Discovery Wait for GPS & DC" width="250"/>
+
+Discovery mode do not consider your SF setting, SF10 is always used, the Tx power is considered.
+
+<img src="../img/Disco_Run.jpg" alt="Discovery Running" width="250"/>
+
+At the end, you get the link for displaying the result on your smartphone.
+
+<img src="../img/Disco_qr.jpg" alt="Discovery Qr Code" width="250"/>
+<img src="../img/Disco_Result.jpg" alt="Discovery Results" width="250"/>
+
+Please note that the Discovery session are cumulated when performed within the same hour and purged after 2 hours (this is subject to evolve in the future)
+

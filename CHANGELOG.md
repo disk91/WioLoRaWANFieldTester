@@ -1,3 +1,9 @@
+## Release 1.8
+- Support TTN
+- Improve Downlink reception and frame counter
+- Fix trouble when displaying SF & Power for the first time
+- Add the discovery mode
+
 ## Release 1.7
 - Fix a bug that sometime infinite loop the device after a couple of hours
 
