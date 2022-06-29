@@ -75,6 +75,8 @@ void setup() {
 
   #if defined SERIALCONFIG || defined DEBUG 
      Serial.begin(9600);
+     uint32_t s = millis();
+     while ( !Serial && (millis() - s) < 3000); 
   #endif
   #if HWTARGET == LORAE5 && defined WITH_LIPO
      if ( lipo.begin() ) {

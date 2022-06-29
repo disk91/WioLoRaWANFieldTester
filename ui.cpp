@@ -1306,31 +1306,37 @@ bool manageConfigScreen(bool interactive, bool firstRun, bool onlyZone) {
           #endif
           break;
         case CONF_ITEM_DEVEUI:
-          if ( _currentColumn & 1 ) {
-            // low quartet
-            loraConf.deveui[_currentColumn/2] = ( (loraConf.deveui[_currentColumn/2]+change) & 0x0F ) | ( loraConf.deveui[_currentColumn/2] & 0xF0);
-          } else {
-            // high quartet
-            loraConf.deveui[_currentColumn/2] = ( (loraConf.deveui[_currentColumn/2]+(16*change)) & 0xF0 ) |  (loraConf.deveui[_currentColumn/2] & 0x0F );
-          }          
+          if ( !state.hidKey ) {
+            if ( _currentColumn & 1 ) {
+              // low quartet
+              loraConf.deveui[_currentColumn/2] = ( (loraConf.deveui[_currentColumn/2]+change) & 0x0F ) | ( loraConf.deveui[_currentColumn/2] & 0xF0);
+            } else {
+              // high quartet
+              loraConf.deveui[_currentColumn/2] = ( (loraConf.deveui[_currentColumn/2]+(16*change)) & 0xF0 ) |  (loraConf.deveui[_currentColumn/2] & 0x0F );
+            }      
+          }    
           break;
         case CONF_ITEM_APPEUI:
-          if ( _currentColumn & 1 ) {
-            // low quartet
-            loraConf.appeui[_currentColumn/2] = ( (loraConf.appeui[_currentColumn/2]+change) & 0x0F ) | ( loraConf.appeui[_currentColumn/2] & 0xF0);
-          } else {
-            // high quartet
-            loraConf.appeui[_currentColumn/2] = ( (loraConf.appeui[_currentColumn/2]+(16*change)) & 0xF0 ) |  (loraConf.appeui[_currentColumn/2] & 0x0F );
-          }          
+          if ( !state.hidKey ) {
+            if ( _currentColumn & 1 ) {
+              // low quartet
+              loraConf.appeui[_currentColumn/2] = ( (loraConf.appeui[_currentColumn/2]+change) & 0x0F ) | ( loraConf.appeui[_currentColumn/2] & 0xF0);
+            } else {
+              // high quartet
+              loraConf.appeui[_currentColumn/2] = ( (loraConf.appeui[_currentColumn/2]+(16*change)) & 0xF0 ) |  (loraConf.appeui[_currentColumn/2] & 0x0F );
+            }
+          }            
           break;
         case CONF_ITEM_APPKEY:
-          if ( _currentColumn & 1 ) {
-            // low quartet
-            loraConf.appkey[_currentColumn/2] = ( (loraConf.appkey[_currentColumn/2]+change) & 0x0F ) | ( loraConf.appkey[_currentColumn/2] & 0xF0);
-          } else {
-            // high quartet
-            loraConf.appkey[_currentColumn/2] = ( (loraConf.appkey[_currentColumn/2]+(16*change)) & 0xF0 ) |  (loraConf.appkey[_currentColumn/2] & 0x0F );
-          }          
+          if ( !state.hidKey ) {
+            if ( _currentColumn & 1 ) {
+              // low quartet
+              loraConf.appkey[_currentColumn/2] = ( (loraConf.appkey[_currentColumn/2]+change) & 0x0F ) | ( loraConf.appkey[_currentColumn/2] & 0xF0);
+            } else {
+              // high quartet
+              loraConf.appkey[_currentColumn/2] = ( (loraConf.appkey[_currentColumn/2]+(16*change)) & 0xF0 ) |  (loraConf.appkey[_currentColumn/2] & 0x0F );
+            }
+          }            
           break;
       }
       displayConfigScreen(_currentItem,_currentColumn,CONF_ACTION_NONE,false,onlyZone);
