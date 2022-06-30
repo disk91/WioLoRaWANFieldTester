@@ -154,6 +154,15 @@ The distance is calculated from the GPS position and the hotspot position return
 
 The following integration and payload transformation allows to decode the gps position and report is to mapper. Thank you Seb for the contribution.
 
+**Dicovery uplink format on port 3 (no ack):**
+| Byte          | Usage                          |
+|---------------|--------------------------------|
+| `0 - 5`       | GSP position see [here](https://www.disk91.com/2015/technology/sigfox/telecom-design-sdk-decode-gps-frame/) for details. Decoding see below |
+
+
+Discovery is sending 10 messages SF10 on every 40 seconds. All the other information comes from the metadata provided by the network server.
+
+
 ## Decoder for the frame format
 
 Such a decoder can be use if you do not want to use my backend to report the coordinate to the helium mapper
