@@ -90,6 +90,7 @@ void initState() {
   state.batVoltage = 0;
   state.batPercent = 0;
   state.batUpdated = false;
+  state.eptyLoops = 0;
 
   state.discoveryState = DISCO_NONE;
   #ifdef DEBUGDATA

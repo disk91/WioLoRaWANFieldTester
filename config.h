@@ -25,6 +25,7 @@
 //#define DEBUGGPS
 //#define DEBUGLORA
 //#define DEBUGDATA
+//#define NODISTANCECHECK
 
 #define RFM95      0      // Make sure the board ROLE is MASTER
 #define LORAE5     1      // Make sure the board ROLE is SLAVE
@@ -103,6 +104,7 @@
 
 #define NONDCZONE_DUTYCYCLE_MS 25000                     // Fair use and preserve DCs in MS
 #define MAXNONMOVEMENT_DURATION_MS ( 30 * 60 * 1000 )    // Fair use - downgrade period when the position of the device is unchanged
+#define MAXDOWNLINKRETRY 2                               // try to empty the downlink queue, stop after this amount of trial
 
 bool readConfig();
 void storeConfig();

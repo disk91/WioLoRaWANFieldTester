@@ -239,8 +239,13 @@ void loop(void) {
         } else {
            // check distance with the previous sent position
            // under 50 meters we send messages on every minutes.
-           if ( gpsEstimateDistance() > 50 && canLoRaSend() ) fireMessage = true;
-           else if ( cTime >= ( 1 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
+           #ifndef NODISTANCECHECK
+             if ( gpsEstimateDistance() > 50 && canLoRaSend() ) fireMessage = true;
+             else if ( cTime >= ( 1 * 60 * 1000 ) && canLoRaSend() ) fireMessage = true;
+           #else
+             // to facilitate debugging
+             if ( canLoRaSend() ) fireMessage = true;
+           #endif
         }
         if ( noMovementCounter >= MAXNONMOVEMENT_DURATION_MS ) {
           ui.selected_mode = MODE_AUTO_15MIN;
@@ -299,6 +304,11 @@ void loop(void) {
         // clean the downlink queue
         // send messages on port2 : the backend will not proceed port 2.
         do_send(2, emptyFrame, sizeof(emptyFrame),getCurrentSf(), state.cPwr,true, state.cRetry); 
+        state.eptyLoops++;
+        if ( state.eptyLoops > MAXDOWNLINKRETRY ) {
+          state.cState = JOINED;
+          state.eptyLoops = 0;
+        }
     } else if ( fireMessage ) {
         // send a new test message on port 1, backend will create a downlink with information about network side reception
         cTime = 0;

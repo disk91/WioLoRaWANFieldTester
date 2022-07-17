@@ -55,6 +55,7 @@ typedef struct s_state {
   uint8_t   cSf;      // Current SF
   uint8_t   cRetry;   // Current Number of retry
   e_state   cState;   // Current State (Joined / NotJoined)
+  uint8_t   eptyLoops;// Number of attempt to empty the downlink queue, to not stuck on that state
   boolean   cnfBack;  // Configuration has been backup
   boolean   hidKey;   // Hide Key field in setup
   
