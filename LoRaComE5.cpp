@@ -565,7 +565,11 @@ bool processTx(void) {
           }
        }
     }
-    
+  } else if ( startsWith(loraContext.bufResponse,"+CMSGHEX: Length err") ) {
+    // current request is not corresponding to the max frame size
+    // this may be due to a LoRaWan additional content like MAC command
+    state.cState = EMPTY_DWNLINK; // next time we send a smaller frame
+    return true; // even if an error, make it as a success.
   } else {
     // unprocessed lines
   }
@@ -669,20 +673,29 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
     // make it simple, the first frame will be lost during join
     // 1% based on SF and data size (24 Bytes)
     // @TODO also consider ack
-    switch (_dr) {
-      case 7:  loraContext.estimatedDCMs = 8200;  break;
-      case 8:  loraContext.estimatedDCMs = 14400; break;
-      case 9:  loraContext.estimatedDCMs = 26700; break;
-      case 10: loraContext.estimatedDCMs = 49400; break;
-      case 11: loraContext.estimatedDCMs = 106900; break;
-      case 12: loraContext.estimatedDCMs = 197400; break;
-      default:
-           LOGLN(("Invalid SF"));
-           return;
-    }
+    if ( loraConf.zone == ZONE_EU868 ) {
+      switch (_dr) {
+        case 7:  loraContext.estimatedDCMs = 8200;  break;
+        case 8:  loraContext.estimatedDCMs = 14400; break;
+        case 9:  loraContext.estimatedDCMs = 26700; break;
+        case 10: loraContext.estimatedDCMs = 49400; break;
+        case 11: loraContext.estimatedDCMs = 106900; break;
+        case 12: loraContext.estimatedDCMs = 197400; break;
+        default:
+             LOGLN(("Invalid SF"));
+             return;
+      }
+   } else {
+      // No Duty Cycle zones, set a minimum time
+      loraContext.estimatedDCMs = NONDCZONE_DUTYCYCLE_MS;
+   }
     sendATCommand("AT+JOIN","+JOIN: Network joined","+JOIN: Join failed","+JOIN: Done",JOIN_TIMEOUT,true,NULL);
     loraContext.isJoining = true;
     state.cState = JOINING;
+    loraContext.lastDr = -1; // Apparently, after the Join the DR needs to be reset or the frame size becomes too long for US915 (or it is service stuff ?)
+    loraContext.lastPower = -100;
+    loraContext.lastRetry = -1;
+
   } else {
       
     loraContext.estimatedDCMs  = interFrameDutyCycleEstimate(_dr,1);
