@@ -1,3 +1,8 @@
+## Release 1.9
+- Fix US915 / SF10 
+- Prevent bundle users to modify the credentials
+- Prevent downlink to be infinite loop
+
 ## Release 1.8
 - Support TTN
 - Improve Downlink reception and frame counter
