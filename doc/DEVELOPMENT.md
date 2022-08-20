@@ -20,7 +20,7 @@ https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
 #### RFM95 version
 * LoRaWAN - MCCI LoRaWAN LMIC library (by IBM, Matthjs Kooljman…) version 3.3.0
 
-#### LoRa-E5 version
+#### RFM95 or LoRa-E5 version with Wio Battery Chassis
 * Battery Chassis - Sparkfun BQ27441
 
 #### Later
@@ -102,6 +102,7 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
 #define WITH_LIPO                     // if defined the LiPo status & charging code is enable
 
 ```
+If you have a DIY with Wio Battery Chassis uncomment this line at 3.1: `#define WITH_WIO_BATTERY_PACK 1`, and you can read the state of charge of the Wio Battery.
 
 - The `key.h file contains the LoRaWAN credential. When all set to 0, the device will expect a serial port configuration as seen in the setup.
 
