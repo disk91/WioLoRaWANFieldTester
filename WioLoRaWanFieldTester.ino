@@ -26,9 +26,9 @@
 #include "testeur.h"
 #include "gps.h"
 
-#if HWTARGET == LORAE5 && defined WITH_LIPO
+#if WITH_WIO_BATTERY_PACK
   #include <SparkFunBQ27441.h>
-  const unsigned int BATTERY_CAPACITY = 600; 
+  const unsigned int BATTERY_CAPACITY = 650; 
 #endif
 
 
@@ -78,7 +78,7 @@ void setup() {
      uint32_t s = millis();
      while ( !Serial && (millis() - s) < 3000); 
   #endif
-  #if HWTARGET == LORAE5 && defined WITH_LIPO
+  #if WITH_WIO_BATTERY_PACK
      if ( lipo.begin() ) {
        state.batOk = true;
        lipo.setCapacity(BATTERY_CAPACITY);
@@ -170,7 +170,7 @@ void loop(void) {
   
   #ifdef WITH_LIPO
     if ( batUpdateTime > 1000 ) {
-      #if HWTARGET == RFM95
+      #if HWTARGET == RFM95 && WITH_WIO_BATTERY_PACK == 0
         uint32_t v = analogRead(LIPO_ADC);
         v = 2*( 3300 * v ) / 1024;  // should be 2230 ...
         #ifdef LIPO_OFFSET_MV
@@ -178,7 +178,7 @@ void loop(void) {
         #endif
         state.batVoltage = v;
         state.batPercent = batteryPercent(state.batVoltage);
-      #elif HWTARGET == LORAE5
+      #elif WITH_WIO_BATTERY_PACK == 1
         if ( state.batOk ) {
           unsigned int soc = lipo.soc();  // Read state-of-charge (%)
           unsigned int volts = lipo.voltage(); // Read battery voltage (mV)

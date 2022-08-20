@@ -91,7 +91,17 @@ void displayTitle() {
     sprintf(title,"Wio LoRaWan Field Tester");
     tft.drawString(title,(320-200)/2, 85, GFXFF);  
     sprintf(title,"Version %s (%s)", VERSION, model==LORAE5 ? "LoRaE5" : "RFM95");
-    tft.drawString(title,(320-180)/2, 115, GFXFF);  
+    tft.drawString(title,(320-180)/2, 115, GFXFF);
+#if WITH_WIO_BATTERY_PACK
+    sprintf(title,"With Wio Terminal Chassis Battery");
+    tft.drawString(title,(320-260)/2, 145, GFXFF);
+#elif defined WITH_LIPO
+    sprintf(title,"With internal LiPo Battery");
+    tft.drawString(title,(320-190)/2, 145, GFXFF);
+#else
+    sprintf(title,"No battery");
+    tft.drawString(title,(320-80)/2, 145, GFXFF);
+#endif
     sprintf(title,"WIO_FT_%02X%02X%02X%02X%02X", loraConf.deveui[3],loraConf.deveui[4], loraConf.deveui[5], loraConf.deveui[6], loraConf.deveui[7]);
     tft.drawString(title,(320-160)/2, 180, GFXFF);
 }
@@ -1152,7 +1162,20 @@ void refreshGpsDetails() {
     sprintf(sTmp,"Hdop:      %d.%d Sats: %d", gps.hdop/100,gps.hdop-100*(gps.hdop/100), gps.sats);
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_QUA_OFF_Y,GFXFF);
 
-    sprintf(sTmp,"Battery:   %d mV (%d%%)",state.batVoltage, state.batPercent);
+    // switch text color based on battery state
+    if ( state.batPercent > 50 ) tft.setTextColor(TFT_GREEN);
+    else if ( state.batPercent > 20 ) tft.setTextColor(TFT_ORANGE);
+    else tft.setTextColor(TFT_RED);
+ 
+#if WITH_WIO_BATTERY_PACK
+    sprintf(sTmp,"Battery(w):%d mV (%d%%)",state.batVoltage, state.batPercent);
+#elif defined WITH_LIPO 
+    // internal battery's voltage
+    sprintf(sTmp,"Battery(i):%d mV (%d%%)",state.batVoltage, state.batPercent);
+#else 
+    // I think anything shorter (like "no battery" or "no battery voltage") might be misleading
+    sprintf(sTmp, "No battery defined in build");
+#endif
     tft.drawString(sTmp,TXT_ALL_OFF_X,TXT_BAT_OFF_Y,GFXFF);
   #ifdef DEBUGGPS
   }
