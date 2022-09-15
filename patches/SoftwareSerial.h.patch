@@ -1,0 +1,13 @@
+diff --git a/SoftwareSerial.new b/SoftwareSerial.h
+index c678a4d..7dbeda2 100644
+--- a/SoftwareSerial.new
++++ b/SoftwareSerial.h
+@@ -35,7 +35,7 @@
+ #define portInputReg(port)    ( &(port->IN) )
+ #define portModeReg(port)     ( &(port->DIR) )
+ 
+-#define _SS_MAX_RX_BUFF 64 // RX buffer size
++#define _SS_MAX_RX_BUFF 128 // RX buffer size
+ #ifndef GCC_VERSION
+ #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+ #endif
