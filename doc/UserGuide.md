@@ -1,6 +1,17 @@
 # User Guide
 
-** This page will be updated soon with the last features added recently**
+## Seeed bundle
+The Seeed bundle is alreeady configured and ready to use. You have no settup to do to start using it. Communications are included up to 200.000 messages.
+
+## Access the data
+The Seeed bundle **is already connected** to the different mapping services and Helium cargo. For DiY version, once you connect the device to disk91 backend, you get the link to mappers established. Cargo configuration is documented in the SETUP.md document.
+
+You can access the data (once GPS position is correct), on the following services
+- [helium coverage mapping](https://mappers.helium.com)
+- [helium tracking - cargo](https://cargo.helium.com)
+- [coveragemap mapping](https://coveragemap.net/heatmap/)
+
+## What do I see on the device screen ?
 
 <img src="../img/mainScreen.jpg" alt="LoRaWan tester" width="250"/> <img src="../img/Mainscreen-2.jpg" alt="LoRaWan tester" width="250"/>
 
@@ -46,6 +57,13 @@ All these information can be displays with an historical graph you select using 
 In the historical graph, a red cross is indicating a packet loss a green cross a 0 value.
 The TX Rssi graph is displaying a min-max bar, this is why you see just a line for a single hotspot response.
 
+The different screen are from LEFT to RIGHT:
+- RX RSSI : Signal level received by the device from the network - it indicates that you are close or far from the LoRaWan gateway responding to the ack
+- RX SNR : Signal over Noise reeceived by the devicee from the network - it indicate the link quality from the LoRaWan gateway responding to the ack
+- RETRY : number of retry before getting a ack
+- TXRSSI : Signal level received by the network from the device - this is indicating the signal quality as perceived by the network on this position. This has a min and max value depending on the number of gateways / hotspot receiving the signal. A strong signal indicate a high communication quality and reduce the risk of message loss.
+- HOTSPOTS : Gives the number of hotspots having received the message from the device. It gives the redundancy of the reception. With Seeed bundle, this is limited to 4 hotspots as a maximum at a time.
+- DISTANCE : Gives the distance to the different hotspots having received the message from the device. This displays the min and max distance. Distance in km  
 
 ### Discovery Mode
 
