@@ -1,0 +1,13 @@
+diff --git a/src/Adafruit_GPS.h b/src/Adafruit_GPS.h
+index 4043c04..586e88d 100644
+--- a/src/Adafruit_GPS.h
++++ b/src/Adafruit_GPS.h
+@@ -24,6 +24,8 @@
+ #ifndef _ADAFRUIT_GPS_H
+ #define _ADAFRUIT_GPS_H
+ 
++#define ESP8266
++
+ /**************************************************************************/
+ /**
+  Comment out the definition of NMEA_EXTENSIONS to make the library use as
