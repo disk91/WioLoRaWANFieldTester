@@ -34,8 +34,8 @@ Check the __Uplink message__ event type to activate.
 
 Now you can create your device into this application and get your credentials.
 
-The Application EUI is by default set to 00..00, you need to change this to anything else to be able to configure your WioLoRaWanFieldTester.
+The Application EUI is by default set to 00..00, you need to change this to anything else to be able to configure your WioLoRaWanFieldTester. You can recompile writing your keys on keys.h or restart the device pressing the 5 direction button. After 1 second after rebooting, stop pushing the 5 direction button, you should see the setup screen displayed and you can change the keys.
 
-Use Lora Specification 1.0.3 for LoRa-E5 modules.
+Use Lora Specification 1.0.3 for LoRa-E5 modules (you can select Seeed Technology and Wio-E5 Dev Kit).
 
 Then you are ready to start mapping.
