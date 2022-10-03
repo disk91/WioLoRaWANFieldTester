@@ -57,6 +57,8 @@ Once done, if you need to verify or change this setup, restart the device pressi
 
 The device uses the Serial line (Wio Terminal USB) to receives the LoRaWAN configuration. You need to execute a series of commands the WioLoRaWABFieldTester understand to do this setup.
 
+**Rq: if you own a seeed bundle, the credential access and modifications is locked. You need to reset the lock. This will clear your initial credentials and they won't be able to be retrieved. It means you will loose the communication advantage included in the bundle. If you make this choice, you will be able to set your own credentials. Follow [this guide](https://github.com/disk91/WioLoRaWANFieldTester/issues/34) to clear thee credential lock.**
+
 For this, you need to use a serial tool or the command line. The tools I recommand are:
 - Windows : [Putty](https://www.putty.org/)
 - MacOsX : [Serial](https://www.decisivetactics.com/products/serial/) (7 day free)
