@@ -65,9 +65,10 @@ The different screen are from LEFT to RIGHT:
 - **Distance:** The distance (in km) to the different hotspots having received the message from the device. This displays the min and max distance.
 
 ## Lock Screen Mode
+
 From version 1.10, you can lock the keys and switch the screen off when mapping, this is useful when your device is in a pocket or a bag. You must be in one of the graph screen and one of the Auto mode (including Max rate).
-- To lock the keys, hold the 5 directions button and within a second, clic on the top button located on the right side. A red line will appear on top of the screen to confirm keys are locked. release the 5 direction button.
-- To lock the keys and switch screen off, you do the same with the top button located on the center. The screen will switch off.
+- To **lock the keys**, hold the 5 directions button and within a second, clic on the top button located on the right side. A red line will appear on top of the screen to confirm keys are locked. release the 5 direction button.
+- To lock the keys and **switch screen off**, you do the same with the top button located on the center. The screen will switch off.
 
 To unlock the keys, just repeat the same operation.
 
