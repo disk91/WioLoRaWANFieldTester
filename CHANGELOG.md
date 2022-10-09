@@ -1,3 +1,7 @@
+## Release 1.10
+- Fix Discovery mode start when not yet connected
+- Key lock & screen off mode
+
 ## Release 1.9
 - Fix US915 / SF10 
 - Prevent bundle users to modify the credentials

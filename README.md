@@ -58,11 +58,10 @@ To get a better understanding on how WioLoRaWANFieldTester works, [read this pag
 - Reduce uplink messages when device is not moving / out of coverage
 - Discovery Mode - allow to see hotspot communications on a map (external website)
 - Works with TTN and Helium
+- Lock key & switched screen off mode
 
 ### Coming later features
-- manage US915 SF10 differently (donwlink size too large by default)
 - sdcard data storage
-- low power management for longer autonomy
 
 ## Get your own device
 
