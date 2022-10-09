@@ -64,6 +64,14 @@ The different screen are from LEFT to RIGHT:
 - **Hotspots:** Number of hotspots having received the message from the device. It gives the redundancy of the reception. With Seeed bundle, this is limited to 4 hotspots as a maximum at a time. For Helium, the maximum number of packets to "buy" (and then the maximum number of hotspots which can be detected in this graph) is configurable from the Helium Console.
 - **Distance:** The distance (in km) to the different hotspots having received the message from the device. This displays the min and max distance.
 
+## Lock Screen Mode
+From version 1.10, you can lock the keys and switch the screen off when mapping, this is useful when your device is in a pocket or a bag. You must be in one of the graph screen and one of the Auto mode (including Max rate).
+- To lock the keys, hold the 5 directions button and within a second, clic on the top button located on the right side. A red line will appear on top of the screen to confirm keys are locked. release the 5 direction button.
+- To lock the keys and switch screen off, you do the same with the top button located on the center. The screen will switch off.
+
+To unlock the keys, just repeat the same operation.
+
+
 ## Discovery Mode
 
 The Discovery Mode sends uplink messages with no ACK to get the maximum number of hotspots capturing the information. The backend server saves this information in a session that can be diplayed at the end of the discovery. On the final step, a QR code gives the link to see the discovery results on your smartphone.

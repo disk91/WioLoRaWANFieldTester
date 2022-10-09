@@ -130,6 +130,7 @@ void screenSetup() {
   ui.hasClick = false;
   ui.alertMode = false;
   ui.lastGpsUpdateTime = 0;
+  ui.lockMode = LOCKMODE_NONE;
   
   // draw mask
   refreshPower(); 
@@ -168,13 +169,13 @@ void refresUI() {
    if ( ui.alertMode ) return;
   #endif
   
-  if (digitalRead(WIO_KEY_C) == LOW && ui.selected_display != DISPLAY_DISCO ) {
+  if (digitalRead(WIO_KEY_C) == LOW && ui.selected_display != DISPLAY_DISCO && ui.lockMode == LOCKMODE_NONE) {
     ui.selected_menu = ( prev_select == SELECTED_POWER )?SELECTED_NONE:SELECTED_POWER;
-  } else if (digitalRead(WIO_KEY_B) == LOW && ui.selected_display != DISPLAY_DISCO) {
+  } else if (digitalRead(WIO_KEY_B) == LOW && ui.selected_display != DISPLAY_DISCO && ui.lockMode == LOCKMODE_NONE ) {
     ui.selected_menu = ( prev_select == SELECTED_SF )?SELECTED_NONE:SELECTED_SF;
-  } else if (digitalRead(WIO_KEY_A) == LOW && ui.selected_display != DISPLAY_DISCO) {
+  } else if (digitalRead(WIO_KEY_A) == LOW && ui.selected_display != DISPLAY_DISCO && ui.lockMode == LOCKMODE_NONE) {
     ui.selected_menu = ( prev_select == SELECTED_RETRY )?SELECTED_NONE:SELECTED_RETRY;
-  } else if (digitalRead(WIO_5S_UP) == LOW && ui.selected_display != DISPLAY_DISCO) {
+  } else if (digitalRead(WIO_5S_UP) == LOW && ui.selected_display != DISPLAY_DISCO && ui.lockMode == LOCKMODE_NONE) {
     switch ( ui.selected_menu ) {
       case SELECTED_POWER:
          tst_setPower(state.cPwr+2);
@@ -202,7 +203,7 @@ void refresUI() {
          break;   
     }  
     hasAction=true;
-  } else if (digitalRead(WIO_5S_DOWN) == LOW && ui.selected_display != DISPLAY_DISCO) {
+  } else if (digitalRead(WIO_5S_DOWN) == LOW && ui.selected_display != DISPLAY_DISCO && ui.lockMode == LOCKMODE_NONE) {
     switch ( ui.selected_menu ) {
       case SELECTED_POWER:
          tst_setPower(state.cPwr-2);
@@ -230,7 +231,7 @@ void refresUI() {
          break;   
     }  
     hasAction=true;
-  } else if (digitalRead(WIO_5S_RIGHT) == LOW && ui.selected_display != DISPLAY_DISCO) {
+  } else if (digitalRead(WIO_5S_RIGHT) == LOW && ui.selected_display != DISPLAY_DISCO && ui.lockMode == LOCKMODE_NONE) {
     configHasChanged = true;
     switch ( ui.selected_display ) {
       case DISPLAY_RSSI_HIST:
@@ -279,7 +280,7 @@ void refresUI() {
          break;   
     }  
     hasAction=true;
-  } else if (digitalRead(WIO_5S_LEFT) == LOW) {
+  } else if (digitalRead(WIO_5S_LEFT) == LOW && ui.lockMode == LOCKMODE_NONE) {
     configHasChanged = true;
     switch ( ui.selected_display ) {
       case DISPLAY_DISCO:
@@ -331,15 +332,45 @@ void refresUI() {
     }  
     hasAction=true;
   } else if (digitalRead(WIO_5S_PRESS) == LOW) {
-    if ( ui.selected_display == DISPLAY_DISCO ) {
+    if ( ui.selected_display == DISPLAY_DISCO && ui.lockMode == LOCKMODE_NONE) {
       if ( state.discoveryState == DISCO_READY ) {
         state.discoveryState = DISCO_WAIT;
         refreshDisco();
       }
     } else {
-      if ( ui.selected_mode == MODE_MANUAL ) {
+      if ( ui.selected_mode == MODE_MANUAL && ui.lockMode == LOCKMODE_NONE) {
         ui.hasClick = true;
         hasAction = true;
+      } else {
+        // lock screen case, press 5D button and quickly later the key A or B depeedning on what you want  
+        if ( digitalRead(WIO_KEY_A) == HIGH && digitalRead(WIO_KEY_B) == HIGH ) {
+          uint32_t start = millis();
+          while ( (millis() - start) < 1000 && digitalRead(WIO_5S_PRESS) == LOW) {
+            if ( digitalRead(WIO_KEY_A) == LOW ) {
+              if ( ui.lockMode == LOCKMODE_NONE ) {
+                 ui.lockMode = LOCKMODE_KEYS;
+                 tft.drawLine(0,0,320,0,TFT_RED);  
+              } else {
+                 ui.lockMode = LOCKMODE_NONE;
+                 tft.drawLine(0,0,320,0,TFT_BLACK);  
+                 digitalWrite(LCD_BACKLIGHT, HIGH);
+              }
+              while ( digitalRead(WIO_5S_PRESS) == LOW);
+              break;
+            }
+            if ( digitalRead(WIO_KEY_B) == LOW) {
+              if ( ui.lockMode == LOCKMODE_NONE ) {
+                 ui.lockMode = LOCKMODE_SCREEN;
+                 digitalWrite(LCD_BACKLIGHT, LOW);
+              } else {
+                 ui.lockMode = LOCKMODE_NONE;
+                 digitalWrite(LCD_BACKLIGHT, HIGH);
+              }
+              while ( digitalRead(WIO_5S_PRESS) == LOW);
+              break;
+            }
+          }
+        }
       }
     }
   }

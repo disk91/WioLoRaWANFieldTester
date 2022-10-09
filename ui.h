@@ -42,6 +42,9 @@
 #define DISPLAY_GPS        7
 #define DISPLAY_DISCO      8
 
+#define LOCKMODE_NONE      0    // normal mode
+#define LOCKMODE_KEYS      1    // lock keys
+#define LOCKMODE_SCREEN    2    // power off screen to get better autonomy
 
 #ifdef WITH_SPLASH_HELIUM
   #ifdef WITH_SPLASH_TTN
@@ -65,6 +68,7 @@ typedef struct s_ui {
   uint8_t previous_display;
   bool    hasClick;         // Hit on button
   bool    alertMode;        // LiPo alert is on
+  int     lockMode;         // lock keyboard (1) with screen off (2)
   uint32_t lastGpsUpdateTime; // Last GPS display update time
 } ui_t;
 
