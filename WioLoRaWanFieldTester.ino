@@ -266,7 +266,7 @@ void loop(void) {
         break;
       case DISCO_WAIT:
         // wait for the end of the duty cycle
-        if ( canLoRaSend() && gps.isReady && gpsQualityIsGoodEnough() ) {
+        if ( state.cState == JOINED && canLoRaSend() && gps.isReady && gpsQualityIsGoodEnough() ) {
           state.startingPosition = gpsEncodePosition48b();
           state.discoveryState = DISCO_TX;
           state.lastSendMs = 0xFFFFFFFF;
