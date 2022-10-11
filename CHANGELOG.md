@@ -1,6 +1,7 @@
 ## Release 1.10
 - Fix Discovery mode start when not yet connected
 - Key lock & screen off mode
+- Backend now allows to clear the discovery mode cache to test different antennas one after the other.
 
 ## Release 1.9
 - Fix US915 / SF10 
