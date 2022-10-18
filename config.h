@@ -31,6 +31,7 @@
 #define LORAE5     1      // Make sure the board ROLE is SLAVE
 
 // 2 - select the target board, original one based on RFM95 or Seed LoRa E5 version
+// go to 3.1, and uncomment that line, if you have a wio battery pack
 #define HWTARGET   LORAE5
 
 #if HWTARGET == LORAE5
@@ -60,6 +61,11 @@
   #define WITH_GPS
   #define WITH_LIPO
 #endif
+
+// to allow using wio battery pack with DIY RFM95 LoRa module
+#define WITH_WIO_BATTERY_PACK (HWTARGET == LORAE5 && defined WITH_LIPO)
+// 3.1 - if you have a DIY with the Wio battery pack, uncomment this line to get Wio battery pack state of charge
+// #define WITH_WIO_BATTERY_PACK 1
 
 // 4 - Active on of the possible Splash screen ( or none or both )
 #define WITH_SPLASH         1
