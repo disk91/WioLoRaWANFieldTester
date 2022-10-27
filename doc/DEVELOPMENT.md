@@ -9,8 +9,9 @@ The installation details are available in the related [Wio LoRaWan Field tester 
 ### Required software components
 * Arduino IDE
 * WioTerminal - [Toolsuite](https://wiki.seeedstudio.com/Wio-Terminal-Getting-Started/)
-* GPS - Adafruit GPS library version 1.5.4
+* GPS - Adafruit GPS library version 1.5.4 (or 1.7.1)
 * QRcode - from Richard More
+* Flash - FlashStorage by various version 1.0.0 (this fixes seeed invalid FlashStorage bundled lib)
 
 :warning: Remove any local library `TFT_eSPI` from your Arduino library folder, if not, it will use the local one with wrong pins definition resulting in black screen on boot. This library is included with Seeed SAMD package installed through Boards Manager.
 ```
@@ -26,7 +27,6 @@ https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
 #### Later
 * File system - Seeed Arduino FS version 2.0.3 (not yet implemented)
 * File system - Seeed Ardunino SFUD version 2.0.1 (not yet implemented)
-* Flash - FlashStorage by various version 1.0.0 (not yet implemented)
 
 ### Configuring the software components
 
@@ -60,7 +60,7 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
 ```C
    #define _SS_MAX_RX_BUFF 128 // RX buffer size
 ```
-- In `variant.cpp` (Libraries/Arduino15/packages/seeeduino/hardware/samd/1.8.2/library/Wire/Wire.cpp), add in  the following lines (they are conflicting with Wire from the same package) ( `&& defined FALSE` ). This is to wait a fix from Seeed on their package.
+- In `Wire.cpp` (Libraries/Arduino15/packages/seeeduino/hardware/samd/1.8.2/library/Wire/Wire.cpp), add in the following lines (they are conflicting with Wire from the same package) ( `&& defined FALSE` ). This is to wait a fix from Seeed on their package.
 ```cpp 
 #if WIRE_INTERFACES_COUNT > 1
   TwoWire Wire1(&PERIPH_WIRE1, PIN_WIRE1_SDA, PIN_WIRE1_SCL);
@@ -103,7 +103,7 @@ Different setups needs to be performed in Libraries (so you know why I don't rea
 
 ```
 
-- The `key.h file contains the LoRaWAN credential. When all set to 0, the device will expect a serial port configuration as seen in the setup.
+- The `key.h` file contains the LoRaWAN credential. When all set to 0, the device will expect a serial port configuration as seen in the setup.
 
 When developing it is more convenient to use a static configuration to avoid reconfiguring the device on every firmware update. For this, you can get the credential as defined in the [Access Helium device credential for developer](ObtainCredsFromHelium.md) section of the documentation.
 
