@@ -1440,6 +1440,49 @@ bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t a
     case ZONE_AU915:
         sprintf(sZone,"AU915");
         break;
+    case ZONE_US915_1:
+        sprintf(sZone,"US915_1");
+        break;
+    case ZONE_US915_3:
+        sprintf(sZone,"US915_3");
+        break;
+    case ZONE_US915_4:
+        sprintf(sZone,"US915_4");
+        break;
+    case ZONE_US915_5:
+        sprintf(sZone,"US915_5");
+        break;
+    case ZONE_US915_6:
+        sprintf(sZone,"US915_6");
+        break;
+    case ZONE_US915_7:
+        sprintf(sZone,"US915_7");
+        break;
+    case ZONE_US915_8:
+        sprintf(sZone,"US915_8");
+        break;
+    case ZONE_AU915_1:
+        sprintf(sZone,"AU915_1");
+        break;
+    case ZONE_AU915_3:
+        sprintf(sZone,"AU915_3");
+        break;
+    case ZONE_AU915_4:
+        sprintf(sZone,"AU915_4");
+        break;
+    case ZONE_AU915_5:
+        sprintf(sZone,"AU915_5");
+        break;
+    case ZONE_AU915_6:
+        sprintf(sZone,"AU915_6");
+        break;
+    case ZONE_AU915_7:
+        sprintf(sZone,"AU915_7");
+        break;
+    case ZONE_AU915_8:
+        sprintf(sZone,"AU915_8");
+        break;
+
     case ZONE_LATER:
         sprintf(sZone,"NA");
         break;

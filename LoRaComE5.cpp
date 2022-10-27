@@ -252,11 +252,24 @@ void loraSetup(void) {
     sendATCommand("AT+CH=7,867.9,0,5","+CH: 7,8679","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);
     sendATCommand("AT+LW=DC,OFF","+LW: DC, OFF","+LW: ERR","",DEFAULT_TIMEOUT,false,NULL); // manually managed to avoid conflicts
     sendATCommand("AT+LW=JDC,OFF","+LW: JDC, OFF","+LW: ERR","",DEFAULT_TIMEOUT,false,NULL); // manually managed to avoid conflicts  
-  } else if ( loraConf.zone == ZONE_US915 ) {
+  } else if ( loraConf.zone == ZONE_US915 || ( loraConf.zone >= ZONE_US915_1 && loraConf.zone <= ZONE_US915_8 ) ) {
     sendATCommand("AT+DR=US915","+DR: US915","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
+    int s,e; 
+    switch ( loraConf.zone ) {
+      default:
+      case ZONE_US915   : s = 8; e = 15; break;
+      case ZONE_US915_1 : s = 0; e = 7; break;
+      case ZONE_US915_3 : s = 16; e = 23; break;
+      case ZONE_US915_4 : s = 24; e = 31; break;
+      case ZONE_US915_5 : s = 32; e = 39; break;
+      case ZONE_US915_6 : s = 40; e = 47; break;
+      case ZONE_US915_7 : s = 48; e = 55; break;
+      case ZONE_US915_8 : s = 56; e = 63; break;
+    }
+
     // unvalidate the subband other than 2
     for ( int i=0 ; i < 72 ; i++ ) {
-      if ( i < 8 || i > 15 ) {
+      if ( i < s || i > e ) {
         sprintf(_cmd,"AT+CH=%d,OFF",i);
         sendATCommand(_cmd,"+CH: CH","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);  
       }
@@ -312,8 +325,20 @@ void loraSetup(void) {
     sendATCommand("AT+DR=KR920","+DR: KR920","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
   } else if ( loraConf.zone == ZONE_IN865 ) {
     sendATCommand("AT+DR=IN865","+DR: IN865","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-  } else if ( loraConf.zone == ZONE_AU915 ) {
+  } else if ( loraConf.zone == ZONE_AU915 || ( loraConf.zone >= ZONE_AU915_1 && loraConf.zone <= ZONE_AU915_8 ) ) {
     sendATCommand("AT+DR=AU915","+DR: AU915","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);  
+    int s,e; 
+    switch ( loraConf.zone ) {
+      default:
+      case ZONE_AU915   : s = 8; e = 15; break;
+      case ZONE_AU915_1 : s = 0; e = 7; break;
+      case ZONE_AU915_3 : s = 16; e = 23; break;
+      case ZONE_AU915_4 : s = 24; e = 31; break;
+      case ZONE_AU915_5 : s = 32; e = 39; break;
+      case ZONE_AU915_6 : s = 40; e = 47; break;
+      case ZONE_AU915_7 : s = 48; e = 55; break;
+      case ZONE_AU915_8 : s = 56; e = 63; break;
+    }
     // unvalidate the subband other than 2
     for ( int i=0 ; i < 72 ; i++ ) {
       if ( i < 8 || i > 15 ) {
@@ -594,7 +619,7 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
     boolean retDr = true;
     if ( loraConf.zone == ZONE_EU868 
       || loraConf.zone == ZONE_AS923_1 || loraConf.zone == ZONE_AS923_2 || loraConf.zone == ZONE_AS923_3 || loraConf.zone == ZONE_AS923_4
-      || loraConf.zone == ZONE_KR920 || loraConf.zone == ZONE_IN865 || loraConf.zone == ZONE_AU915 ) {
+      || loraConf.zone == ZONE_KR920 || loraConf.zone == ZONE_IN865 || loraConf.zone == ZONE_AU915 || ( loraConf.zone >= ZONE_AU915_1 && loraConf.zone <= ZONE_AU915_8 )) {
       // DR0 - SF12 / DR5 - SF7
       switch (_dr) {
         case 7:
@@ -619,7 +644,7 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
              LOGLN(("Invalid SF"));
              return;
       }
-    } else if ( loraConf.zone == ZONE_US915 ) {
+    } else if ( loraConf.zone == ZONE_US915 || (loraConf.zone >= ZONE_US915_1 && loraConf.zone <= ZONE_US915_8 ) ) {
       // DR0 - SF10 / DR3 - SF7
       switch (_dr) {
         case 7:

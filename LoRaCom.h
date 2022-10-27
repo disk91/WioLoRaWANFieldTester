@@ -55,8 +55,22 @@ bool loraQuickSetup();
 #define ZONE_KR920      7
 #define ZONE_IN865      8
 #define ZONE_AU915      9
+#define ZONE_US915_1    10
+#define ZONE_US915_3    11  
+#define ZONE_US915_4    12  
+#define ZONE_US915_5    13  
+#define ZONE_US915_6    14  
+#define ZONE_US915_7    15  
+#define ZONE_US915_8    16  
+#define ZONE_AU915_1    17
+#define ZONE_AU915_3    18  
+#define ZONE_AU915_4    19  
+#define ZONE_AU915_5    20  
+#define ZONE_AU915_6    21  
+#define ZONE_AU915_7    22  
+#define ZONE_AU915_8    23  
 #define ZONE_LATER      99
-#define ZONE_MAX        ZONE_AU915
+#define ZONE_MAX        ZONE_AU915_8
 #define ZONE_MIN        ZONE_EU868
 
 #endif
