@@ -333,7 +333,7 @@ void refresUI() {
     hasAction=true;
   } else if (digitalRead(WIO_5S_PRESS) == LOW) {
     if ( ui.selected_display == DISPLAY_DISCO && ui.lockMode == LOCKMODE_NONE) {
-      if ( state.discoveryState == DISCO_READY ) {
+      if ( state.discoveryState == DISCO_READY && state.cState >= JOINED ) {
         state.discoveryState = DISCO_WAIT;
         refreshDisco();
       } else if ( state.discoveryState == DISCO_TX ) {
