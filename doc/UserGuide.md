@@ -85,7 +85,7 @@ To start a discovery session, it is better to be already connected to the networ
 
 <img src="../img/Disco_Wait.jpg" alt="Discovery Wait for GPS & DC" width="250"/>
 
-Discovery Mode ignores your SF setting; SF10 is always used. The Tx Power option is still considered, however.
+Discovery Mode ignores your SF setting; SF10 is always used. The Tx Power option is still considered, however. You can pause the DISCO mode and restart it by clicking on the 5d button. 
 
 <img src="../img/Disco_Run.jpg" alt="Discovery Running" width="250"/>
 
@@ -94,5 +94,6 @@ At the end, you get the "R code link for displaying the result on your smartphon
 <img src="../img/Disco_qr.jpg" alt="Discovery Qr Code" width="250"/>
 <img src="../img/Disco_Result.jpg" alt="Discovery Results" width="250"/>
 
-Please note that the Discovery Mode sessions are accumulated when performed within the same hour, and are purged after 2 hours (subject to change).
+Please note that the Discovery Mode sessions are accumulated when performed within the same hour, and are purged after 2 hours (subject to change). You can manually purge the backend data if you want to test different antennas consecutively as an exemple. The cleaning button is accessible on the web page displaying results.
+
 
