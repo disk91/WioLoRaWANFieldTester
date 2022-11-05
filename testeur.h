@@ -33,7 +33,8 @@
 #define DISCO_READY   1
 #define DISCO_WAIT    2
 #define DISCO_TX      3
-#define DISCO_END     4
+#define DISCO_PAUSE   4
+#define DISCO_END     5
 
 #define DISCO_TIME_MS 40000   // inter-frame time 35s
 #define DISCO_FRAMES  10      // number of frames

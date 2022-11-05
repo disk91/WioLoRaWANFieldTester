@@ -294,6 +294,10 @@ void loop(void) {
           refreshDisco();
         }
         break;
+      case DISCO_PAUSE:
+        // pause the discovery execution
+        // nothing to be done
+        break;
       case DISCO_END:
         // print QR
         // do nothing, wait for the end

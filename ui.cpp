@@ -336,7 +336,14 @@ void refresUI() {
       if ( state.discoveryState == DISCO_READY ) {
         state.discoveryState = DISCO_WAIT;
         refreshDisco();
+      } else if ( state.discoveryState == DISCO_TX ) {
+        state.discoveryState = DISCO_PAUSE;
+        refreshDisco();
+      } else if ( state.discoveryState == DISCO_PAUSE ) {
+        state.discoveryState = DISCO_TX;
+        refreshDisco();
       }
+      hasAction = true;
     } else {
       if ( ui.selected_mode == MODE_MANUAL && ui.lockMode == LOCKMODE_NONE) {
         ui.hasClick = true;
@@ -1227,7 +1234,16 @@ void refreshDisco() {
         tft.drawString("Running ...",(320-80)/2,180, GFXFF);  
       }
       break;
-
+    case DISCO_PAUSE:  {
+        // print in pause
+        int progress = (100 * state.totalSent) / DISCO_FRAMES;
+        tft.drawRoundRect((320-200)/2,200,200,10,5,TFT_WHITE);
+        tft.fillRoundRect((320-200)/2+2,202,((204*progress)/100),6,3,TFT_WHITE);
+        tft.setTextColor(TFT_GRAY);
+        tft.setFreeFont(FS9);     // Select the original small TomThumb font
+        tft.drawString("In Pause ...",(320-80)/2,180, GFXFF);  
+      }
+      break;
     case DISCO_END: {
         QRCode qrcode;
         uint8_t qrcodeData[qrcode_getBufferSize(3)];
