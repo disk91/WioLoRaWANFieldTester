@@ -1,9 +1,12 @@
+## Release 1.11
+- Fix AU915 sub band bug
+
 ## Release 1.10
 - Fix Discovery mode start when not yet connected
 - Key lock & screen off mode
 - Backend now allows to clear the discovery mode cache to test different antennas one after the other.
 - Discovery mode can be paused/resumed by clicking on 5d button
-- US915 and AS915 sub bands support
+- US915 and AU915 sub bands support
 
 ## Release 1.9
 - Fix US915 / SF10 
