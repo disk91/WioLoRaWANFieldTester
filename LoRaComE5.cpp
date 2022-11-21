@@ -330,12 +330,12 @@ void loraSetup(void) {
     int s,e;
     switch ( loraConf.zone ) {
       default:
-      case ZONE_AU915   : s = 8; e = 15; break;
       case ZONE_AU915_1 : s = 0; e = 7; break;
+      case ZONE_AU915_2 : s = 8; e = 15; break;
       case ZONE_AU915_3 : s = 16; e = 23; break;
       case ZONE_AU915_4 : s = 24; e = 31; break;
       case ZONE_AU915_5 : s = 32; e = 39; break;
-      case ZONE_AU915_6 : s = 40; e = 47; break;
+      case ZONE_AU915   : s = 40; e = 47; break;
       case ZONE_AU915_7 : s = 48; e = 55; break;
       case ZONE_AU915_8 : s = 56; e = 63; break;
     }

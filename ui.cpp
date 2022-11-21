@@ -1453,9 +1453,6 @@ bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t a
     case ZONE_IN865:    
         sprintf(sZone,"IN865");
         break;
-    case ZONE_AU915:
-        sprintf(sZone,"AU915");
-        break;
     case ZONE_US915_1:
         sprintf(sZone,"US915_1");
         break;
@@ -1480,6 +1477,9 @@ bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t a
     case ZONE_AU915_1:
         sprintf(sZone,"AU915_1");
         break;
+    case ZONE_AU915_2:
+        sprintf(sZone,"AU915_2");
+        break;
     case ZONE_AU915_3:
         sprintf(sZone,"AU915_3");
         break;
@@ -1489,8 +1489,8 @@ bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t a
     case ZONE_AU915_5:
         sprintf(sZone,"AU915_5");
         break;
-    case ZONE_AU915_6:
-        sprintf(sZone,"AU915_6");
+    case ZONE_AU915:
+        sprintf(sZone,"AU915");
         break;
     case ZONE_AU915_7:
         sprintf(sZone,"AU915_7");

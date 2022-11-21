@@ -54,7 +54,7 @@ bool loraQuickSetup();
 #define ZONE_AS923_4    6
 #define ZONE_KR920      7
 #define ZONE_IN865      8
-#define ZONE_AU915      9
+#define ZONE_AU915_2    9
 #define ZONE_US915_1    10
 #define ZONE_US915_3    11  
 #define ZONE_US915_4    12  
@@ -66,7 +66,7 @@ bool loraQuickSetup();
 #define ZONE_AU915_3    18  
 #define ZONE_AU915_4    19  
 #define ZONE_AU915_5    20  
-#define ZONE_AU915_6    21  
+#define ZONE_AU915      21  
 #define ZONE_AU915_7    22  
 #define ZONE_AU915_8    23  
 #define ZONE_LATER      99
