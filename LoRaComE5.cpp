@@ -254,7 +254,7 @@ void loraSetup(void) {
     sendATCommand("AT+LW=JDC,OFF","+LW: JDC, OFF","+LW: ERR","",DEFAULT_TIMEOUT,false,NULL); // manually managed to avoid conflicts  
   } else if ( loraConf.zone == ZONE_US915 || ( loraConf.zone >= ZONE_US915_1 && loraConf.zone <= ZONE_US915_8 ) ) {
     sendATCommand("AT+DR=US915","+DR: US915","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
-    int s,e; 
+    int s,e;
     switch ( loraConf.zone ) {
       default:
       case ZONE_US915   : s = 8; e = 15; break;
@@ -267,7 +267,7 @@ void loraSetup(void) {
       case ZONE_US915_8 : s = 56; e = 63; break;
     }
 
-    // unvalidate the subband other than 2
+    // unvalidate ch outside of selected subband
     for ( int i=0 ; i < 72 ; i++ ) {
       if ( i < s || i > e ) {
         sprintf(_cmd,"AT+CH=%d,OFF",i);
@@ -327,7 +327,7 @@ void loraSetup(void) {
     sendATCommand("AT+DR=IN865","+DR: IN865","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);
   } else if ( loraConf.zone == ZONE_AU915 || ( loraConf.zone >= ZONE_AU915_1 && loraConf.zone <= ZONE_AU915_8 ) ) {
     sendATCommand("AT+DR=AU915","+DR: AU915","+DR: ERR","",DEFAULT_TIMEOUT,false,NULL);  
-    int s,e; 
+    int s,e;
     switch ( loraConf.zone ) {
       default:
       case ZONE_AU915   : s = 8; e = 15; break;
@@ -339,9 +339,9 @@ void loraSetup(void) {
       case ZONE_AU915_7 : s = 48; e = 55; break;
       case ZONE_AU915_8 : s = 56; e = 63; break;
     }
-    // unvalidate the subband other than 2
+    // unvalidate ch outside of selected subband
     for ( int i=0 ; i < 72 ; i++ ) {
-      if ( i < 8 || i > 15 ) {
+      if ( i < s || i > e ) {
         sprintf(_cmd,"AT+CH=%d,OFF",i);
         sendATCommand(_cmd,"+CH: CH","+CH: ERR","",DEFAULT_TIMEOUT,false,NULL);  
       }
