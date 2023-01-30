@@ -91,7 +91,7 @@ void setup() {
 
   // With some LoRa-E5 we have a problem with the GPS default serial speed
   // So ate first we need to fix that
-  #if HWTARGET == LORAE5
+  #if HWTARGET == LORAE5 && defined(WITH_GPS)
     processLoRaE5GpsFix();
   #endif
   displayTitle();
@@ -266,7 +266,11 @@ void loop(void) {
         break;
       case DISCO_WAIT:
         // wait for the end of the duty cycle
-        if ( state.cState >= JOINED && canLoRaSend() && gps.isReady && gpsQualityIsGoodEnough() ) {
+        if ( state.cState >= JOINED && canLoRaSend()
+        #ifdef WITH_GPS
+         && gps.isReady && gpsQualityIsGoodEnough()
+        #endif
+         ) {
           state.startingPosition = gpsEncodePosition48b();
           state.discoveryState = DISCO_TX;
           state.lastSendMs = 0xFFFFFFFF;
@@ -351,6 +355,7 @@ void loop(void) {
   batUpdateTime += duration;
   
   // Time duration without movement
+  #ifdef WITH_GPS
   if (  ! gps.isReady || ! gpsQualityIsGoodEnough() || gpsEstimateDistance() < 50 ) {
     if ( noMovementCounter < MAXNONMOVEMENT_DURATION_MS ) {
        noMovementCounter += duration; 
@@ -358,6 +363,5 @@ void loop(void) {
   } else {
     noMovementCounter = 0;
   }
-
-
+  #endif
 }

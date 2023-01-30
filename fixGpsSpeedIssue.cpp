@@ -20,7 +20,7 @@
 
 #include "Arduino.h"
 #include "config.h"
-#if HWTARGET == LORAE5
+#if HWTARGET == LORAE5 && defined(WITH_GPS)
 
 #include "TFT_eSPI.h"
 #include "testeur.h"
