@@ -38,6 +38,7 @@
   #define WITH_GPS
   #define SERIALE5  Serial1
   #define WITH_LIPO
+  //#define WITH_BEEP
 #endif
 
 #if HWTARGET == RFM95

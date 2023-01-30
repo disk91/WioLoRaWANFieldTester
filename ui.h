@@ -104,6 +104,7 @@ bool manageConfigScreen(bool interactive, bool firstRun, bool onlyZone);
 bool displayConfigScreen(uint8_t selectedItem, uint8_t selectedColumn, uint8_t action, bool refreshAll, bool onlyZone);
 void LoRaMissing();
 void refreshDisco();
+void wioBeep(int ms);
 
 #define CONF_ACTION_NONE     0
 #define CONF_ACTION_MODIFY   1

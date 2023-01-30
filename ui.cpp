@@ -80,7 +80,10 @@ void initScreen() {
   pinMode(WIO_5S_DOWN, INPUT_PULLUP);
   pinMode(WIO_5S_LEFT, INPUT_PULLUP);
   pinMode(WIO_5S_RIGHT, INPUT_PULLUP);
-  pinMode(WIO_5S_PRESS, INPUT_PULLUP); 
+  pinMode(WIO_5S_PRESS, INPUT_PULLUP);
+  #ifdef WITH_BEEP
+  pinMode(WIO_BUZZER, OUTPUT);
+  #endif
 }
 
 void displayTitle() {
@@ -1652,3 +1655,11 @@ void LoRaMissing() {
       tft.setFreeFont(FS9);     // Select the original small TomThumb font
       tft.drawString("LoRa board is missing",75,112, GFXFF);  
 }
+
+#ifdef WITH_BEEP
+void wioBeep(int ms) {
+  analogWrite(WIO_BUZZER, 128);
+  delay(ms);
+  analogWrite(WIO_BUZZER, 0);
+}
+#endif
