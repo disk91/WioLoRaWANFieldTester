@@ -30,8 +30,9 @@ void gpsSetup() {
   gps.isReady = false;
 }
 
-void gpsLoop() {
+boolean gpsLoop() {
   // just do nothing
+  return false;
 }
 
 uint64_t gpsEncodePosition48b() {

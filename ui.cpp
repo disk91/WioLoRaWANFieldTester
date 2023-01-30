@@ -447,9 +447,11 @@ void refresUI() {
       case DISPLAY_DISTANCE:
         refreshDistance();
         break;
+#ifdef WITH_GPS
       case DISPLAY_GPS:
         refreshGpsDetails();
         break;
+#endif
       case DISPLAY_DISCO:
         refreshDisco();
         break;
@@ -1081,6 +1083,7 @@ void refreshDistance() {
 void refreshGps() {
   int xOffset = X_OFFSET+4;
   int yOffset = Y_OFFSET+2*Y_SIZE+5;
+  #ifdef WITH_GPS
   if ( gps.isReady ) {
     if (  gpsQualityIsGoodEnough() ) {
        tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_GREEN);  
@@ -1094,11 +1097,15 @@ void refreshGps() {
      }
      tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_RED);
   }
+  #else
+  tft.fillRoundRect(xOffset,yOffset,10,10,5,TFT_LIGHTGREY);
+  #endif
 }
 
 /**
  * Display GPS data (mostly for debugging purpose and curiosity)
  */
+#ifdef WITH_GPS
 #define TXT_TIME_OFF_Y      (HIST_Y_OFFSET+10)
 #define TXT_LAT_OFF_Y       (HIST_Y_OFFSET+35)
 #define TXT_LNG_OFF_Y       (HIST_Y_OFFSET+60)
@@ -1196,6 +1203,7 @@ void refreshGpsDetails() {
   }
   #endif
 }
+#endif
 
 #define DISCO_X_OFFSET  (HIST_X_OFFSET+35)
 #define DISCO_y_OFFSET  (HIST_Y_OFFSET+60)
