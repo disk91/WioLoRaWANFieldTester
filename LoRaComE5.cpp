@@ -520,6 +520,9 @@ bool processTx(void) {
         }
      }
      loraContext.hasAcked = true;
+     #ifdef WITH_BEEP
+     wioBeep(300);
+     #endif
   } else if (startsWith(loraContext.bufResponse,"+CMSGHEX: Done")) {
     loraContext.elapsedTime = millis() - loraContext.startTime;
     if ( loraContext.hasAcked ) {
@@ -554,6 +557,9 @@ bool processTx(void) {
                state.retry[idx] = loraContext.lastRetry;
             }
          }
+         #ifdef WITH_BEEP
+         wioBeep(600);
+         #endif
       }
       state.hasRefreshed = true;
       if ( ui.selected_mode != MODE_MAX_RATE && loraContext.downlinkPending ) {
@@ -788,6 +794,12 @@ void loraLoop(void) {
             LOGLN(("Joined network"));
             loraContext.hasJoined = true;
             state.cState = JOINED;
+            #ifdef WITH_BEEP
+            // Two long beeps for joined network
+            wioBeep(600);
+            delay(200);
+            wioBeep(600);
+            #endif
         } else {
             // Failed to join
             LOGLN(("Failed to join network"));
