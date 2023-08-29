@@ -580,10 +580,17 @@ void refreshLastFrame() {
      } else {
        sprintf(tmp,"%04d  LOST",state.seq[idx]);
      }
-     tft.drawString(tmp,xOffset+3,yOffset+3, GFXFF);     
-     if ( state.hs[idx] != NODATA ) {
-        sprintf(tmp,">%d / %d< dBm %d hs",state.worstRssi[idx],state.bestRssi[idx],state.hs[idx]);
-        tft.drawString(tmp,xOffset+X_SIZE+2,yOffset+Y_SIZE+3, GFXFF);   
+     tft.drawString(tmp,xOffset+3,yOffset+3, GFXFF);
+     for ( int i = 0 ; i < state.elements ; i++ ) {
+        int idx2 = getIndexInBuffer(state.elements-(i+1));
+        if ( idx2 != MAXBUFFER && state.hs[idx2] != NODATA ) {
+          if (idx2 != idx) {
+            tft.setTextColor(TFT_RED);  // Last downlink older than last written
+          }
+          sprintf(tmp,">%d / %d< dBm %d hs %.1fkm",state.worstRssi[idx2],state.bestRssi[idx2],state.hs[idx2],float(state.maxDistance[idx2])/1000);
+          tft.drawString(tmp,xOffset+X_SIZE+2,yOffset+Y_SIZE+3, GFXFF);
+          break;
+        }
      }
   }
   tft.drawRoundRect(xOffset,yOffset,42,Y_SIZE,R_SIZE,TFT_WHITE);
