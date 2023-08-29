@@ -1005,8 +1005,20 @@ void refreshTxHs() {
 
 
 void refreshDistance() {
+  // Get maximum distance recording
+  uint16_t maxScale = 1200;
+  for ( int i = 0 ; i < state.elements ; i++ ) {
+    int idx = getIndexInBuffer(state.elements-(i+1));
+    if ( idx != MAXBUFFER ) {
+      if ( state.hs[idx] != NODATA && state.maxDistance[idx] > maxScale ) {
+          uint16_t newmax = (int)(state.maxDistance[idx] * 1.15);
+          maxScale = min(newmax, MAX_DIST);
+      }
+    }
+  }
+
    // No need to refresh every time
-  if ( ui.previous_display != ui.selected_display ) {
+  if (ui.previous_display != ui.selected_display || ui.lastDistanceMax != maxScale) {
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET-18,HIST_X_TXTSIZE,18,TFT_BLACK);
     tft.fillRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,TFT_BLACK);
     tft.setFreeFont(FF25);    
@@ -1015,6 +1027,7 @@ void refreshDistance() {
     tft.drawRoundRect(HIST_X_OFFSET,HIST_Y_OFFSET,HIST_X_SIZE,HIST_Y_SIZE,R_SIZE,TFT_WHITE);
     ui.previous_display = ui.selected_display;
   }
+  ui.lastDistanceMax = maxScale;
 
   // clean the bar
   int xSz = (HIST_X_SIZE - (HIST_X_OFFSET+HIST_X_BAR_OFFSET + MAXBUFFER*HIST_X_BAR_SPACE)) / MAXBUFFER;
@@ -1027,11 +1040,17 @@ void refreshDistance() {
   int yOffset = HIST_Y_OFFSET+HIST_Y_SIZE-1;
   int lastY = yOffset+21;
   char sTmp[10];
-  for ( uint32_t i = 5000 ; i < MAX_DIST ; i+= 5000 ) {
-    int y = yOffset-(log((((i/500) * 2 * (i+5000)) / MAX_DIST))*26);
+  uint32_t step = (int)(maxScale / 12.8);
+  for ( uint32_t i = step ; i < maxScale ; i+= step ) {
+    int delta = i / step * 10;
+    int y = yOffset-(log(((delta * 2 * (i+step)) / maxScale))*26);
     tft.drawLine(HIST_X_OFFSET+50,y,HIST_X_SIZE-2,y,TFT_GRAY20);
     if ( lastY - y > 20 ) {
-      sprintf(sTmp,"%dkm",i/1000); 
+      if (step < 1000) {
+        sprintf(sTmp,"%.1fkm",float(i)/1000);
+      } else {
+        sprintf(sTmp,"%dkm",i/1000);
+      }
       tft.setFreeFont(FS9);    
       tft.setTextColor(TFT_GRAY);
       tft.drawString(sTmp,HIST_X_OFFSET+5,y-15,GFXFF);
@@ -1046,19 +1065,19 @@ void refreshDistance() {
           uint16_t minDistance = state.minDistance[idx];
           uint16_t maxDistance = state.maxDistance[idx];
           int miny, maxy;
-          if ( minDistance >= 5000 ) {
-             miny = yOffset-(log((((minDistance/500) * 2 * (minDistance+5000)) / MAX_DIST))*26);
+          if ( minDistance >= step ) {
+             miny = yOffset-(log((((minDistance/step * 10) * 2 * (minDistance+step)) / maxScale))*26);
           } else {
              // linear in the area
              miny  = yOffset-(log((((5000/500) * 2 * (5000+5000)) / MAX_DIST))*26);
-             miny  = yOffset - ( minDistance * (yOffset-miny) ) / 5000; 
+             miny  = yOffset - ( minDistance * (yOffset-miny) ) / step;
           }
-          if ( maxDistance >= 5000 ) {
-             maxy = yOffset-(log((((maxDistance/500) * 2 * (maxDistance+5000)) / MAX_DIST))*26);
+          if ( maxDistance >= step ) {
+             maxy = yOffset-(log((((maxDistance/step * 10) * 2 * (maxDistance+step)) / maxScale))*26);
           } else {
              // linear in the area
              maxy  = yOffset - (log((((5000/500) * 2 * (5000+5000)) / MAX_DIST))*26);
-             maxy  = yOffset - ( maxDistance * (yOffset-maxy) ) / 5000 - 2; 
+             maxy  = yOffset - ( maxDistance * (yOffset-maxy) ) / step - 2;
           }
           if ( minDistance == maxDistance ) {
              tft.fillRect(xOffset,maxy,xSz,1,TFT_GREEN); 
