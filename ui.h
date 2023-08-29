@@ -70,6 +70,7 @@ typedef struct s_ui {
   bool    alertMode;        // LiPo alert is on
   int     lockMode;         // lock keyboard (1) with screen off (2)
   uint32_t lastGpsUpdateTime; // Last GPS display update time
+  uint16_t lastDistanceMax;  // Last auto-scale val
 } ui_t;
 
 extern ui_t ui;
