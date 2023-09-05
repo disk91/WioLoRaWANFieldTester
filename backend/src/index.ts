@@ -6,7 +6,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const app: Express = express()
-const port = process.env.PORT!
+const port = process.env.PORT ?? 8080
 
 app.use(logger('[:date[iso]] :method :url :status :response-time ms - :res[content-length]'))
 app.use(express.json())
