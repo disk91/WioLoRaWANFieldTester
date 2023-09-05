@@ -51,10 +51,12 @@ class WioController {
     this.log(`Request: ${JSON.stringify(req.body)}`)
 
     if (wiodata.payload.error !== undefined) {
+      this.log(`Error: ${wiodata.payload.error}`)
       res.send(wiodata.payload.error)
       return
     }
     if (downlinkUrl === undefined || downlinkKey === undefined) {
+      this.log('Error: missing downlink headers')
       res.send('missing downlink headers')
       return
     }
