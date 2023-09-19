@@ -98,7 +98,8 @@ void initState() {
   #endif
 }
 
-void addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lost) {
+uint8_t addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lost) {
+  uint8_t idx = state.writePtr;
   state.seq[state.writePtr] = seq;
   if ( ! lost ) { 
       state.rssi[state.writePtr] = rssi;
@@ -121,6 +122,7 @@ void addInBuffer(int16_t rssi, int16_t snr, uint8_t retry, uint16_t seq, bool lo
   } else {
     state.elements++;
   }
+  return idx;
 }
 
 uint8_t getIndexInBuffer(int i) {

@@ -56,6 +56,7 @@ typedef struct {
   uint32_t estimatedDCMs;
   bool (*lineProcessing)(void);
   uint8_t currentSeqId; // simplified
+  uint8_t currentIdx;
   float lastRssi;
   float lastSnr;
   uint8_t tmpInt8;
@@ -63,6 +64,7 @@ typedef struct {
 loraE5_t loraContext;
 
 bool processATResponse();
+bool processTx();
 
 /**
  * Execute an AT command with a timeout
@@ -149,9 +151,33 @@ int indexOf(const char * str, const char * ref) {
  */
 bool processATResponse() {
 
-  // nothing to be done
-  if ( !loraContext.runningCommand ) return true;
-
+  // nothing to be done, flush serial
+  if ( !loraContext.runningCommand ) {
+    while ( SERIALE5.available() > 0 ) {
+      char c = SERIALE5.read();
+      if ( (c == '\0' || c == '\r' || c == '\n' ) ) {
+        if ( loraContext.respIndex > 0 ) {
+          // process line response outside run cmd context
+          loraContext.bufResponse[loraContext.respIndex] = '\0';
+          LOGLORALN((loraContext.bufResponse));
+          
+          if ( startsWith(loraContext.bufResponse, "+MSG:" ) ) {
+              processTx();    // TX downlink response
+          }
+        }
+        loraContext.respIndex = 0;
+      } else {
+        if ( loraContext.respIndex < 2*MAX_RESP_BUF_SZ ) {
+          loraContext.bufResponse[loraContext.respIndex] = c;
+          loraContext.respIndex++;
+        } else {
+          LOGLN(("Response size overflow"));
+          loraContext.respIndex = 0;
+        }
+      }
+    }
+    return true;
+  }
   // manage timeout
   uint32_t duration  = millis() - loraContext.startTime;   // overflow after 50D. risk taken.
   if ( duration > loraContext.maxDuration ) {
@@ -502,34 +528,50 @@ uint32_t txDurationEstimate(uint8_t _dr) {
 // 12:23:33.627 -> +CMSGHEX: Done
 
 bool processTx(void) {
-  if ( startsWith(loraContext.bufResponse,"+CMSGHEX: RXWIN*, RSSI") ) {
-     int s = indexOf(loraContext.bufResponse,"RSSI ");
+  char *buf = loraContext.bufResponse;
+
+  if ( startsWith(buf, "+CMSGHEX: *") ) {
+    buf += strlen("+CMSGHEX: ");
+  } else if ( startsWith(buf, "+MSGHEX: *") ) {
+    buf += strlen("+MSGHEX: ");
+  } else if ( startsWith(buf, "+MSG: *") ) {
+    buf += strlen("+MSG: ");
+  } else {
+    return false; // not a TX response
+  }
+
+  if ( startsWith(buf,"RXWIN*, RSSI") ) {
+     int s = indexOf(buf,"RSSI ");
      loraContext.lastRssi = 0.0;
      loraContext.lastSnr = 0.0;
      if ( s > 0 ) {
         char sRssi[10];
-        if ( extractNumber(&loraContext.bufResponse[s], sRssi,10) ) {
+        if ( extractNumber(&buf[s], sRssi,10) ) {
            loraContext.lastRssi = atof(sRssi);
         }
      }
-     s = indexOf(loraContext.bufResponse,"SNR ");
+     s = indexOf(buf,"SNR ");
      if ( s > 0 ) {
         char sSnr[10];
-        if ( extractNumber(&loraContext.bufResponse[s], sSnr,10) ) {
+        if ( extractNumber(&buf[s], sSnr,10) ) {
            loraContext.lastSnr = atof(sSnr);
         }
      }
      loraContext.hasAcked = true;
-  } else if (startsWith(loraContext.bufResponse,"+CMSGHEX: Done")) {
+  } else if (startsWith(buf,"Done") ) {
     loraContext.elapsedTime = millis() - loraContext.startTime;
     if ( loraContext.hasAcked ) {
       uint8_t retries = loraContext.elapsedTime / txDurationEstimate(loraContext.lastDr); // really approximative approach
       //Serial.printf("Add Data for seq(%d) rssi(%d) snr(%d) \r\n",loraContext.currentSeqId,(int16_t)loraContext.lastRssi, (int16_t)loraContext.lastSnr);
       LOGF(("Add Frame %d\r\n",loraContext.currentSeqId));
-      addInBuffer((int16_t)loraContext.lastRssi, (int16_t)loraContext.lastSnr, retries, loraContext.currentSeqId, false);
+      if ( loraContext.currentIdx != MAXBUFFER ) {
+        state.rssi[loraContext.currentIdx] = (int16_t)loraContext.lastRssi;
+        state.snr[loraContext.currentIdx] = (int16_t)loraContext.lastSnr;
+        state.retry[loraContext.currentIdx] = retries;
+      }
       if ( loraContext.gotDownlink ) {
          uint16_t downlinkSeqId = loraContext.bufDownlink[0];
-         int idx = getIndexBySeq(downlinkSeqId);
+         int idx = (downlinkSeqId == loraContext.currentSeqId) ? loraContext.currentIdx : getIndexBySeq(downlinkSeqId);
          LOGF(("Search Frame %d %d\r\n",downlinkSeqId, idx));
          if ( idx != MAXBUFFER ) {
             state.worstRssi[idx]  = loraContext.bufDownlink[1];
@@ -564,33 +606,32 @@ bool processTx(void) {
       loraContext.estimatedDCMs = interFrameDutyCycleEstimate(loraContext.lastDr, retries);
     } else {
       //Serial.printf("Add Data for seq(%d) rssi(%d) snr(%d) [Lost]\r\n",loraContext.currentSeqId,(int16_t)0, (int16_t)0);
-      addInBuffer(0, 0, 0, loraContext.currentSeqId, true);
       state.hasRefreshed = true;
       state.cState = JOINED;
     }
-  } else if ( startsWith(loraContext.bufResponse,"+CMSGHEX: FPEND") ) {
+  } else if ( startsWith(buf,"FPEND") ) {
     // downlink pending
     loraContext.downlinkPending = true;
-  } else if ( startsWith(loraContext.bufResponse,"+CMSGHEX: PORT: *; RX: ") ) {
+  } else if ( startsWith(buf,"PORT: *; RX: ") ) {
     // downlink content
-    int s = indexOf(loraContext.bufResponse,"PORT: ");
+    int s = indexOf(buf,"PORT: ");
     int port=0;
     if ( s > 0 ) {
        char sPort[10];
-       if ( extractNumber(&loraContext.bufResponse[s], sPort,10) ) {
+       if ( extractNumber(&buf[s], sPort,10) ) {
           port = atoi(sPort);
        }
     }
-    s = indexOf(loraContext.bufResponse,"RX: \"");
+    s = indexOf(buf,"RX: \"");
     if ( s > 0 ) {
        uint8_t sz = MAX_DOWNLINK_BUF;
-       if ( extractHexStr(&loraContext.bufResponse[s], loraContext.bufDownlink, &sz) ) {
+       if ( extractHexStr(&buf[s], loraContext.bufDownlink, &sz) ) {
           if ( sz == 6 && port == 2 ) {
             loraContext.gotDownlink = true;
           }
        }
     }
-  } else if ( startsWith(loraContext.bufResponse,"+CMSGHEX: Length err") ) {
+  } else if ( startsWith(buf,"Length err") ) {
     // current request is not corresponding to the max frame size
     // this may be due to a LoRaWan additional content like MAC command
     state.cState = EMPTY_DWNLINK; // next time we send a smaller frame
@@ -740,6 +781,7 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
     loraContext.downlinkPending = false;
     loraContext.gotDownlink = false;
     loraContext.currentSeqId = (loraContext.currentSeqId + 1) & 0xFF ;
+    loraContext.currentIdx = addInBuffer(0, 0, 0, loraContext.currentSeqId, true);
     state.cState = IN_TX;
     if (acked) {
        sendATCommand(_cmd,"+CMSGHEX: Done","","",SEND_TIMEOUT_BASE*(retries+1),true,processTx);     
