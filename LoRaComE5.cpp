@@ -56,6 +56,7 @@ typedef struct {
   uint32_t estimatedDCMs;
   bool (*lineProcessing)(void);
   uint8_t currentSeqId; // simplified
+  uint8_t currentIdx;
   float lastRssi;
   float lastSnr;
   uint8_t tmpInt8;
@@ -563,10 +564,14 @@ bool processTx(void) {
       uint8_t retries = loraContext.elapsedTime / txDurationEstimate(loraContext.lastDr); // really approximative approach
       //Serial.printf("Add Data for seq(%d) rssi(%d) snr(%d) \r\n",loraContext.currentSeqId,(int16_t)loraContext.lastRssi, (int16_t)loraContext.lastSnr);
       LOGF(("Add Frame %d\r\n",loraContext.currentSeqId));
-      addInBuffer((int16_t)loraContext.lastRssi, (int16_t)loraContext.lastSnr, retries, loraContext.currentSeqId, false);
+      if ( loraContext.currentIdx != MAXBUFFER ) {
+        state.rssi[loraContext.currentIdx] = (int16_t)loraContext.lastRssi;
+        state.snr[loraContext.currentIdx] = (int16_t)loraContext.lastSnr;
+        state.retry[loraContext.currentIdx] = retries;
+      }
       if ( loraContext.gotDownlink ) {
          uint16_t downlinkSeqId = loraContext.bufDownlink[0];
-         int idx = getIndexBySeq(downlinkSeqId);
+         int idx = (downlinkSeqId == loraContext.currentSeqId) ? loraContext.currentIdx : getIndexBySeq(downlinkSeqId);
          LOGF(("Search Frame %d %d\r\n",downlinkSeqId, idx));
          if ( idx != MAXBUFFER ) {
             state.worstRssi[idx]  = loraContext.bufDownlink[1];
@@ -601,7 +606,6 @@ bool processTx(void) {
       loraContext.estimatedDCMs = interFrameDutyCycleEstimate(loraContext.lastDr, retries);
     } else {
       //Serial.printf("Add Data for seq(%d) rssi(%d) snr(%d) [Lost]\r\n",loraContext.currentSeqId,(int16_t)0, (int16_t)0);
-      addInBuffer(0, 0, 0, loraContext.currentSeqId, true);
       state.hasRefreshed = true;
       state.cState = JOINED;
     }
@@ -777,6 +781,7 @@ void do_send(uint8_t port, uint8_t * data, uint8_t sz, uint8_t _dr, uint8_t pwr,
     loraContext.downlinkPending = false;
     loraContext.gotDownlink = false;
     loraContext.currentSeqId = (loraContext.currentSeqId + 1) & 0xFF ;
+    loraContext.currentIdx = addInBuffer(0, 0, 0, loraContext.currentSeqId, true);
     state.cState = IN_TX;
     if (acked) {
        sendATCommand(_cmd,"+CMSGHEX: Done","","",SEND_TIMEOUT_BASE*(retries+1),true,processTx);     
